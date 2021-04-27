@@ -40,7 +40,6 @@ export class AuthController {
   }
 
 
-
   @Post('/register/admin')
   @UseGuards(ClientGuard)
   public registerAdmin(@Body() body: RegisterAdmin) {

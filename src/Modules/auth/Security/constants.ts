@@ -1,4 +1,5 @@
 export const jwtConstants = {
-  secret: 'com.ts_academy.back',
-  authToken: '2P9PtRqP9EsrzNQD0GVOElKBMEKDc92ImqiZhaOTXUg=',
+  appId: 'com.ts_academy.back',
+  secret: 'override_egypt21',
+  authToken: 'GPArE2mR+4yu37oxT/HMBvifTgDViU7164H93TtInNY',
 }; 
