@@ -7,10 +7,10 @@ import { User, UserDocument } from '../../Models/user.model';
 import { Lang } from '../../shared/enums/lang.enum';
 @Injectable()
 export class UserService {
-    async login(username: string, defaultLang: Lang) {
+    async login(username: string, defaultLang?: Lang) {
        let user =  await this.UserModel.findOne({$or:[{email: username},{phone: username}]}).populate('student').populate('parent').populate('teacher').exec();
        if (user){
-           user.defaultLang = defaultLang ;
+           user.defaultLang = defaultLang ?? Lang.en ;
            user.updateOne(user)
        }
        return user

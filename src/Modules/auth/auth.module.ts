@@ -13,7 +13,10 @@ import { JwtStrategy } from './Security/jwt.strategy';
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt', session: true }),
     JwtModule.register({
-      secret: jwtConstants.secret
+      secret: jwtConstants.secret,
+      signOptions:{
+        expiresIn:'1h'
+      }
     }),
     UserModule,
     TeacherModule,

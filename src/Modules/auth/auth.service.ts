@@ -16,12 +16,11 @@ import { Grade } from '../../Models/grade.model';
 import { Stage } from '../../Models/stage.model';
 import { refreshToken } from './DTOs/refreshToken.dto';
 import { Lang } from '../../shared/enums/lang.enum';
+import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
 
 
 @Injectable()
 export class AuthService {
-
-
 
 
 
@@ -36,16 +35,63 @@ export class AuthService {
         return this.jwtService.sign({ id: user['_id'], email: user['email'], phone: user['phone'], userType: user['userType'] })
     }
 
-    async refreshToken(refresh: refreshToken) {
-        const decodedToken = this.jwtService.decode(refresh.oldtoken) as any
-        if (decodedToken.email == refresh.email && decodedToken.exp <= new Date().getTime()) {
-          const user = await this.userService.login(refresh.email,Lang.en)
-          return {
+    async changePassword(req: any, body: ChangePassword) {
+        let user = await this.userService.findOne(req.user.id);
+        if (!user)
+            throw new UnauthorizedException('check your credintials');
+        if (OverrideUtils.dycreptPassword(user.password) !== body.oldPassword)
+            throw new UnauthorizedException('check your credintials');
+
+        user.password = OverrideUtils.encryptPassword(body.newPassword);
+        user.isActive = true;
+        user.tempCode = "";
+        user = await this.userService.update(user['_id'], user);
+        return {
             ...user['_doc'],
             token: this.sign(user),
         };
+        
+    }
+    async newPassword(req, body: ResetPassword) {
+        let user = await this.userService.findOne(req.user.id);
+        if (!user)
+            throw new UnauthorizedException('check your credintials');
+
+        if (!user.isActive)
+            user.password = OverrideUtils.encryptPassword(body.newPassword);
+        user.isActive = true;
+        user.tempCode = "";
+        user = await this.userService.update(user['_id'], user);
+        return {
+            ...user['_doc'],
+            token: this.sign(user),
+        };
+    }
+
+
+    async resetPassword(username: string) {
+        let user;
+        user = await this.userService.login(username);
+        if (!user)
+            throw new UnauthorizedException('check your credintials');
+        user.tempCode = "00000";
+        user.isActive = false;
+        user = await this.userService.update(user['_id'], user);
+        return {
+            ...user['_doc'],
+            token: this.sign(user),
+        };
+    }
+    async refreshToken(refresh: refreshToken) {
+        const decodedToken = this.jwtService.decode(refresh.oldtoken) as any
+        if (decodedToken.email == refresh.email && decodedToken.exp <= new Date().getTime()) {
+            const user = await this.userService.login(refresh.email, Lang.en)
+            return {
+                ...user['_doc'],
+                token: this.sign(user),
+            };
         } else {
-          throw new UnauthorizedException("Can Not Refresh Token")
+            throw new UnauthorizedException("Can Not Refresh Token")
         }
     }
     async resendCode(req: any) {
@@ -68,6 +114,7 @@ export class AuthService {
         if (user.isActive === false && user.tempCode !== code)
             throw new UnauthorizedException('invalid code');
         user.isActive = true;
+        user.tempCode = "";
         user = await this.userService.update(user['_id'], user);
         return {
             ...user['_doc'],

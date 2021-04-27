@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
 import { Login } from './DTOs/login.dto';
 import { refreshToken } from './DTOs/refreshToken.dto';
 import { RegisterAdmin, RegisterParent, RegisterStudent, RegisterTeacher } from './DTOs/register.dto';
 import { ClientGuard } from './Security/client.guard';
 import { JwtAuthGuard } from './Security/jwt-auth.guard';
-
 
 @ApiTags('Auth')
 @Controller('Auth')
@@ -31,6 +31,23 @@ export class AuthController {
   @UseGuards(ClientGuard)
   public refreshToken(@Body() refresh: refreshToken) {
     return this.service.refreshToken(refresh);
+  }
+  @Get('/resetPassword/:username')
+  @UseGuards(ClientGuard)
+  public resetPassword(@Param('username') username:string) {
+    return this.service.resetPassword(username);
+  }
+
+  @Put('/newPassword')
+  @UseGuards(JwtAuthGuard)
+  public newPassword(@Req() req, @Body() newPass :ResetPassword ) {
+    return this.service.newPassword(req,newPass);
+  }
+
+  @Put('/changePassword')
+  @UseGuards(JwtAuthGuard)
+  public changePassword(@Req() req, @Body() changePassword :ChangePassword ) {
+    return this.service.changePassword(req,changePassword);
   }
 
   @Get('/resendCode')
