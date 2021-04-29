@@ -20,10 +20,29 @@ export class CourseController {
   }
   @UseGuards(JwtAuthGuard)
   @Post('content/:courseId')
-  async addCourseContent(@Req() req, @Body() body: CourseContent,@Param('courseId') courseId : string): Promise<Course> {
+  async addCourseContent(@Req() req, @Body() body: CourseContent,@Param('courseId') courseId : string): Promise<CourseContent[]> {
     return this.service.addCourseContent(req,courseId, body)
   }
 
 
+  @UseGuards(JwtAuthGuard)
+  @Put('content/:courseId/:contentId')
+  async updateCourseContent(@Req() req, @Body() body: CourseContent,@Param('courseId') courseId : string,@Param('contentId') contentId : string): Promise<CourseContent[]> {
+    return this.service.updateCourseContent(req,courseId,contentId, body)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('content/:courseId/:contentId')
+  async deleteCourseContent(@Req() req,@Param('courseId') courseId : string,@Param('contentId') contentId : string): Promise<CourseContent[]> {
+    return this.service.deleteCourseContent(req,courseId,contentId)
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('teacher')
+  async teacher(@Req() req): Promise<Course[]> {
+    return this.service.getTeacherCourses(req)
+  }
+  
 
 }

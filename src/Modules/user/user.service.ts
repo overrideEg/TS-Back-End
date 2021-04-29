@@ -15,13 +15,13 @@ export class UserService {
     ) { }
 
     findByParent(parentId: any) {
-        return this.UserModel.find({ parent: new ObjectId(parentId) }).populate('student').populate('parent').populate('teacher').lean().exec();
+        return this.UserModel.find({ parent: new ObjectId(parentId) }).populate('student').populate('parent').populate('teacher').lean().exec() as User;
     }
     findByStudent(studentId: any) {
-        return this.UserModel.find({ student: new ObjectId(studentId) }).populate('student').populate('parent').populate('teacher').lean().exec();
+        return this.UserModel.find({ student: new ObjectId(studentId) }).populate('student').populate('parent').populate('teacher').lean().exec() as User;
     }
     findByTeacher(teacherId: any) {
-        return this.UserModel.find({ teacher: new ObjectId(teacherId) }).populate('student').populate('parent').populate('teacher').lean().exec();
+        return this.UserModel.find({ teacher: new ObjectId(teacherId) }).populate('student').populate('parent').populate('teacher').lean().exec() as User;
     }
     async login(username: string, defaultLang?: Lang) {
         let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).populate('student').populate('parent').populate('teacher').exec();

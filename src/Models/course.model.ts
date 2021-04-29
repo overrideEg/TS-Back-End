@@ -7,6 +7,7 @@ import { Grade } from './grade.model';
 import { Stage } from './stage.model';
 import { Day } from '../shared/enums/day.enum';
 import { Teacher } from './teacher.model';
+import { OverrideUtils } from '../shared/override-utils';
 
 export enum LessonType {
     video = 'video',
@@ -14,8 +15,8 @@ export enum LessonType {
 }
 export class Lesson {
     @ApiProperty({ required: false })
-    @Prop({ auto: true, type: SchemaTypes.ObjectId })
-    id: any
+    @Prop({required:true})
+    OId: string
     @ApiProperty()
     @Prop()
     name: string;
@@ -29,8 +30,8 @@ export class Lesson {
 
 export class CourseContent {
     @ApiProperty({ required: false })
-    @Prop({ auto: true, type: SchemaTypes.ObjectId })
-    id: any
+    @Prop({required:true})
+    OId: string
     @ApiProperty()
     @Prop()
     chapter: string
@@ -55,6 +56,9 @@ export class Course extends OBaseEntity {
     info: string;
     @ApiProperty()
     @Prop()
+    startDate: number;
+    @ApiProperty()
+    @Prop()
     description: string
     @ApiProperty({ type: () => Stage })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name })
@@ -62,8 +66,8 @@ export class Course extends OBaseEntity {
     @ApiProperty({ type: () => Grade })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name })
     grade?: Grade;
-    @ApiProperty({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday] })
-    @Prop([Day])
+    @ApiProperty({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday] ,isArray:true})
+    @Prop({enum:[Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday],type:[String]})
     Days: Day[]
     @ApiProperty()
     @Prop()
@@ -75,9 +79,9 @@ export class Course extends OBaseEntity {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name })
     teacher?: Teacher;
     
-    @ApiProperty()
-    cRating = 10 - Math.random() * 10
-    @ApiProperty()
-    progress = 100 - Math.random() * 100
+    @ApiProperty({type: Number})
+    cRating : number
+    @ApiProperty({type: Number})
+    progress:number
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);

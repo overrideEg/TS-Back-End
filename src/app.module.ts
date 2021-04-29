@@ -20,6 +20,7 @@ import { BannerModule } from './Modules/banner/banner.module';
 import { SubjectModule } from './Modules/subject/subject.module';
 import { PromotionModule } from './Modules/promotion/promotion.module';
 import { OurContactsModule } from './Modules/our-contacts/our-contacts.module';
+import { CourseModule } from './Modules/course/course.module';
 const overrideMoules = [
   FileModule,
   AuthModule,
@@ -33,7 +34,8 @@ const overrideMoules = [
   BannerModule,
   SubjectModule,
   PromotionModule,
-  OurContactsModule
+  OurContactsModule,
+  CourseModule
 ]
 @Module({
   imports: [

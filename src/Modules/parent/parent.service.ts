@@ -14,15 +14,46 @@ export class ParentService {
         return await this.ParentModel.create(req);
     }
     async findAll(): Promise<Parent[]> {
-        let parents = await this.ParentModel.find().exec();
+        let parents = await this.ParentModel.find().populate('students')
+        .populate({
+            path: 'students',
+            populate: { path: 'city', model: 'City', },
+          })
+        .populate({
+            path: 'students',
+            populate: { path: 'grade', model: 'Grade', },
+          })
+        .populate({
+            path: 'students',
+            populate: { path: 'stage', model: 'Stage', },
+          }).lean()
+          .exec();
         for await (let parent of parents) {
-            parent.user = await this.userService.findByParent(parent['_id'])['_doc']
+            parent.user = await this.userService.findByParent(parent['_id'])
+            for await (let student of parent.students) {
+                student.user = await this.userService.findByStudent(parent['_id'])
+            }
         }
         return parents;
     }
     async findOne(id: string): Promise<Parent> {
-        let parent = await this.ParentModel.findById(id).exec();
-        parent.user = await this.userService.findByParent(parent['_id'])['_doc']
+        let parent = await this.ParentModel.findById(id).populate('students')
+        .populate({
+            path: 'students',
+            populate: { path: 'city', model: 'City', },
+          })
+        .populate({
+            path: 'students',
+            populate: { path: 'grade', model: 'Grade', },
+          })
+        .populate({
+            path: 'students',
+            populate: { path: 'stage', model: 'Stage', },
+          }).lean().exec();
+        parent.user = await this.userService.findByParent(parent['_id'])
+        for await (let student of parent.students) {
+            student.user = await this.userService.findByStudent(parent['_id'])
+        }
         return parent;
     }
     async update(id: string, req: Parent): Promise<Parent> {

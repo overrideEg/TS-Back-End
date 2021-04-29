@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Student, StudentDocument } from '../../Models/student.model';
+import { User } from '../../Models/user.model';
 import { UserService } from '../user/user.service';
 @Injectable()
 export class StudentService {
@@ -21,15 +22,15 @@ export class StudentService {
         return this.StudentModel.findOne({studentId: studentId}).lean().exec();
     }
     async findAll(): Promise<Student[]> {
-        let students = await this.StudentModel.find().exec();
+        let students = await this.StudentModel.find().populate('city').populate('grade').populate('stage').lean().exec();
         for await (let student of students) {
-            student.user = await this.userService.findByStudent(student['_id'])['_doc']
+            student.user =  await this.userService.findByStudent(student['_id']);
         }
         return students;
     }
     async findOne(id: string): Promise<Student> {
-        let student = await this.StudentModel.findById(id).exec();
-        student.user = await this.userService.findByStudent(student['_id'])['_doc']
+        let student = await this.StudentModel.findById(id).populate('city').populate('grade').populate('stage').lean().exec();
+        student.user = await this.userService.findByStudent(student['_id'])
 
         return student;
     }
