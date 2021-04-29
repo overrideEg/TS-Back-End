@@ -29,6 +29,9 @@ export class Student extends OBaseEntity {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name })
     grade?: Grade;
+
+    @ApiProperty({ type: () => User })
+    user?: User;
     
 
 }

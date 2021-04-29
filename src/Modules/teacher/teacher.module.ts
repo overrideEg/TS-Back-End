@@ -3,6 +3,7 @@ import { TeacherService } from './teacher.service';
 import { TeacherController } from './teacher.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Teacher, TeacherSchema } from '../../Models/teacher.model';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -10,7 +11,8 @@ import { Teacher, TeacherSchema } from '../../Models/teacher.model';
       {
         name: Teacher.name, schema: TeacherSchema
       }
-    ])
+    ]),
+    UserModule
   ],
   controllers: [TeacherController],
   providers: [TeacherService],
