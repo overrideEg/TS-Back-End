@@ -193,7 +193,7 @@ export class AuthService {
         teacher.city['_id'] = body.cityId;
         teacher.coverletter = body.coverLetter;
         teacher.resume = body.resume;
-        let savedTeacher = await this.teacherService.save(teacher);
+        let savedTeacher = await (await this.teacherService.save(teacher)).populate('city');
         //create user
         let user = new User();
         user.userType = UserType.teacher;
@@ -206,7 +206,6 @@ export class AuthService {
         user.teacher = savedTeacher;
         let savedUser = await this.userService.save(user).catch(reason => {
             savedTeacher.deleteOne(savedTeacher._id)
-
             throw new BadRequestException('can not create user  ', reason)
         });
         //signed token
@@ -228,7 +227,7 @@ export class AuthService {
         //create parent
         let parent = new Parent();
         parent.students = [savedSudent];
-        let savedParent = await this.parentService.save(parent);
+        let savedParent = await (await this.parentService.save(parent)).populate('students');
         //create user
         let user = new User();
         user.userType = UserType.parent;
@@ -263,7 +262,7 @@ export class AuthService {
         student['city']['_id'] = body.cityId;
         student['grade']['_id'] = body.gradeId;
         student['stage']['_id'] = body.stageId;
-        let savedSudent = await this.studentService.save(student);
+        let savedSudent = await (await this.studentService.save(student)).populate('city').populate('grade').populate('stage');
         //create user
         let user = new User();
         user.userType = UserType.student;
