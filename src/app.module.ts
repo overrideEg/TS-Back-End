@@ -39,8 +39,12 @@ const overrideMoules = [
 ]
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/ts-academy',{
-
+  
+    MongooseModule.forRoot('mongodb://localhost/ts-academy', {
+      connectionFactory: (connection) => {
+        connection.plugin(require('mongoose-autopopulate'));
+        return connection;
+      }
     }),
     ConfigModule.forRoot({
       envFilePath: '.env',

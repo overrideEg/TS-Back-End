@@ -24,7 +24,31 @@ export class UserService {
         return this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).populate('student').populate('parent').populate('teacher').lean().exec() as User;
     }
     async login(username: string, defaultLang?: Lang) {
-        let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).populate('student').populate('parent').populate('teacher').exec();
+        let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] })
+            .populate('student')
+            .populate({
+                path: 'student',
+                populate: { path: 'city', model: 'City', },
+            })
+            .populate({
+                path: 'student',
+                populate: { path: 'grade', model: 'Grade', },
+            })
+            .populate({
+                path: 'student',
+                populate: { path: 'stage', model: 'Stage', },
+            })
+            .populate('parent')
+            .populate({
+                path: 'parent',
+                populate: { path: 'students', model: 'Student', },
+            })
+            .populate('teacher')
+            .populate({
+                path: 'teacher',
+                populate: { path: 'city', model: 'City', },
+            })
+            .exec();
         if (user) {
             user.defaultLang = defaultLang ?? Lang.en;
             user.updateOne(user)
@@ -43,10 +67,58 @@ export class UserService {
         return await this.UserModel.create(req);
     }
     async findAll(): Promise<User[]> {
-        return this.UserModel.find().populate('student').populate('parent').populate('teacher').exec();
+        return this.UserModel.find()
+        .populate('student')
+            .populate({
+                path: 'student',
+                populate: { path: 'city', model: 'City', },
+            })
+            .populate({
+                path: 'student',
+                populate: { path: 'grade', model: 'Grade', },
+            })
+            .populate({
+                path: 'student',
+                populate: { path: 'stage', model: 'Stage', },
+            })
+            .populate('parent')
+            .populate({
+                path: 'parent',
+                populate: { path: 'students', model: 'Student', },
+            })
+            .populate('teacher')
+            .populate({
+                path: 'teacher',
+                populate: { path: 'city', model: 'City', },
+            })
+            .exec();
     }
     async findOne(id: string): Promise<User> {
-        return this.UserModel.findById(id).populate('student').populate('parent').populate('teacher').exec();
+        return this.UserModel.findById(id)
+        .populate('student')
+            .populate({
+                path: 'student',
+                populate: { path: 'city', model: 'City', },
+            })
+            .populate({
+                path: 'student',
+                populate: { path: 'grade', model: 'Grade', },
+            })
+            .populate({
+                path: 'student',
+                populate: { path: 'stage', model: 'Stage', },
+            })
+            .populate('parent')
+            .populate({
+                path: 'parent',
+                populate: { path: 'students', model: 'Student', },
+            })
+            .populate('teacher')
+            .populate({
+                path: 'teacher',
+                populate: { path: 'city', model: 'City', },
+            })
+        .exec();
     }
     async update(id: string, req: User): Promise<User> {
         await this.UserModel.findByIdAndUpdate(id, req);

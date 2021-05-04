@@ -36,7 +36,7 @@ export class User extends OBaseEntity {
     avatar?: string
     @Prop({ enum: [Lang.en, Lang.ar], default: Lang.en })
     defaultLang?: Lang;
-    @Prop({ default: '123456' })
+    @Prop({ default: '12345' })
     tempCode?: string;
     @Prop({ enum: [UserType.admin, UserType.parent, UserType.student, UserType.teacher], default: UserType.student })
     userType?: UserType;
