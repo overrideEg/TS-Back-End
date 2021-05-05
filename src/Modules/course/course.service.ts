@@ -36,7 +36,7 @@ export class CourseService {
             throw new BadRequestException('only teacher can add courses');
         }
         let teacher = (await this.userService.findOne(req.user.id)).teacher;
-        let course = await this.CourseModel.findById(courseId).populate('teacher').populate('stage').populate('grade').exec()
+        let course = await this.CourseModel.findById(courseId).exec()
         if (course.teacher['_id'].toString() !== teacher['_id'].toString())
             throw new BadRequestException('only teacher can add his content');
         body['OId'] = OverrideUtils.generateGUID()
@@ -53,7 +53,7 @@ export class CourseService {
             throw new BadRequestException('only teacher can add courses');
         }
         let teacher = (await this.userService.findOne(req.user.id)).teacher;
-        let course = await this.CourseModel.findById(courseId).populate('teacher').populate('stage').populate('grade').exec()
+        let course = await this.CourseModel.findById(courseId).exec()
         if (course.teacher['_id'].toString() !== teacher['_id'].toString())
             throw new BadRequestException('only teacher can add his content');
         let content = course.content.find(cont => cont.OId === contentId);
@@ -72,7 +72,7 @@ export class CourseService {
             throw new BadRequestException('only teacher can add courses');
         }
         let teacher = (await this.userService.findOne(req.user.id)).teacher;
-        let course = await this.CourseModel.findById(courseId).populate('teacher').populate('stage').populate('grade').exec()
+        let course = await this.CourseModel.findById(courseId).exec()
         if (course.teacher['_id'].toString() !== teacher['_id'].toString())
             throw new BadRequestException('only teacher can add his content');
         let content = course.content.find(cont => cont.OId === contentId);
@@ -90,9 +90,7 @@ export class CourseService {
         }
         let teacher = (await this.userService.findOne(req.user.id)).teacher;
         let courses = await this.CourseModel.find({ teacher: teacher['_id'] })
-            .populate('teacher').populate('stage').populate('grade').populate({
-                'path': 'teacher.city', model: 'City'
-            }).lean()
+            .lean()
             .exec()
         courses.forEach(course => {
 

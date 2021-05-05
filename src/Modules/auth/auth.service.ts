@@ -193,7 +193,7 @@ export class AuthService {
         teacher.city['_id'] = body.cityId;
         teacher.coverletter = body.coverLetter;
         teacher.resume = body.resume;
-        let savedTeacher = await (await this.teacherService.save(teacher)).populate('city');
+        let savedTeacher = await this.teacherService.save(teacher);
         //create user
         let user = new User();
         user.userType = UserType.teacher;
@@ -227,7 +227,7 @@ export class AuthService {
         //create parent
         let parent = new Parent();
         parent.students = [savedSudent];
-        let savedParent = await (await this.parentService.save(parent)).populate('students');
+        let savedParent =  await this.parentService.save(parent);
         //create user
         let user = new User();
         user.userType = UserType.parent;
@@ -262,7 +262,7 @@ export class AuthService {
         student['city']['_id'] = body.cityId;
         student['grade']['_id'] = body.gradeId;
         student['stage']['_id'] = body.stageId;
-        let savedSudent = await (await this.studentService.save(student)).populate('city').populate('grade').populate('stage');
+        let savedSudent = await this.studentService.save(student);
         //create user
         let user = new User();
         user.userType = UserType.student;

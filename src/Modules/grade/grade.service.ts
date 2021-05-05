@@ -9,15 +9,15 @@ export class GradeService {
         @InjectModel(Grade.name) private GradeModel: Model<GradeDocument>
     ) { }
     async save(req: Grade) {
-        let saved = await (await this.GradeModel.create(req)).populate('stage')
+        let saved = await (await this.GradeModel.create(req))
        
         return saved;
     }
     async findAll(): Promise<Grade[]> {
-        return this.GradeModel.find().populate('stage').exec();
+        return this.GradeModel.find().exec();
     }
     async findOne(id: string): Promise<Grade> {
-        return this.GradeModel.findById(id).populate('stage').exec();
+        return this.GradeModel.findById(id).exec();
     }
     async update(id: string, req: Grade): Promise<Grade> {
          await this.GradeModel.findByIdAndUpdate(id, req);

@@ -17,14 +17,14 @@ export class TeacherService {
     }
     
     async findAll(): Promise<Teacher[]> {
-        let teachers = await  this.TeacherModel.find().populate('city').lean().exec();
+        let teachers = await  this.TeacherModel.find().lean().exec();
         for await (let teacher of teachers) {
             teacher.user = await this.userService.findByTeacher(teacher['_id'])
         }
         return teachers
     }
     async findOne(id: string): Promise<Teacher> {
-        let teacher = await  this.TeacherModel.findById(id).populate('city').lean().exec();
+        let teacher = await  this.TeacherModel.findById(id).lean().exec();
         teacher.user = await this.userService.findByTeacher(teacher['_id'])
 
         return teacher;

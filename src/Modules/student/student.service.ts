@@ -20,20 +20,18 @@ export class StudentService {
 
     findByStudentId( studentId: string) {
         return this.StudentModel.findOne({studentId: studentId})
-        .populate('city')
-        .populate('grade')
-        .populate('stage')
+
           .lean().exec();
     }
     async findAll(): Promise<Student[]> {
-        let students = await this.StudentModel.find().populate('city').populate('grade').populate('stage').lean().exec();
+        let students = await this.StudentModel.find().lean().exec();
         for await (let student of students) {
             student.user =  await this.userService.findByStudent(student['_id']);
         }
         return students;
     }
     async findOne(id: string): Promise<Student> {
-        let student = await this.StudentModel.findById(id).populate('city').populate('grade').populate('stage').lean().exec();
+        let student = await this.StudentModel.findById(id).lean().exec();
         student.user = await this.userService.findByStudent(student['_id'])
 
         return student;
