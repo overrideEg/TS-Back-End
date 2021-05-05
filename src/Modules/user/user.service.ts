@@ -25,29 +25,29 @@ export class UserService {
     }
     async login(username: string, defaultLang?: Lang) {
         let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] })
-            .populate('student')
-            .populate({
-                path: 'student',
-                populate: { path: 'city', model: 'City', },
-            })
-            .populate({
-                path: 'student',
-                populate: { path: 'grade', model: 'Grade', },
-            })
-            .populate({
-                path: 'student',
-                populate: { path: 'stage', model: 'Stage', },
-            })
-            .populate('parent')
-            .populate({
-                path: 'parent',
-                populate: { path: 'students', model: 'Student', },
-            })
-            .populate('teacher')
-            .populate({
-                path: 'teacher',
-                populate: { path: 'city', model: 'City', },
-            })
+            // .populate('student')
+            // .populate({
+            //     path: 'student',
+            //     populate: { path: 'city', model: 'City', },
+            // })
+            // .populate({
+            //     path: 'student',
+            //     populate: { path: 'grade', model: 'Grade', },
+            // })
+            // .populate({
+            //     path: 'student',
+            //     populate: { path: 'stage', model: 'Stage', },
+            // })
+            // .populate('parent')
+            // .populate({
+            //     path: 'parent',
+            //     populate: { path: 'students', model: 'Student', },
+            // })
+            // .populate('teacher')
+            // .populate({
+            //     path: 'teacher',
+            //     populate: { path: 'city', model: 'City', },
+            // })
             .exec();
         if (user) {
             user.defaultLang = defaultLang ?? Lang.en;

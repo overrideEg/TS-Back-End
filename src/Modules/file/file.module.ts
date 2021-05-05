@@ -7,11 +7,22 @@ import { OFileSchema } from './entities/file.entity';
 @Module({
   imports:
 
-    [MongooseModule.forFeature([
-      { name: 'fs.files', schema: OFileSchema }
-    ]
-    ),
-
+    [
+      
+    //   MongooseModule.forFeature([
+    //   { name: 'fs.files', schema: OFileSchema }
+    // ]
+    // ),
+    MongooseModule.forFeatureAsync([
+      {
+        name: 'fs.files',
+        useFactory: () => {
+          const schema = OFileSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
 
 
 

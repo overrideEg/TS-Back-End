@@ -18,16 +18,16 @@ export class Student extends OBaseEntity {
 
     @ApiProperty({type:()=>City})
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name ,autopopulate: true})
     city?: City;
 
     @ApiProperty({type:()=>Stage})
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name ,autopopulate: true})
     stage?: Stage;
     @ApiProperty({type:()=>Grade})
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name,autopopulate: true })
     grade?: Grade;
 
     @ApiProperty({ type: () => User })

@@ -6,9 +6,17 @@ import { Stage, StageSchema } from '../../Models/stage.model';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([
-      {name: Stage.name,schema:StageSchema}
-    ])
+   
+    MongooseModule.forFeatureAsync([
+      {
+        name: Stage.name,
+        useFactory: () => {
+          const schema = StageSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [StageController],
   providers: [StageService]

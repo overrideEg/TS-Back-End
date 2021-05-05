@@ -6,9 +6,17 @@ import { City, CitySchema } from '../../Models/city.model';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([
-      {name: City.name,schema: CitySchema}
-    ])
+  
+    MongooseModule.forFeatureAsync([
+      {
+        name: City.name,
+        useFactory: () => {
+          const schema = CitySchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [CityController],
   providers: [CityService],

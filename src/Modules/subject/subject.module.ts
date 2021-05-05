@@ -6,9 +6,17 @@ import { Subject, SubjectSchema } from '../../Models/subject.model';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([{
-      name: Subject.name, schema: SubjectSchema
-    }])
+    
+    MongooseModule.forFeatureAsync([
+      {
+        name: Subject.name,
+        useFactory: () => {
+          const schema = SubjectSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [SubjectController],
   providers: [SubjectService]

@@ -6,11 +6,17 @@ import { Grade, GradeSchema } from '../../Models/grade.model';
 
 @Module({
   imports:[
-    MongooseModule.forFeature(
-      [
-        {name: Grade.name,schema:GradeSchema}
-      ]
-    )
+   
+    MongooseModule.forFeatureAsync([
+      {
+        name: Grade.name,
+        useFactory: () => {
+          const schema = GradeSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [GradeController],
   providers: [GradeService]

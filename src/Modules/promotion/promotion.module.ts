@@ -6,9 +6,18 @@ import { Promotion, PromotionSchema } from '../../Models/promotion.model';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([
-      {name: Promotion.name,schema: PromotionSchema}
-    ])
+    
+    MongooseModule.forFeatureAsync([
+      {
+        name: Promotion.name,
+        useFactory: () => {
+          const schema = PromotionSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
+
   ],
   controllers: [PromotionController],
   providers: [PromotionService]

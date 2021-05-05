@@ -6,9 +6,17 @@ import { OurContacts, OurContactsSchema } from '../../Models/our-contacts';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([
-      {name: OurContacts.name,schema: OurContactsSchema}
-    ])
+  
+    MongooseModule.forFeatureAsync([
+      {
+        name: OurContacts.name,
+        useFactory: () => {
+          const schema = OurContactsSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [OurContactsController],
   providers: [OurContactsService]

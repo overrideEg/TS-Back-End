@@ -61,10 +61,10 @@ export class Course extends OBaseEntity {
     @Prop()
     description: string
     @ApiProperty({ type: () => Stage })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name,autopopulate: true })
     stage?: Stage;
     @ApiProperty({ type: () => Grade })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name ,autopopulate: true})
     grade?: Grade;
     @ApiProperty({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday] ,isArray:true})
     @Prop({enum:[Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday],type:[String]})
@@ -76,7 +76,7 @@ export class Course extends OBaseEntity {
     @Prop([CourseContent])
     content: CourseContent[];
     @ApiProperty({ type: () => Teacher })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name ,autopopulate: true})
     teacher?: Teacher;
     
     @ApiProperty({type: Number})

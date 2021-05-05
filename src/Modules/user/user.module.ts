@@ -5,13 +5,21 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../../Models/user.model';
 
 @Module({
-  imports:[
-    MongooseModule.forFeature([
-      {name: User.name, schema: UserSchema}
-    ])
+  imports: [
+    MongooseModule.forFeatureAsync([
+      {
+        name: User.name,
+        useFactory:  async () => {
+          const schema = UserSchema;
+          // const pop = Populate;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports:[UserService]
+  exports: [UserService]
 })
-export class UserModule {}
+export class UserModule { }

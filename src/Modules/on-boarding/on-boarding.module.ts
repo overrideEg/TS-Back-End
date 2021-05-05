@@ -6,9 +6,17 @@ import { OnBoarding, OnBoardingSchema } from '../../Models/on-boarding.model';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([{
-      name: OnBoarding.name,schema: OnBoardingSchema
-    }])
+    
+    MongooseModule.forFeatureAsync([
+      {
+        name: OnBoarding.name,
+        useFactory: () => {
+          const schema = OnBoardingSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [OnBoardingController],
   providers: [OnBoardingService]

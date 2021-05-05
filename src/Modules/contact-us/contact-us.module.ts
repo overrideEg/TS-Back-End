@@ -6,11 +6,17 @@ import { ContactUs, ContactUsSchema } from '../../Models/contact-us.model';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([
+    
+    MongooseModule.forFeatureAsync([
       {
-        name: ContactUs.name,schema: ContactUsSchema
-      }
-    ])
+        name: ContactUs.name,
+        useFactory: () => {
+          const schema = ContactUsSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [ContactUsController],
   providers: [ContactUsService]

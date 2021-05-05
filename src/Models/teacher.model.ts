@@ -9,7 +9,7 @@ export type TeacherDocument = Teacher & Document;
 @Schema()
 export class Teacher extends OBaseEntity {
     @ApiProperty({ type: () => City })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name ,autopopulate: true})
     city?: City;
     @ApiProperty()
     @Prop()

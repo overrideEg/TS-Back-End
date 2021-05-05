@@ -6,7 +6,16 @@ import { Banner, BannerSchema } from '../../Models/banner.model';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([{name: Banner.name,schema: BannerSchema}])
+    MongooseModule.forFeatureAsync([
+      {
+        name: Banner.name,
+        useFactory: () => {
+          const schema = BannerSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
   ],
   controllers: [BannerController],
   providers: [BannerService]

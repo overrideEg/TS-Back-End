@@ -7,8 +7,16 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   imports:[
-    MongooseModule.forFeature([
-      {name: Student.name,schema: StudentSchema}
+  
+    MongooseModule.forFeatureAsync([
+      {
+        name: Student.name,
+        useFactory: () => {
+          const schema = StudentSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
     ]),
     UserModule
   ],

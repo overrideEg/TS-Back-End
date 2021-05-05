@@ -15,7 +15,7 @@ export class Grade extends OBaseEntity {
     @Prop()
     gradeNumber: number;
     @ApiProperty({ type: () => Stage })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name,autopopulate: true })
     stage?: Stage;
 }
 export const GradeSchema = SchemaFactory.createForClass(Grade);

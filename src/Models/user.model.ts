@@ -40,11 +40,11 @@ export class User extends OBaseEntity {
     tempCode?: string;
     @Prop({ enum: [UserType.admin, UserType.parent, UserType.student, UserType.teacher], default: UserType.student })
     userType?: UserType;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Student.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Student.name ,autopopulate: true})
     student?: Student;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name ,autopopulate: true})
     teacher?: Teacher;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Parent.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Parent.name ,autopopulate: true})
     parent?: Parent;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
