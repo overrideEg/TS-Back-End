@@ -31,7 +31,7 @@ export class CourseService {
     }
 
 
-    async addCourseContent(req: any, courseId: string, body: CourseContent): Promise<CourseContent[] | PromiseLike<CourseContent[]>> {
+    async addCourseContent(req: any, courseId: string, contents: CourseContent[]): Promise<CourseContent[] | PromiseLike<CourseContent[]>> {
         if (req.user.userType !== UserType.teacher.toString()) {
             throw new BadRequestException('only teacher can add courses');
         }
@@ -39,50 +39,16 @@ export class CourseService {
         let course = await this.CourseModel.findById(courseId).exec()
         if (course.teacher['_id'].toString() !== teacher['_id'].toString())
             throw new BadRequestException('only teacher can add his content');
-        body['OId'] = OverrideUtils.generateGUID()
-        body.lessons.forEach(lesson => lesson['OId'] = OverrideUtils.generateGUID());
-        course.content != null ? course.content.push(body) : course.content = [body];
-
-        course.updateOne(course).exec();
+        contents.forEach(content => {
+            content.OId = OverrideUtils.generateGUID();
+            content.lessons.forEach(lesson => lesson['OId'] = OverrideUtils.generateGUID());
+        })
+        course.updateOne(course, { useFindAndModify: false }).exec();
         return course.content;
     }
 
 
-    async updateCourseContent(req: any, courseId: string, contentId: string, body: CourseContent): Promise<CourseContent[] | PromiseLike<CourseContent[]>> {
-        if (req.user.userType !== UserType.teacher.toString()) {
-            throw new BadRequestException('only teacher can add courses');
-        }
-        let teacher = (await this.userService.findOne(req.user.id)).teacher;
-        let course = await this.CourseModel.findById(courseId).exec()
-        if (course.teacher['_id'].toString() !== teacher['_id'].toString())
-            throw new BadRequestException('only teacher can add his content');
-        let content = course.content.find(cont => cont.OId === contentId);
-        if (!content)
-            throw new BadRequestException('no content was found with provided id');
-        content.OId = contentId
-        content.chapter = body.chapter;
-        content.lessons = body.lessons;
-        course.updateOne(course).exec();
-        return course.content;
-    }
-
-
-    async deleteCourseContent(req: any, courseId: string, contentId: string): Promise<CourseContent[] | PromiseLike<CourseContent[]>> {
-        if (req.user.userType !== UserType.teacher.toString()) {
-            throw new BadRequestException('only teacher can add courses');
-        }
-        let teacher = (await this.userService.findOne(req.user.id)).teacher;
-        let course = await this.CourseModel.findById(courseId).exec()
-        if (course.teacher['_id'].toString() !== teacher['_id'].toString())
-            throw new BadRequestException('only teacher can add his content');
-        let content = course.content.find(cont => cont.OId === contentId);
-        if (!content)
-            throw new BadRequestException('no content was found with provided id');
-        course.content.splice(course.content.findIndex(cont => cont.OId === contentId), 1);
-        course.updateOne(course).exec();
-        return course.content;
-    }
-
+   
 
     async getTeacherCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
         if (req.user.userType !== UserType.teacher.toString()) {

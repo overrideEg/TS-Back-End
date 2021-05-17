@@ -11,7 +11,6 @@ import { User, UserSchema } from '../../Models/user.model';
         name: User.name,
         useFactory:  async () => {
           const schema = UserSchema;
-          // const pop = Populate;
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
