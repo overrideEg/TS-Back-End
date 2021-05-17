@@ -10,11 +10,13 @@ import { AllExceptionsFilter } from './shared/exception.filter';
 // const cluster = require('cluster');
 // const numCPUs = require('os').cpus().length;
 import compression from 'fastify-compress';
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), { logger: true });
   app.setGlobalPrefix('v1')
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalPipes(new ValidationPipe({errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }));
   app.enableShutdownHooks();
   app.register(compression);
   app.register(require('fastify-multipart'))
