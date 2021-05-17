@@ -17,14 +17,18 @@ export enum LessonType {
     excercice = 'excercice'
 }
 export class Attachement {
+    @ApiProperty()
     @Prop()
     id : string;
+    @ApiProperty()
     @IsString()
     @Prop()
     path: string;
+    @ApiProperty()
     @Prop()
     @IsString()
     name : string;
+    @ApiProperty()
     @Prop()
     @IsString()
     mimeType: string;
@@ -41,7 +45,7 @@ export class Lesson {
     @Prop({ enum: [LessonType.video, LessonType.excercice] })
     @IsEnum(LessonType)
     type: LessonType;
-    @ApiProperty()
+    @ApiProperty({type : ()=>Attachement})
     @Prop({ required: false })
     @IsString()
     @ValidateNested()
