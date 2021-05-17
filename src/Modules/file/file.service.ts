@@ -40,7 +40,9 @@ export class FileService {
 
               resolve({
                 id: uploadStream.id.toString(),
-                path: fullUrl + '/File/' + uploadStream.id.toString()
+                path: fullUrl + '/File/' + uploadStream.id.toString(),
+                name : filename,
+                mimetype: mimetype
               })
             })
 
@@ -73,7 +75,9 @@ export class FileService {
             part.file.on('end', () => {
               files.push({
                 id: uploadStream.id.toString(),
-                path: fullUrl + '/File/' + uploadStream.id.toString()
+                path: fullUrl + '/File/' + uploadStream.id.toString(),
+                name : part.filename,
+                mimetype: part.mimetype
               })
 
             })

@@ -9,12 +9,25 @@ import { Day } from '../shared/enums/day.enum';
 import { Teacher } from './teacher.model';
 import { OverrideUtils } from '../shared/override-utils';
 import { Subject } from './subject.model';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum LessonType {
     video = 'video',
     excercice = 'excercice'
+}
+export class Attachement {
+    @Prop()
+    id : string;
+    @IsString()
+    @Prop()
+    path: string;
+    @Prop()
+    @IsString()
+    name : string;
+    @Prop()
+    @IsString()
+    mimeType: string;
 }
 export class Lesson {
     @ApiProperty({ required: false })
@@ -31,8 +44,9 @@ export class Lesson {
     @ApiProperty()
     @Prop({ required: false })
     @IsString()
-    @IsOptional()
-    attachement: string;
+    @ValidateNested()
+    @Type(()=>Attachement)
+    attachement: Attachement;
 }
 
 export class CourseContent {
