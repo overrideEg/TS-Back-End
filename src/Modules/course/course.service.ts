@@ -43,7 +43,7 @@ export class CourseService {
             content.OId = OverrideUtils.generateGUID();
             content.lessons.forEach(lesson => lesson['OId'] = OverrideUtils.generateGUID());
         })
-        course.updateOne(course, { useFindAndModify: false }).exec();
+        await course.updateOne(course, { useFindAndModify: false }).exec();
         return course.content;
     }
 
