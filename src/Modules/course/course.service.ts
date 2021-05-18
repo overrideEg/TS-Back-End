@@ -33,7 +33,7 @@ export class CourseService {
             throw new BadRequestException('only teacher can update courses');
         }
         let teacher = await this.userService.findOne(req.user.id);
-        if (teacher['_id'].toString !== req.user.id){
+        if (teacher['_id'].toString() !== req.user.id){
             throw new BadRequestException('only teacher can update his courses');
         }
         //TODO:
@@ -46,7 +46,7 @@ export class CourseService {
             throw new BadRequestException('only teacher can update courses');
         }
         let teacher = await this.userService.findOne(req.user.id);
-        if (teacher['_id'].toString !== req.user.id){
+        if (teacher['_id'].toString() !== req.user.id){
             throw new BadRequestException('only teacher can update his courses');
         }
         let course = await this.CourseModel.findById(id).exec();
@@ -89,8 +89,8 @@ export class CourseService {
             .exec() as any
         courses.forEach(course => {
             course = course.toObject();
-            course.cRating = 10 - Math.random() * 10
-            course.progress = 100 - Math.random() * 100
+            course['cRating'] = 10 - Math.random() * 10
+            course['progress'] = 100 - Math.random() * 100
         })
         return courses;
     }
