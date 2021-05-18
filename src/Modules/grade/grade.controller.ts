@@ -28,6 +28,11 @@ export class GradeController {
     return this.service.findAll();
   }
 
+  @Get('/stage/:stageId')
+  getAllGradesByStageId(@Param('stageId') stageId: string): Promise<Grade[]> {
+    return this.service.findAllGradesByStageId(stageId);
+  }
+
 
   /* GET One Grade End Point */
   @UseGuards(JwtAuthGuard)

@@ -3,8 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Grade, GradeDocument } from '../../Models/grade.model';
+const ObjectId = require('mongoose').Types.ObjectId;
+
 @Injectable()
 export class GradeService {
+    
     constructor(
         @InjectModel(Grade.name) private GradeModel: Model<GradeDocument>
     ) { }
@@ -16,6 +19,9 @@ export class GradeService {
     async findAll(): Promise<Grade[]> {
         return this.GradeModel.find().exec();
     }
+    findAllGradesByStageId(stageId: string): Promise<Grade[]> {
+        return this.GradeModel.find({stage:new ObjectId(stageId)}).exec();
+      }
     async findOne(id: string): Promise<Grade> {
         return this.GradeModel.findById(id).exec();
     }

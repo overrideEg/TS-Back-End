@@ -57,6 +57,13 @@ export class CourseService {
         }
         let teacher = (await this.userService.findOne(req.user.id)).teacher;
         let courses = await this.CourseModel.find({ teacher: teacher['_id'] })
+        .populate('stage').populate('grade').populate({
+            path:'grade',
+            populate:{
+                path: "stage",
+                model:"Stage"
+             }
+        })
             .lean()
             .exec()
         courses.forEach(course => {
