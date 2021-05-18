@@ -27,10 +27,20 @@ export class CourseController {
 
 
   @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(@Req() req, @Body() body: Course,@Param('id') id : string): Promise<Course> {
+    return this.service.update(req,id, body)
+  }
+  
+  @UseGuards(JwtAuthGuard)
   @Get('teacher')
   async teacher(@Req() req): Promise<Course[]> {
     return this.service.getTeacherCourses(req)
   }
   
-
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(@Req() req,@Param('id') id : string): Promise<Course> {
+    return this.service.delete(req,id)
+  }
 }
