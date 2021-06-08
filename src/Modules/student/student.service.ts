@@ -29,7 +29,7 @@ export class StudentService {
         return students;
     }
     async findOne(id: string): Promise<Student> {
-        let student = await this.StudentModel.findById(id).lean().exec();
+        let student = await this.StudentModel.findById(id).exec();
         student.user = await this.userService.findByStudent(student['_id'])
 
         return student;

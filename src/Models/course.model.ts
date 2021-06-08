@@ -47,7 +47,6 @@ export class Lesson {
     type: LessonType;
     @ApiProperty({type : ()=>Attachement})
     @Prop({ required: false })
-    @IsString()
     @ValidateNested()
     @Type(()=>Attachement)
     attachement: Attachement;
