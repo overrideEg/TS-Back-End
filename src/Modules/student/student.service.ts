@@ -19,13 +19,13 @@ export class StudentService {
     }
 
     findByStudentId( studentId: string) {
-        return this.StudentModel.findOne({studentId: studentId}).lean().exec();
+        return this.StudentModel.findOne({studentId: studentId}).exec();
     }
     async findAll(): Promise<Student[]> {
-        let students = await this.StudentModel.find().exec() as any[];
+        let students = await this.StudentModel.find().exec();
         for await (let student of students) {
-            student = student.toObject()
-            student.user =  await this.userService.findByStudent(student['_id']);
+            // student = student.toObject()
+            student['user'] =  await this.userService.findByStudent(student['_id']);
         }
         return students;
     }

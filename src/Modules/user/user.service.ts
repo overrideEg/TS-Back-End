@@ -22,13 +22,13 @@ export class UserService {
     ) { }
 
     findByParent(parentId: any) {
-        return this.UserModel.findOne({ parent: new ObjectId(parentId) }).lean().exec() as User;
+        return this.UserModel.findOne({ parent: new ObjectId(parentId) }).exec() as User;
     }
     findByStudent(studentId: any) {
-        return this.UserModel.findOne({ student: new ObjectId(studentId) }).lean().exec() as User;
+        return this.UserModel.findOne({ student: new ObjectId(studentId) }).exec() as User;
     }
     findByTeacher(teacherId: any) {
-        return this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).lean().exec() as User;
+        return this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).exec() as User;
     }
 
 
