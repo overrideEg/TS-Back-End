@@ -9,17 +9,37 @@ import { Day } from '../shared/enums/day.enum';
 import { Teacher } from './teacher.model';
 import { OverrideUtils } from '../shared/override-utils';
 import { Subject } from './subject.model';
-import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { User } from './user.model';
 
 export enum LessonType {
     video = 'video',
     excercice = 'excercice'
 }
+
+export class CourseReview {
+    @Prop({ required: true })
+    OId: string
+    @Prop()
+    time: number;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
+    user?: User;
+    @ApiProperty({ description: 'comment', required: true })
+    @Prop({ default: '' })
+    @IsString()
+    comment?: string;
+    @ApiProperty({ description: 'stars', required: true })
+    @Prop({ default: 5 })
+    @IsNumber()
+    @Min(1)
+    @Max(5)
+    stars?: number;
+}
 export class Attachement {
     @ApiProperty()
     @Prop()
-    id : string;
+    id: string;
     @ApiProperty()
     @IsString()
     @Prop()
@@ -27,7 +47,7 @@ export class Attachement {
     @ApiProperty()
     @Prop()
     @IsString()
-    name : string;
+    name: string;
     @ApiProperty()
     @Prop()
     @IsString()
@@ -35,7 +55,7 @@ export class Attachement {
 }
 export class Lesson {
     @ApiProperty({ required: false })
-    @Prop({required:true})
+    @Prop({ required: true })
     OId: string
     @ApiProperty()
     @Prop()
@@ -45,10 +65,10 @@ export class Lesson {
     @Prop({ enum: [LessonType.video, LessonType.excercice] })
     @IsEnum(LessonType)
     type: LessonType;
-    @ApiProperty({type : ()=>Attachement})
+    @ApiProperty({ type: () => Attachement })
     @Prop({ required: false })
     @ValidateNested()
-    @Type(()=>Attachement)
+    @Type(() => Attachement)
     attachement: Attachement;
 
     @Prop({ default: false })
@@ -57,7 +77,7 @@ export class Lesson {
 
 export class CourseContent {
     @ApiProperty({ required: false })
-    @Prop({required:true})
+    @Prop({ required: true })
     OId: string
     @ApiProperty()
     @Prop()
@@ -66,7 +86,7 @@ export class CourseContent {
     @ApiProperty({ type: () => Lesson, isArray: true })
     @Prop([Lesson])
     @ValidateNested()
-    @Type(()=>Lesson)
+    @Type(() => Lesson)
     lessons: Lesson[]
 }
 export type CourseDocument = Course & Document;
@@ -100,37 +120,47 @@ export class Course extends OBaseEntity {
     @IsString()
     description: string
     @ApiProperty({ type: () => Stage })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name,autopopulate: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name, autopopulate: true })
     @IsNotEmpty()
     stage?: Stage;
     @ApiProperty({ type: () => Grade })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name, autopopulate: true })
     @IsNotEmpty()
     grade?: Grade;
     @ApiProperty({ type: () => Subject })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Subject.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Subject.name, autopopulate: true })
     @IsNotEmpty()
     subject?: Subject;
-    @ApiProperty({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday] ,isArray:true})
-    @Prop({enum:[Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday],type:[String]})
-    @IsEnum(Day,{each:true})
+    @ApiProperty({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday], isArray: true })
+    @Prop({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday], type: [String] })
+    @IsEnum(Day, { each: true })
     Days: Day[]
     @ApiProperty()
     @Prop()
     @IsNumber()
     hour: number;
+
     @ApiProperty({ type: () => CourseContent, isArray: true })
     @Prop([CourseContent])
     @ValidateNested()
-    @Type(()=>CourseContent)
+    @Type(() => CourseContent)
     content: CourseContent[];
+
+    @ApiProperty({ type: () => CourseReview, isArray: true })
+    @Prop([CourseReview])
+    @ValidateNested()
+    @Type(() => CourseReview)
+    reviews: CourseReview[];
+
     @ApiProperty({ type: () => Teacher })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name, autopopulate: true })
     teacher?: Teacher;
-    
-    @ApiProperty({type: Number})
-    cRating : number
-    @ApiProperty({type: Number})
-    progress:number
+
+    @ApiProperty({ type: Number })
+    @Prop()
+    cRating: number
+    @ApiProperty({ type: Number })
+    @Prop()
+    progress: number
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);

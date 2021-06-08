@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Course, CourseContent } from '../../Models/course.model';
+import { Course, CourseContent, CourseReview } from '../../Models/course.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { CourseService } from './course.service';
 
@@ -24,6 +24,14 @@ export class CourseController {
   async addCourseContent(@Req() req, @Body() body: CourseContent[], @Param('courseId') courseId: string): Promise<CourseContent[]> {
     return this.service.addCourseContent(req, courseId, body)
   }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({ type: CourseContent, isArray: true })
+  @Post('review/:courseId')
+  async reviewCourse(@Req() req, @Body() body: CourseReview, @Param('courseId') courseId: string): Promise<CourseReview[]> {
+    return this.service.reviewCourse(req, courseId, body)
+  }
+
 
 
   @UseGuards(JwtAuthGuard)

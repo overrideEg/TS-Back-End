@@ -6,6 +6,7 @@ import { Lang } from '../shared/enums/lang.enum';
 import { Student } from './student.model';
 import { Teacher } from './teacher.model';
 import { Parent } from './parent.model';
+import { Course } from './course.model';
 
 export enum UserType {
     admin = 'Admin',
@@ -21,7 +22,7 @@ export class User extends OBaseEntity {
     name?: string;
     @Prop()
     email?: string;
-    
+
     @Prop({ default: false })
     isActive?: boolean;
 
@@ -40,11 +41,16 @@ export class User extends OBaseEntity {
     tempCode?: string;
     @Prop({ enum: [UserType.admin, UserType.parent, UserType.student, UserType.teacher], default: UserType.student })
     userType?: UserType;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Student' ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Student', autopopulate: true })
     student?: Student;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name, autopopulate: true })
     teacher?: Teacher;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Parent.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Parent.name, autopopulate: true })
     parent?: Parent;
+
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Course.name, autopopulate: true }])
+    cart?: Course[];
+
+
 }
 export const UserSchema = SchemaFactory.createForClass(User);

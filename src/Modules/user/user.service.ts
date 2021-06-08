@@ -16,7 +16,7 @@ export class UserService {
     private readonly logger = new Logger(UserService.name);
 
     constructor(
-        @InjectModel(User.name) private UserModel: Model<UserDocument>,
+        @InjectModel(User.name) public UserModel: Model<UserDocument>,
         @InjectModel(Student.name) private StudentModel: Model<StudentDocument>,
         @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>
     ) { }
@@ -51,7 +51,7 @@ export class UserService {
         }
         if (profile.email) {
             let existsEmail = await this.UserModel.findOne({ email: profile.email })
-            if (existsEmail)
+            if (existsEmail && req.user.email != profile.email)
                 throw new BadRequestException('this email is used by other user')
             user.email = profile.email
         }

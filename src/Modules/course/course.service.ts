@@ -2,13 +2,16 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Course, CourseContent, CourseDocument, LessonType } from '../../Models/course.model';
+import { Course, CourseContent, CourseDocument, CourseReview, LessonType } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
+const ObjectId = require('mongoose').Types.ObjectId;
+
 @Injectable()
 export class CourseService {
+
 
 
 
@@ -73,10 +76,19 @@ export class CourseService {
             content.lessons.forEach(lesson => lesson['OId'] = OverrideUtils.generateGUID());
         })
         course.content = contents;
-        await this.CourseModel.findByIdAndUpdate(course['_id'],course).exec();
+        await this.CourseModel.findByIdAndUpdate(course['_id'], course).exec();
         return course.content;
     }
 
+    async reviewCourse(req: any, courseId: string, body: CourseReview): Promise<CourseReview[] | PromiseLike<CourseReview[]>> {
+        let course = await this.CourseModel.findById(courseId).exec()
+        body.OId = OverrideUtils.generateGUID();
+        body.user = new ObjectId(req.user.id)
+        body.time = Date.now()
+        course.reviews === null ? course.reviews = [body] : course.reviews.push(body);
+        await this.CourseModel.findByIdAndUpdate(course['_id'], course).exec();
+        return (await this.CourseModel.findById(courseId).exec()).reviews;
+    }
 
 
 
@@ -84,14 +96,24 @@ export class CourseService {
         if (req.user.userType !== UserType.teacher.toString()) {
             throw new BadRequestException('only teacher can view this request');
         }
-        let teacher = (await this.userService.findOne(req.user.id)).teacher;
-        let courses = await this.CourseModel.find({ teacher: teacher['_id'] })
-            .exec() as any
-        courses.forEach((course) => {
-            course = course.toObject();
-            course['cRating'] = 10 - Math.random() * 10;
-            course['progress'] = 100 - Math.random() * 100
-        })
+        let teacher = (await this.userService.findOne(req.user.id))?.teacher;
+        let courses =[]
+        if (teacher){
+             courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
+
+            for await (let course of courses) {
+    
+                course['progress'] = 100 - Math.random() * 100;
+    
+                for await (let review of course.reviews) {
+                    review.user = await this.userService.UserModel.findOne(review.user).exec()
+                }
+                course['cRating'] = course.reviews.length == 0 ? 5 : course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length;
+    
+            }
+    
+        }
+      
         return courses;
     }
 
