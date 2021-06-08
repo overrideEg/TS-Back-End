@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { profile } from 'console';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
 import { User, UserType } from '../../Models/user.model';
@@ -25,8 +25,9 @@ export class UserController {
     /* GET All Users End Point */
     @UseGuards(JwtAuthGuard)
     @Get('/all')
+    @ApiQuery({ name: 'userType', enum: [UserType.admin,UserType.parent,UserType.student,UserType.teacher], required: false })
     getAllUsers(@Query('userType') userType: string): Promise<User[]> {
-        return this.service.findAll(userType? UserType[userType]: null);
+        return this.service.findAll(userType);
     }
 
 
@@ -53,8 +54,8 @@ export class UserController {
 
     @UseGuards(JwtAuthGuard)
     @Put('/profile')
-    updateProfile(@Req() req,@Body() profile : UpdateProfile ): Promise<User> {
-        return this.service.updateProfile(req,profile);
+    updateProfile(@Req() req, @Body() profile: UpdateProfile): Promise<User> {
+        return this.service.updateProfile(req, profile);
     }
 
     /* Delete  User End Point */

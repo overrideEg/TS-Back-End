@@ -93,7 +93,7 @@ export class UserService {
     async save(req: User) {
         return await this.UserModel.create(req);
     }
-    async findAll(userType: UserType): Promise<User[]> {
+    async findAll(userType): Promise<User[]> {
         return userType ? this.UserModel.find({ userType: userType }).exec() : this.UserModel.find().exec();
     }
     async findOne(id: string): Promise<User> {
