@@ -2,14 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Course, CourseContent, CourseDocument } from '../../Models/course.model';
+import { Course, CourseContent, CourseDocument, LessonType } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
 @Injectable()
 export class CourseService {
- 
+
 
 
     constructor(
@@ -33,11 +33,11 @@ export class CourseService {
             throw new BadRequestException('only teacher can update courses');
         }
         let teacher = await this.userService.findOne(req.user.id);
-        if (teacher['_id'].toString() !== req.user.id){
+        if (teacher['_id'].toString() !== req.user.id) {
             throw new BadRequestException('only teacher can update his courses');
         }
         //TODO:
-        await this.CourseModel.findByIdAndUpdate(id,body).exec();
+        await this.CourseModel.findByIdAndUpdate(id, body).exec();
         return await this.CourseModel.findById(id).exec();
     }
 
@@ -46,17 +46,17 @@ export class CourseService {
             throw new BadRequestException('only teacher can update courses');
         }
         let teacher = await this.userService.findOne(req.user.id);
-        if (teacher['_id'].toString() !== req.user.id){
+        if (teacher['_id'].toString() !== req.user.id) {
             throw new BadRequestException('only teacher can update his courses');
         }
         let course = await this.CourseModel.findById(id).exec();
-        if (course.startDate < Date.now()){
+        if (course.startDate < Date.now()) {
             throw new BadRequestException('you can not delete started course');
         }
 
         return await this.CourseModel.findByIdAndDelete(id);
-      }
-   
+    }
+
 
 
 
@@ -87,10 +87,13 @@ export class CourseService {
         let teacher = (await this.userService.findOne(req.user.id)).teacher;
         let courses = await this.CourseModel.find({ teacher: teacher['_id'] })
             .exec() as any
-        courses.forEach(course => {
+        courses.forEach((course) => {
             course = course.toObject();
-            course['cRating'] = 10 - Math.random() * 10
-            course['progress'] = 100 - Math.random() * 100
+
+            
+            course['cRating'] = 10 - Math.random() * 10;
+            let videosCount = course.content.reduce((acc,less)=>less?.lessons?.reduce((acc, lesson) => acc + lesson?.type == LessonType.video ? lesson?.isDone ? 1 : 0 : 0, 0))
+            course['progress'] = course.content.reduce((acc, less) => acc + videosCount, 0) / course.content.reduce((acc, less) => acc + less?.lessons?.reduce((acc, lesson) => acc + lesson?.type === LessonType.video ? 1 : 0, 0), 0)
         })
         return courses;
     }

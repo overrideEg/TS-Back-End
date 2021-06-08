@@ -51,6 +51,9 @@ export class Lesson {
     @ValidateNested()
     @Type(()=>Attachement)
     attachement: Attachement;
+
+    @Prop({ default: false })
+    isDone: boolean;
 }
 
 export class CourseContent {
@@ -81,6 +84,10 @@ export class Course extends OBaseEntity {
     @Prop()
     @IsString()
     name: string;
+    @ApiProperty()
+    @Prop()
+    @IsNumber()
+    price: number;
     @ApiProperty()
     @Prop()
     @IsString()
