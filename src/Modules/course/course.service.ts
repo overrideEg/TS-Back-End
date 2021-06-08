@@ -73,7 +73,7 @@ export class CourseService {
             content.lessons.forEach(lesson => lesson['OId'] = OverrideUtils.generateGUID());
         })
         course.content = contents;
-        await course.updateOne({ _id: course['_id'] }).exec();
+        await this.CourseModel.findByIdAndUpdate(course['_id'],course).exec();
         return course.content;
     }
 
