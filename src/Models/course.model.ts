@@ -108,7 +108,7 @@ export class Course extends OBaseEntity {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name ,autopopulate: true})
     @IsNotEmpty()
     grade?: Grade;
-    @ApiProperty({ type: () => Grade })
+    @ApiProperty({ type: () => Subject })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Subject.name ,autopopulate: true})
     @IsNotEmpty()
     subject?: Subject;

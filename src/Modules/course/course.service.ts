@@ -89,11 +89,8 @@ export class CourseService {
             .exec() as any
         courses.forEach((course) => {
             course = course.toObject();
-
-            
             course['cRating'] = 10 - Math.random() * 10;
-            let videosCount = course.content.reduce((acc,less)=>less?.lessons?.reduce((acc, lesson) => acc + lesson?.type == LessonType.video ? lesson?.isDone ? 1 : 0 : 0, 0))
-            course['progress'] = course.content.reduce((acc, less) => acc + videosCount, 0) / course.content.reduce((acc, less) => acc + less?.lessons?.reduce((acc, lesson) => acc + lesson?.type === LessonType.video ? 1 : 0, 0), 0)
+            course['progress'] = 100 - Math.random() * 100
         })
         return courses;
     }

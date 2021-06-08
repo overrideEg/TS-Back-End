@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { profile } from 'console';
+import { UpdateProfile } from '../../dtos/update-profile.dto';
 import { User } from '../../Models/user.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { UserService } from './user.service';
@@ -49,6 +51,11 @@ export class UserController {
         return this.service.update(id, req);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Put('/profile')
+    updateProfile(@Req() req,@Body() profile : UpdateProfile ): Promise<User> {
+        return this.service.updateProfile(req,profile);
+    }
 
     /* Delete  User End Point */
     @UseGuards(JwtAuthGuard)
