@@ -8,8 +8,8 @@ import { User } from './user.model';
 export type ParentDocument = Parent & Document;
 @Schema()
 export class Parent extends OBaseEntity {
-    @ApiProperty({type:()=>Student,isArray:true})
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Student.name,autopopulate: true }])
+    @ApiProperty({ type: () => Student, isArray: true })
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Student.name, autopopulate: true }])
     students?: Student[];
 
     @ApiProperty({ type: () => User })

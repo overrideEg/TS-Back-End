@@ -43,9 +43,10 @@ export class UserService {
     async updateProfile(req: any, profile: UpdateProfile): Promise<User> {
         let user = await this.findOne(req.user.id);
         if (user.userType === UserType.student){
-            let student = new Student()
+            let student = user.student;
             if (profile.gradeId){
-                
+                student.grade['_id'] = profile.gradeId
+
             }
         }
             throw new Error('Method not implemented.');
