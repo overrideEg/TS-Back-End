@@ -66,9 +66,7 @@ export class UserService {
             if (profile.cityId) {
                 student.city['_id'] = profile.cityId
             }
-            await this.StudentModel.findByIdAndUpdate(student['_id'], student)
-
-
+            await this.StudentModel.updateOne({ _id: student['_id'] }, student)
         }
         if (user.userType === UserType.teacher) {
             let teacher = user.teacher;
@@ -79,12 +77,10 @@ export class UserService {
             if (profile.bio) {
                 teacher.bio = profile.bio;
             }
-            await this.TeacherModel.findByIdAndUpdate(teacher['_id'], teacher)
+            await this.TeacherModel.updateOne({ _id: teacher['_id'] }, teacher);
         }
 
-        return await this.update(req.user.id,user);
-
-
+        return await this.update(req.user.id, user);
     }
 
     validate(payload: any) {
@@ -97,8 +93,8 @@ export class UserService {
     async save(req: User) {
         return await this.UserModel.create(req);
     }
-    async findAll(): Promise<User[]> {
-        return this.UserModel.find().exec();
+    async findAll(userType: UserType): Promise<User[]> {
+        return userType ? this.UserModel.find({ userType: userType }).exec() : this.UserModel.find().exec();
     }
     async findOne(id: string): Promise<User> {
         return this.UserModel.findById(id).exec();

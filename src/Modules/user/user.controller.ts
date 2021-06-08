@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { profile } from 'console';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
-import { User } from '../../Models/user.model';
+import { User, UserType } from '../../Models/user.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { UserService } from './user.service';
 
@@ -25,8 +25,8 @@ export class UserController {
     /* GET All Users End Point */
     @UseGuards(JwtAuthGuard)
     @Get('/all')
-    getAllUsers(): Promise<User[]> {
-        return this.service.findAll();
+    getAllUsers(@Query('userType') userType: string): Promise<User[]> {
+        return this.service.findAll(userType? UserType[userType]: null);
     }
 
 

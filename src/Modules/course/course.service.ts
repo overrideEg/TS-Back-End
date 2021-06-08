@@ -97,23 +97,33 @@ export class CourseService {
             throw new BadRequestException('only teacher can view this request');
         }
         let teacher = (await this.userService.findOne(req.user.id))?.teacher;
-        let courses =[]
-        if (teacher){
-             courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
+        let courses = []
+        if (teacher) {
+            courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
 
             for await (let course of courses) {
-    
-                course['progress'] = 100 - Math.random() * 100;
-    
+                // course['progress'] = 100 - Math.random() * 100;
+
+                let progress = 0;
+                let videos = 0;
+                course.content.forEach(cont => {
+                    let contentProgress = 0;
+                    cont.lessons.forEach(less => {
+                        less.type.toString() === 'video' ? videos += 1 : videos += 0;
+                        less.type.toString() === 'video' && less.isDone ? contentProgress += 1 : contentProgress += 0;
+                    });
+                    progress += contentProgress;
+                });
+                course.progress = progress / videos * 100;
                 for await (let review of course.reviews) {
                     review.user = await this.userService.UserModel.findOne(review.user).exec()
                 }
                 course['cRating'] = course.reviews.length == 0 ? 5 : course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length;
-    
+
             }
-    
+
         }
-      
+
         return courses;
     }
 

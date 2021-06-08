@@ -8,53 +8,52 @@ import { ParentService } from './parent.service';
 
 @ApiTags('Parent')
 @Controller('Parent')
-export class ParentController { 
+export class ParentController {
 
-/* CRUD End Points for Parent Created By Override */
+    /* CRUD End Points for Parent Created By Override */
 
 
-constructor(private service:  ParentService) 
- { }
-/* POST Parent End Point */
+    constructor(private service: ParentService) { }
+    /* POST Parent End Point */
 
- 
- 
-/* GET All Parents End Point */
-@Roles('admin')
-@UseGuards(JwtAuthGuard) 
- @Get('/all') 
- getAllParents() :Promise<Parent[]> {
-return this.service.findAll(); 
- } 
- 
 
-/* GET One Parent End Point */
-@Roles('admin')
-@UseGuards(JwtAuthGuard) 
- @Get(':id') 
- findOne(@Param('id') id: string) :Promise<Parent> {
-return this.service.findOne(id); 
- } 
-  
- 
-/* PUT  Parent End Point */
-@Roles('admin')
-@UseGuards(JwtAuthGuard) 
- @Put(':id') 
- updateParent(@Param('id') id: string, @Body() req: Parent)  :Promise<any>{
- return this.service.update(id, req);
- } 
- 
 
-/* Delete  Parent End Point */
-@Roles('admin')
-@UseGuards(JwtAuthGuard) 
- @Delete(':id') 
- deleteParent(@Param('id') id: string) :Promise<any>{
-return this.service.remove(id) 
- } 
- 
-/* End of Parent Controller Class 
- 
- */
+    /* GET All Parents End Point */
+    @Roles('admin')
+    @UseGuards(JwtAuthGuard)
+    @Get('/all')
+    getAllParents(): Promise<Parent[]> {
+        return this.service.findAll();
+    }
+
+
+    /* GET One Parent End Point */
+    @Roles('admin')
+    @UseGuards(JwtAuthGuard)
+    @Get(':id')
+    findOne(@Param('id') id: string): Promise<Parent> {
+        return this.service.findOne(id);
+    }
+
+
+    /* PUT  Parent End Point */
+    @Roles('admin')
+    @UseGuards(JwtAuthGuard)
+    @Put(':id')
+    updateParent(@Param('id') id: string, @Body() req: Parent): Promise<any> {
+        return this.service.update(id, req);
+    }
+
+
+    /* Delete  Parent End Point */
+    @Roles('admin')
+    @UseGuards(JwtAuthGuard)
+    @Delete(':id')
+    deleteParent(@Param('id') id: string): Promise<any> {
+        return this.service.remove(id)
+    }
+
+    /* End of Parent Controller Class 
+     
+     */
 }
