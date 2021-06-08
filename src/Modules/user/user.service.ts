@@ -1,9 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { use } from 'passport';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
-import { Student } from '../../Models/student.model';
+import { Student, StudentDocument } from '../../Models/student.model';
+import { Teacher, TeacherDocument } from '../../Models/teacher.model';
 import { User, UserDocument, UserType } from '../../Models/user.model';
 import { Lang } from '../../shared/enums/lang.enum';
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -14,7 +16,9 @@ export class UserService {
     private readonly logger = new Logger(UserService.name);
 
     constructor(
-        @InjectModel(User.name) private UserModel: Model<UserDocument>
+        @InjectModel(User.name) private UserModel: Model<UserDocument>,
+        @InjectModel(Student.name) private StudentModel: Model<StudentDocument>,
+        @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>
     ) { }
 
     findByParent(parentId: any) {
@@ -42,14 +46,45 @@ export class UserService {
     }
     async updateProfile(req: any, profile: UpdateProfile): Promise<User> {
         let user = await this.findOne(req.user.id);
-        if (user.userType === UserType.student){
-            let student = user.student;
-            if (profile.gradeId){
-                student.grade['_id'] = profile.gradeId
-
-            }
+        if (profile.name) {
+            user.name = profile.name;
         }
-            throw new Error('Method not implemented.');
+        if (profile.email) {
+            let existsEmail = await this.UserModel.findOne({ email: profile.email })
+            if (existsEmail)
+                throw new BadRequestException('this email is used by other user')
+            user.email = profile.email
+        }
+        if (user.userType === UserType.student) {
+            let student = user.student;
+            if (profile.gradeId) {
+                student.grade['_id'] = profile.gradeId
+            }
+            if (profile.stageId) {
+                student.stage['_id'] = profile.stageId
+            }
+            if (profile.cityId) {
+                student.city['_id'] = profile.cityId
+            }
+            await this.StudentModel.findByIdAndUpdate(student['_id'], student)
+
+
+        }
+        if (user.userType === UserType.teacher) {
+            let teacher = user.teacher;
+
+            if (profile.cityId) {
+                teacher.city['_id'] = profile.cityId
+            }
+            if (profile.bio) {
+                teacher.bio = profile.bio;
+            }
+            await this.TeacherModel.findByIdAndUpdate(teacher['_id'], teacher)
+        }
+
+        return await this.update(req.user.id,user);
+
+
     }
 
     validate(payload: any) {
@@ -70,7 +105,7 @@ export class UserService {
     }
     async update(id: string, req: User): Promise<User> {
         await this.UserModel.findByIdAndUpdate(id, req);
-        return this.findOne(id)
+        return this.findOne(id);
     }
     async remove(id: string): Promise<User> {
         return await this.UserModel.findByIdAndRemove(id);

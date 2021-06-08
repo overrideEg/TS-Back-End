@@ -40,7 +40,7 @@ export class User extends OBaseEntity {
     tempCode?: string;
     @Prop({ enum: [UserType.admin, UserType.parent, UserType.student, UserType.teacher], default: UserType.student })
     userType?: UserType;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Student.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Student' ,autopopulate: true})
     student?: Student;
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name ,autopopulate: true})
     teacher?: Teacher;

@@ -31,7 +31,7 @@ export class Attachement {
     @ApiProperty()
     @Prop()
     @IsString()
-    mimeType: string;
+    mimetype: string;
 }
 export class Lesson {
     @ApiProperty({ required: false })

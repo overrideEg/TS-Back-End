@@ -9,7 +9,7 @@ export type ParentDocument = Parent & Document;
 @Schema()
 export class Parent extends OBaseEntity {
     @ApiProperty({ type: () => Student, isArray: true })
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Student.name, autopopulate: true }])
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Student', autopopulate: true }])
     students?: Student[];
 
     @ApiProperty({ type: () => User })
