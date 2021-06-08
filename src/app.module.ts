@@ -1,3 +1,4 @@
+import { CartModule } from './Modules/cart/cart.module';
 import { CacheModule, Module, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -35,11 +36,12 @@ const overrideMoules = [
   SubjectModule,
   PromotionModule,
   OurContactsModule,
-  CourseModule
+  CourseModule,
+  CartModule,
 ]
 @Module({
   imports: [
-  
+
     MongooseModule.forRoot('mongodb://localhost/ts-academy', {
       connectionFactory: (connection) => {
         connection.plugin(require('mongoose-autopopulate'));
