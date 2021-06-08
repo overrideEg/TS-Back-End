@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from '../../Models/user.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
@@ -27,6 +27,12 @@ export class UserController {
         return this.service.findAll();
     }
 
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/profile')
+    getMyProfile(@Req() req): Promise<User> {
+        return this.service.myProfile(req);
+    }
 
     /* GET One User End Point */
     @UseGuards(JwtAuthGuard)

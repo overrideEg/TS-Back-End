@@ -8,6 +8,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class UserService {
+
     private readonly logger = new Logger(UserService.name);
 
     constructor(
@@ -23,15 +24,19 @@ export class UserService {
     findByTeacher(teacherId: any) {
         return this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).lean().exec() as User;
     }
+
+
     async login(username: string, defaultLang?: Lang) {
-        let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] })
-            
-            .exec();
+        let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).exec();
         if (user) {
             user.defaultLang = defaultLang ?? Lang.en;
             user.updateOne(user)
         }
         return user
+    }
+    
+    async myProfile(req): Promise<User> {
+        return await this.findOne(req.user.id)
     }
 
     validate(payload: any) {
@@ -45,14 +50,10 @@ export class UserService {
         return await this.UserModel.create(req);
     }
     async findAll(): Promise<User[]> {
-        return this.UserModel.find()
-        
-            .exec();
+        return this.UserModel.find().exec();
     }
     async findOne(id: string): Promise<User> {
-        return this.UserModel.findById(id)
-       
-        .exec();
+        return this.UserModel.findById(id).exec();
     }
     async update(id: string, req: User): Promise<User> {
         await this.UserModel.findByIdAndUpdate(id, req);
