@@ -70,7 +70,7 @@ export class CourseService {
         const expirationTimeInSeconds = 3600
         const currentTimestamp = Math.floor(Date.now() / 1000)
         const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const tokenA = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 123, RtcRole.PUBLISHER, privilegeExpiredTs);
+        const tokenA = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, null, RtcRole.PUBLISHER, privilegeExpiredTs);
         lesson.liveToken = tokenA;
         return lesson;
 
