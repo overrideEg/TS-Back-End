@@ -26,7 +26,7 @@ export class CourseController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @ApiBody({ type: CourseContent, isArray: true })
+  @ApiBody({ type: CourseReview })
   @Post('review/:courseId')
   async reviewCourse(@Req() req, @Body() body: CourseReview, @Param('courseId') courseId: string): Promise<CourseReview[]> {
     return this.service.reviewCourse(req, courseId, body)
