@@ -165,5 +165,8 @@ export class Course extends OBaseEntity {
     @ApiProperty({ type: Number })
     @Prop()
     progress: number
+    @ApiProperty({ type: Number })
+    @Prop()
+    enrolled: number
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);
