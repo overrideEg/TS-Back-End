@@ -70,7 +70,7 @@ export class CourseService {
         const expirationTimeInSeconds = 3600
         const currentTimestamp = Math.floor(Date.now() / 1000)
         const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const tokenA = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId,0, RtcRole.PUBLISHER, privilegeExpiredTs);
+        const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId,req.user.email, RtcRole.PUBLISHER, privilegeExpiredTs);
         lesson.liveToken = tokenA;
         return lesson;
 
@@ -83,7 +83,8 @@ export class CourseService {
         const expirationTimeInSeconds = 3600
         const currentTimestamp = Math.floor(Date.now() / 1000)
         const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const tokenA = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId,0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+        const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId,req.user.email, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+
         lesson.liveToken = tokenA;
         return lesson;
 
