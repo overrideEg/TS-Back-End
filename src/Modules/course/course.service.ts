@@ -70,7 +70,7 @@ export class CourseService {
         const expirationTimeInSeconds = 3600
         const currentTimestamp = Math.floor(Date.now() / 1000)
         const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const tokenA = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
+        const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId, req.user.id, RtcRole.SUBSCRIBER, privilegeExpiredTs);
         lesson.liveToken = tokenA;
         return lesson;
 
@@ -111,12 +111,11 @@ export class CourseService {
 
         course.related = await this.CourseModel.find({
             $or: [
-                { subject: course.subject['_id'] },
-                { teacher: course.teacher['_id'] },
-                { grade: course.grade['_id'] },
-                { stage: course.stage['_id'] },
-                { stage: course.stage['_id'] },
-            ]
+                { subject: course.subject ? course.subject['_id'] : null },
+                { teacher: course.teacher['_id'] ?? '' },
+                { grade: course.grade['_id'] ?? '' },
+                { stage: course.stage['_id'] ?? '' }],
+            _id: {$ne: course['_id']}
         });
         course.related = course.related.slice(0, 6);
         let progress = 0;
