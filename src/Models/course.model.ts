@@ -61,6 +61,9 @@ export class Lesson {
     @Prop()
     @IsString()
     name: string;
+    @ApiProperty()
+    @Prop()
+    liveToken: string;
     @ApiProperty({ enum: [LessonType.excercice, LessonType.video] })
     @Prop({ enum: [LessonType.video, LessonType.excercice] })
     @IsEnum(LessonType)

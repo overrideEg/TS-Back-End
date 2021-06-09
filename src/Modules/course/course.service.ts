@@ -1,16 +1,19 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
+import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import { Model } from 'mongoose';
 import { Course, CourseContent, CourseDocument, CourseReview, LessonType } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
+import { Agora } from '../auth/Security/constants';
 import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class CourseService {
+
 
 
 
@@ -60,6 +63,18 @@ export class CourseService {
         return await this.CourseModel.findByIdAndDelete(id);
     }
 
+    async startLive(req, courseId, lessonId) {
+        let course = await this.CourseModel.findById(courseId).lean().exec();
+        let content = course.content.find(content => content.lessons.find(less => less.OId === lessonId));
+        let lesson = content.lessons.find(less => less.OId === lessonId);
+        const expirationTimeInSeconds = 3600
+        const currentTimestamp = Math.floor(Date.now() / 1000)
+        const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+        const tokenA =  RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, Math.floor(1000000000 + Math.random() * 900000), null, privilegeExpiredTs);
+        lesson.liveToken = tokenA;
+        return lesson;
+
+    }
 
 
 
@@ -89,7 +104,28 @@ export class CourseService {
         await this.CourseModel.findByIdAndUpdate(course['_id'], course).exec();
         return (await this.CourseModel.findById(courseId).exec()).reviews;
     }
+    async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
+        let course = await this.CourseModel.findById(id).exec();
 
+
+        let progress = 0;
+        let videos = 0;
+        course.content.forEach(cont => {
+            let contentProgress = 0;
+            cont.lessons.forEach(less => {
+                less.type.toString() === 'video' ? videos += 1 : videos += 0;
+                less.type.toString() === 'video' && less.isDone ? contentProgress += 1 : contentProgress += 0;
+            });
+            progress += contentProgress;
+        });
+        course.progress = progress / videos * 100;
+        for await (let review of course.reviews) {
+            review.user = await this.userService.UserModel.findOne(review.user).exec()
+        }
+        course['cRating'] = course.reviews.length == 0 ? 5 : course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length;
+
+        return course;
+    }
 
 
     async getTeacherCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
