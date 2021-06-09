@@ -70,12 +70,24 @@ export class CourseService {
         const expirationTimeInSeconds = 3600
         const currentTimestamp = Math.floor(Date.now() / 1000)
         const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId, req.user.id, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+        const tokenA = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId,0, RtcRole.PUBLISHER, privilegeExpiredTs);
         lesson.liveToken = tokenA;
         return lesson;
 
     }
 
+    async joinLive(req, courseId, lessonId) {
+        let course = await this.CourseModel.findById(courseId).lean().exec();
+        let content = course.content.find(content => content.lessons.find(less => less.OId === lessonId));
+        let lesson = content.lessons.find(less => less.OId === lessonId);
+        const expirationTimeInSeconds = 3600
+        const currentTimestamp = Math.floor(Date.now() / 1000)
+        const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+        const tokenA = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId,0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+        lesson.liveToken = tokenA;
+        return lesson;
+
+    }
 
 
     async addCourseContent(req: any, courseId: string, contents: CourseContent[]): Promise<CourseContent[] | PromiseLike<CourseContent[]>> {
