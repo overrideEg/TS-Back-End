@@ -21,14 +21,14 @@ export class UserService {
         @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>
     ) { }
 
-    findByParent(parentId: any) {
-        return this.UserModel.findOne({ parent: new ObjectId(parentId) }).exec() as User;
+    async findByParent(parentId: any) {
+        return await this.UserModel.findOne({ parent: new ObjectId(parentId) }).exec() as User;
     }
-    findByStudent(studentId: any) {
-        return this.UserModel.findOne({ student: new ObjectId(studentId) }).exec() as User;
+    async findByStudent(studentId: any) {
+        return await this.UserModel.findOne({ student: new ObjectId(studentId) }).exec() as User;
     }
-    findByTeacher(teacherId: any) {
-        return this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).exec() as User;
+    async findByTeacher(teacherId: any) {
+        return await this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).exec() as User;
     }
 
 

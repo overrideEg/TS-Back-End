@@ -70,7 +70,7 @@ export class CourseService {
         const expirationTimeInSeconds = 3600
         const currentTimestamp = Math.floor(Date.now() / 1000)
         const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const tokenA =  RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, Math.floor(1000000000 + Math.random() * 900000), null, privilegeExpiredTs);
+        const tokenA =  RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, Math.floor(1000000000 + Math.random() * 900000), RtcRole.PUBLISHER, privilegeExpiredTs);
         lesson.liveToken = tokenA;
         return lesson;
 
@@ -107,9 +107,10 @@ export class CourseService {
     async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
 
-
+        course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
         let progress = 0;
         let videos = 0;
+        course.enrolled = Number((Math.random() * 100).toFixed(0))
         course.content.forEach(cont => {
             let contentProgress = 0;
             cont.lessons.forEach(less => {
