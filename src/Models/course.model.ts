@@ -168,5 +168,8 @@ export class Course extends OBaseEntity {
     @ApiProperty({ type: Number })
     @Prop()
     enrolled: number
+
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Course.name, autopopulate: true }])
+    related?: Course[];
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);
