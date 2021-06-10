@@ -95,13 +95,18 @@ export class CourseContent {
 export type CourseDocument = Course & Document;
 @Schema()
 export class Course extends OBaseEntity {
+
+  
+
     @ApiProperty()
     @Prop()
-    createdAt: number
+    createdAt: number;
+
     @ApiProperty()
     @Prop()
     @IsString()
     cover: string
+
     @ApiProperty()
     @Prop()
     @IsString()
