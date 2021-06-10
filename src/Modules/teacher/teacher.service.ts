@@ -31,19 +31,12 @@ export class TeacherService {
 
     async getTeacherProfile(id: string): Promise<TeacherProfile> {
         let teacher = await this.TeacherModel.findById(id).lean().exec();
-        let user = await this.userService.findByTeacher(teacher['_id'].toString());
+        let user = await this.userService.findByTeacher(teacher['_id']);
         let courses = await this.CourseModel.find({ teacher: teacher }).sort({ createdAt: 'desc' }).exec();
         for await (const course of courses) {
+            course.teacher = teacher;
             course.teacher.user = user;
-
-            course.related = await this.CourseModel.find({
-                $or: [
-                    { subject: course.subject ? course.subject['_id'] : null },
-                    { teacher: course.teacher['_id'] ?? null },
-                    { grade: course.grade['_id'] ?? null },
-                    { stage: course.stage['_id'] ?? null }],
-                _id: { $ne: course['_id'] }
-            });
+            course.related = [];
             course.related = course.related.slice(0, 6);
             let progress = 0;
             let videos = 0;
