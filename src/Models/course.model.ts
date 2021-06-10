@@ -160,13 +160,13 @@ export class Course extends OBaseEntity {
     teacher?: Teacher;
 
     @ApiProperty({ type: Number })
-    @Prop({})
+    @Prop({ default: 5 })
     cRating: number
     @ApiProperty({ type: Number })
-    @Prop()
+    @Prop({ default: 0 })
     progress: number
     @ApiProperty({ type: Number })
-    @Prop()
+    @Prop({ default: 0 })
     enrolled: number;
     @ApiProperty()
     @Prop()
