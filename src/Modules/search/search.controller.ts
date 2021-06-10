@@ -16,7 +16,7 @@ export class SearchController {
     @Query('search') search: string,
     @Query('page') page: number,
     @Query('limit') limit: number): Promise<GlobalSearch> {
-    return this.searchService.findAll(req, search, (+page ?? 1) - 1, +limit ?? 15)
+    return this.searchService.globalSearch(req, search, (+page ?? 1) - 1, +limit ?? 15)
   }
   @UseGuards(JwtAuthGuard)
   @Get(':subjectId')

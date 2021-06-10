@@ -12,7 +12,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class SearchService {
-   
+
     constructor(
         @InjectModel(Course.name) private CourseModel: Model<CourseDocument>,
         @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>,
@@ -20,7 +20,7 @@ export class SearchService {
     ) { }
 
 
-    async findAll(req: any, search: string, page: number, limit: number): Promise<GlobalSearch | PromiseLike<GlobalSearch>> {
+    async globalSearch(req: any, search: string, page: number, limit: number): Promise<GlobalSearch | PromiseLike<GlobalSearch>> {
         let globalSearch = new GlobalSearch()
         let courses = await this.CourseModel.find(
             {
@@ -44,23 +44,7 @@ export class SearchService {
             course.teacher.user = await this.userService.findByTeacher(course?.teacher['_id'])
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id']) })
             course.related = [];
-            let progress = 0;
-            let videos = 0;
-            course.enrolled = Number((Math.random() * 100).toFixed(0))
-            course.content.forEach(cont => {
-                let contentProgress = 0;
-                cont.lessons.forEach(less => {
-                    less.type.toString() === 'video' ? videos += 1 : videos += 0;
-                    less.type.toString() === 'video' && less.isDone ? contentProgress += 1 : contentProgress += 0;
-                });
-                progress += contentProgress;
-            });
-            course.progress = progress / videos * 100;
-            for await (let review of course.reviews) {
-                review.user = await this.userService.UserModel.findOne(review.user).exec()
-            }
-            course['cRating'] = course.reviews.length == 0 ? 5 : course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length;
-
+       
         }
         globalSearch.courses = courses;
         let userTeachers = await this.userService.UserModel.find(
@@ -85,16 +69,9 @@ export class SearchService {
             profile.name = user.name;
             profile.avatar = user.avatar ?? "";
             let teacherCourses = await this.CourseModel.find({ teacher: user.teacher });
-            for await (const course of teacherCourses) {
-
-                for await (let review of course.reviews) {
-                    review.user = await this.userService.UserModel.findOne(review.user).exec()
-                }
-                course['cRating'] = course.reviews.length == 0 ? 5 : course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length;
-            }
             profile.noOfStudents = +((Math.random() * 100).toFixed(0));
             profile.noOfCourses = teacherCourses.length
-            profile.rate = teacherCourses.length>0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+            profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
             profile.bio = user.teacher?.bio ?? user.name;
             profile.userId = user['_id']
             globalSearch.teachers.push(profile);
@@ -102,8 +79,17 @@ export class SearchService {
         return globalSearch;
     }
 
-    filter(req: any, subjectId: string, gradeId: string, stageId: string, cityId: string, rate: Sort, page: number, limit: number): GlobalFilter | PromiseLike<GlobalFilter> {
-        throw new Error('Method not implemented.');
-      }
-  
+    async filter(req: any, subjectId: string, gradeId: string, stageId: string, cityId: string, rate: Sort, page: number, limit: number): Promise<GlobalFilter | PromiseLike<GlobalFilter>> {
+        let globalFilter = new GlobalFilter();
+
+        let topCourses = await this.CourseModel.find({
+            subject: new ObjectId(subjectId)
+
+        })
+
+
+        return globalFilter;
+
+    }
+
 }

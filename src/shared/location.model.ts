@@ -1,6 +1,6 @@
 import { Prop } from "@nestjs/mongoose"
 import { ApiProperty } from "@nestjs/swagger"
-import { ArrayMaxSize, ArrayMinSize, IsLatitude, IsLatLong, IsString } from "class-validator";
+import { ArrayMaxSize, ArrayMinSize, IsLatitude, IsLatLong, IsNumber, IsString } from "class-validator";
 
 export class LocationModel {
 
@@ -10,7 +10,6 @@ export class LocationModel {
     type: string;
     @ApiProperty({ type: [Number] })
     @Prop({ type: [Number] })
-    @IsLatLong({each:true})
     @ArrayMinSize(2)
     @ArrayMaxSize(2)
     coordinates: Array<number>;
