@@ -167,8 +167,10 @@ export class Course extends OBaseEntity {
     progress: number
     @ApiProperty({ type: Number })
     @Prop()
-    enrolled: number
-
+    enrolled: number;
+    @ApiProperty()
+    @Prop()
+    inCart:  boolean;
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Course.name, autopopulate: true }])
     related?: Course[];
 }

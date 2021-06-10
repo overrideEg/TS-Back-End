@@ -22,6 +22,7 @@ import { SubjectModule } from './Modules/subject/subject.module';
 import { PromotionModule } from './Modules/promotion/promotion.module';
 import { OurContactsModule } from './Modules/our-contacts/our-contacts.module';
 import { CourseModule } from './Modules/course/course.module';
+import { SearchModule } from './Modules/search/search.module';
 const overrideMoules = [
   FileModule,
   AuthModule,
@@ -38,6 +39,7 @@ const overrideMoules = [
   OurContactsModule,
   CourseModule,
   CartModule,
+  SearchModule
 ]
 @Module({
   imports: [
