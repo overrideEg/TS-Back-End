@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Course, CourseContent, CourseReview } from '../../Models/course.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
@@ -35,21 +35,23 @@ export class CourseController {
 
   @UseGuards(JwtAuthGuard)
   @Get('live/:courseId/:lessonId')
-  async startLive(@Req() req, @Param('courseId') courseId: string,@Param('lessonId') lessonId: string): Promise<any> {
+  async startLive(@Req() req, @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<any> {
     return this.service.startLive(req, courseId, lessonId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('join/:courseId/:lessonId')
-  async joinLive(@Req() req, @Param('courseId') courseId: string,@Param('lessonId') lessonId: string): Promise<any> {
+  async joinLive(@Req() req, @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<any> {
     return this.service.joinLive(req, courseId, lessonId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getOneCourse(@Req() req,@Param('id') id: string): Promise<Course> {
+  async getOneCourse(@Req() req, @Param('id') id: string): Promise<Course> {
     return this.service.findOne(req, id)
   }
+
+  
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(@Req() req, @Body() body: Course, @Param('id') id: string): Promise<Course> {

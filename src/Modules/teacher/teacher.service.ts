@@ -21,7 +21,7 @@ export class TeacherService {
     }
 
     async findAll(): Promise<Teacher[]> {
-        let teachers = await this.TeacherModel.find().lean().exec();
+        let teachers = await this.TeacherModel.find().exec();
         for await (let teacher of teachers) {
             teacher.user = await this.userService.findByTeacher(teacher['_id'])
         }
@@ -30,7 +30,7 @@ export class TeacherService {
 
 
     async getTeacherProfile(id: string): Promise<TeacherProfile> {
-        let teacher = await this.TeacherModel.findById(id).lean().exec();
+        let teacher = await this.TeacherModel.findById(id).exec();
         let user = await this.userService.findByTeacher(teacher['_id']);
         let courses = await this.CourseModel.find({ teacher: teacher }).sort({ createdAt: 'desc' }).exec();
         for await (const course of courses) {
@@ -62,12 +62,12 @@ export class TeacherService {
         profile.name = user.name;
         profile.userId = user['_id'];
         profile.avatar = user['avatar'] ?? '';
-        profile.rate = courses.reduce((acc, course) => acc + (course.reviews.length == 0 ? 5 :  course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length), 0) / courses.length;
-        profile.noOfStudents = +((Math.random() * 100).toFixed(0));
+        profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
+                profile.noOfStudents = +((Math.random() * 100).toFixed(0));
         return profile;
     }
     async findOne(id: string): Promise<Teacher> {
-        let teacher = await this.TeacherModel.findById(id).lean().exec();
+        let teacher = await this.TeacherModel.findById(id).exec();
         teacher.user = await this.userService.findByTeacher(teacher['_id'])
 
         return teacher;
