@@ -4,6 +4,7 @@ import { TeacherController } from './teacher.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Teacher, TeacherSchema } from '../../Models/teacher.model';
 import { UserModule } from '../user/user.module';
+import { Course, CourseSchema } from '../../Models/course.model';
 
 @Module({
   imports: [
@@ -13,6 +14,14 @@ import { UserModule } from '../user/user.module';
         name: Teacher.name,
         useFactory: () => {
           const schema = TeacherSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+      {
+        name: Course.name,
+        useFactory: () => {
+          const schema = CourseSchema;
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },

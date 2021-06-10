@@ -24,7 +24,7 @@ export class Teacher extends OBaseEntity {
     @Prop()
     bio: string
     @ApiProperty({ type: () => User })
-    @Prop()
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
     user?: User;
 }
 export const TeacherSchema = SchemaFactory.createForClass(Teacher);

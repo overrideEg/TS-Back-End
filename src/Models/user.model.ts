@@ -43,7 +43,7 @@ export class User extends OBaseEntity {
     userType?: UserType;
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Student', autopopulate: true })
     student?: Student;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name, autopopulate: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Teacher', autopopulate: true })
     teacher?: Teacher;
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Parent.name, autopopulate: true })
     parent?: Parent;
