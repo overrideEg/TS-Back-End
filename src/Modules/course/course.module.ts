@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CourseController } from './course.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from '../../Models/course.model';
 import { UserModule } from '../user/user.module';
+import { CheckoutModule } from '../checkout/checkout.module';
+import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
 
 @Module({
   imports: [
@@ -38,10 +40,20 @@ import { UserModule } from '../user/user.module';
           return schema;
         },
       },
+      {
+        name: Checkout.name,
+        useFactory: async () => {
+          const schema = CheckoutSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+      
     ]),
-    UserModule
+    UserModule,
   ],
   controllers: [CourseController],
-  providers: [CourseService]
+  providers: [CourseService],
+  exports: [CourseService],
 })
 export class CourseModule { }

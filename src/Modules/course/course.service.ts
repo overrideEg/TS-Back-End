@@ -1,12 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import { Model } from 'mongoose';
+import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Course, CourseContent, CourseDocument, CourseReview, LessonType } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { Agora } from '../auth/Security/constants';
+import { CheckoutService } from '../checkout/checkout.service';
 import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -17,10 +19,11 @@ export class CourseService {
 
 
 
-
     constructor(
         @InjectModel(Course.name) private CourseModel: Model<CourseDocument>,
-        private userService: UserService
+        private userService: UserService,
+        @InjectModel(Checkout.name) public CheckoutModel: Model<CheckoutDocument>,
+
     ) { }
 
 
@@ -43,7 +46,7 @@ export class CourseService {
             throw new BadRequestException('only teacher can update his courses');
         }
         //TODO:
-        await this.CourseModel.updateOne({_id: id}, body).exec();
+        await this.CourseModel.updateOne({ _id: id }, body).exec();
         return await this.CourseModel.findById(id).exec();
     }
 
@@ -104,7 +107,7 @@ export class CourseService {
             content.lessons.forEach(lesson => lesson['OId'] = OverrideUtils.generateGUID());
         })
         course.content = contents;
-        await this.CourseModel.updateOne({_id: course['_id']}, course).exec();
+        await this.CourseModel.updateOne({ _id: course['_id'] }, course).exec();
         return course.content;
     }
 
@@ -114,7 +117,7 @@ export class CourseService {
         body.user = new ObjectId(req.user.id)
         body.time = Date.now()
         course.reviews === null ? course.reviews = [body] : course.reviews.push(body);
-        await this.CourseModel.updateOne({_id:course['_id']}, course).exec();
+        await this.CourseModel.updateOne({ _id: course['_id'] }, course).exec();
         return (await this.CourseModel.findById(courseId).exec()).reviews;
     }
     async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
@@ -122,7 +125,7 @@ export class CourseService {
 
         course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
 
-        course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id) , cart: new ObjectId(course['_id'].toString())})
+        course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
         course.related = await this.CourseModel.find({
             $or: [
                 { subject: course.subject ? course.subject['_id'] : null },
@@ -141,13 +144,26 @@ export class CourseService {
             throw new BadRequestException('only teacher can view this request');
         }
         let teacher = (await this.userService.findOne(req.user.id))?.teacher;
-        let courses = []
+        let courses = [];
         if (teacher) {
             courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
-
         }
-
         return courses;
     }
+    async getStudentCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
+        let purchased = await this.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
+        let courses = []
+        purchased.map(purchase => {
+            return purchase.lines.map(line => {
+                courses.push(line.course);
+            })
+        });
+        
+    
+
+
+       return courses;
+    }
+
 
 }

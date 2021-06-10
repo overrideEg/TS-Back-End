@@ -51,6 +51,8 @@ export class CourseController {
     return this.service.findOne(req, id)
   }
 
+
+
   
   @UseGuards(JwtAuthGuard)
   @Put(':id')
@@ -62,6 +64,12 @@ export class CourseController {
   @Get('teacher')
   async teacher(@Req() req): Promise<Course[]> {
     return this.service.getTeacherCourses(req)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('student')
+  async myCourses(@Req() req): Promise<Course[]> {
+    return this.service.getStudentCourses(req)
   }
 
   @UseGuards(JwtAuthGuard)

@@ -1,11 +1,12 @@
 import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GlobalFilter, GlobalSearch } from '../../dtos/search.dto';
 import { Sort } from '../../enums/sort.enum';
 import { Course } from '../../Models/course.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { SearchService } from './search.service';
 
+@ApiTags('Search')
 @Controller('Search')
 export class SearchController {
   constructor(private readonly searchService: SearchService) { }
