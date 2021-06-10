@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { Teacher } from '../../Models/teacher.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { Roles } from '../auth/Security/roles.decorator';
@@ -31,6 +32,12 @@ export class TeacherController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Teacher> {
     return this.service.findOne(id);
+  }
+  /* GET One Teacher End Point */
+  @UseGuards(JwtAuthGuard)
+  @Get('profile/:id')
+  getTeacherProfile(@Param('id') id: string): Promise<TeacherProfile> {
+    return this.service.getTeacherProfile(id);
   }
 
 

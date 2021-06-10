@@ -24,6 +24,7 @@ export class Teacher extends OBaseEntity {
     @Prop()
     bio: string
     @ApiProperty({ type: () => User })
+    @Prop()
     user?: User;
 }
 export const TeacherSchema = SchemaFactory.createForClass(Teacher);
