@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiParam, ApiQuery } from '@nestjs/swagger';
 import { GlobalFilter, GlobalSearch } from '../../dtos/search.dto';
 import { Sort } from '../../enums/sort.enum';
 import { Course } from '../../Models/course.model';
@@ -21,6 +21,12 @@ export class SearchController {
   @UseGuards(JwtAuthGuard)
   @Get(':subjectId')
   @ApiQuery({ name: 'rate', description: 'rate sorting', enum: [Sort.HTL, Sort.LTH] })
+  @ApiQuery({ name: 'page', description: 'page', required: true })
+  @ApiQuery({ name: 'limit', description: 'number of pages', required: false })
+  @ApiQuery({ name: 'gradeId', description: 'gradeId', required: false })
+  @ApiQuery({ name: 'stageId', description: 'stageId', required: false })
+  @ApiQuery({ name: 'cityId', description: 'cityId', required: false })
+  @ApiParam({ name: 'subjectId', description: 'subjectId', required: true })
   async filter(
     @Req() req,
     @Param('subjectId') subjectId: string,

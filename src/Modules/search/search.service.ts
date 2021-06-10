@@ -44,7 +44,7 @@ export class SearchService {
             course.teacher.user = await this.userService.findByTeacher(course?.teacher['_id'])
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id']) })
             course.related = [];
-       
+
         }
         globalSearch.courses = courses;
         let userTeachers = await this.userService.UserModel.find(
@@ -82,12 +82,56 @@ export class SearchService {
     async filter(req: any, subjectId: string, gradeId: string, stageId: string, cityId: string, rate: Sort, page: number, limit: number): Promise<GlobalFilter | PromiseLike<GlobalFilter>> {
         let globalFilter = new GlobalFilter();
 
-        let topCourses = await this.CourseModel.find({
-            subject: new ObjectId(subjectId)
+        let featuresCourses = await this.CourseModel.find({
+            subject: new ObjectId(subjectId),
 
-        })
+        }).sort({ 'cRating': 'desc' }).exec();
 
 
+        for await (const course of featuresCourses) {
+            course.inCart =  await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id) , cart: new ObjectId(course['_id'].toString())})
+        }
+        globalFilter.topInstructors = []
+
+        for await (const course of featuresCourses) {
+
+            let profile = new TeacherProfile();
+            course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
+            profile.name = course.teacher.user.name;
+            profile.avatar = course.teacher.user.avatar ?? "";
+            let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
+            profile.noOfStudents = +((Math.random() * 100).toFixed(0));
+            profile.noOfCourses = teacherCourses.length
+            profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+            profile.bio = course.teacher.user.teacher?.bio ?? course.teacher.user.name;
+            profile.userId = course.teacher.user['_id']
+            globalFilter.topInstructors.push(profile);
+        }
+
+        globalFilter.featuresCourses = featuresCourses.slice(0, 10);
+
+        let allCourses = await this.CourseModel.find({
+
+            $and: [
+                { subject: new ObjectId(subjectId) },
+                {
+                    $or: [
+                        gradeId ? { grade: new ObjectId(gradeId) } : {},
+                        stageId ? { grade: new ObjectId(stageId) } : {},
+                    ]
+                }
+            ]
+        }).sort({ 'cRating': rate === Sort.HTL ? 'desc' : 'asc' }) .limit(limit)
+        .skip(limit * page).exec();
+
+        for await (const course of allCourses) {
+            course.inCart =  await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id) , cart: new ObjectId(course['_id'].toString())})
+
+        }
+        if (cityId) {
+            allCourses = allCourses.filter(course => course?.teacher?.city['_id'] === cityId);
+        }
+        globalFilter.allCourses = allCourses;
         return globalFilter;
 
     }
