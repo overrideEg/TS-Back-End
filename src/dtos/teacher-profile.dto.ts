@@ -16,4 +16,6 @@ export class TeacherProfile {
     courses: Course[]
     @ApiProperty()
     userId: number;
+    @ApiProperty()
+    avatar: string;
 }

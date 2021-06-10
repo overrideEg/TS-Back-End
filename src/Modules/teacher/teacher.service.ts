@@ -68,7 +68,8 @@ export class TeacherService {
         profile.noOfCourses = courses.length;
         profile.name = user.name;
         profile.userId = user['_id'];
-        profile.rate = courses.reduce((acc, course) => acc + course.reviews.reduce((acc, rev) => acc + (rev.stars / course.reviews.length), 0), 0);
+        profile.avatar = user.avatar
+        profile.rate = courses.reduce((acc, course) => acc + (course.reviews.length == 0 ? 5 :  course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length), 0) / courses.length;
         profile.noOfStudents = +((Math.random() * 100).toFixed(0));
         return profile;
     }
