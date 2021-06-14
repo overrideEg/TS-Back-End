@@ -1,28 +1,25 @@
 import { Module } from '@nestjs/common';
-import { SearchService } from './search.service';
-import { SearchController } from './search.controller';
+import { HomeService } from './home.service';
+import { HomeController } from './home.controller';
+import { BannerModule } from '../banner/banner.module';
+import { PartnerModule } from '../partner/partner.module';
 import { UserModule } from '../user/user.module';
+import { SubjectModule } from '../subject/subject.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from '../../Models/course.model';
-import { Teacher, TeacherSchema } from '../../Models/teacher.model';
 import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
 
 @Module({
   imports:[
-    
+    BannerModule,
+    PartnerModule,
+    UserModule,
+    SubjectModule,
     MongooseModule.forFeatureAsync([
       {
         name: Course.name,
         useFactory: () => {
           const schema = CourseSchema;
-          schema.plugin(require('mongoose-autopopulate'));
-          return schema;
-        },
-      },
-      {
-        name: Teacher.name,
-        useFactory: () => {
-          const schema = TeacherSchema;
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
@@ -35,10 +32,10 @@ import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
           return schema;
         },
       },
+     
     ]),
-    UserModule
   ],
-  controllers: [SearchController],
-  providers: [SearchService]
+  controllers: [HomeController],
+  providers: [HomeService]
 })
-export class SearchModule {}
+export class HomeModule {}

@@ -17,6 +17,7 @@ import { Stage } from '../../Models/stage.model';
 import { refreshToken } from './DTOs/refreshToken.dto';
 import { Lang } from '../../shared/enums/lang.enum';
 import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
+import { jwtConstants } from './Security/constants';
 
 
 @Injectable()
@@ -31,9 +32,20 @@ export class AuthService {
         private parentService: ParentService,
         private jwtService: JwtService) { }
 
+    public async getUserFromAuthenticationToken(token: string) {
+        token = token.substr(7);
+        const payload = this.jwtService.verify(token, {
+            secret: jwtConstants.secret
+        });
+        if (payload.id) {
+            return this.userService.findOne(payload.id);
+        }
+    }
     sign(user: User) {
         return this.jwtService.sign({ id: user['_id'], email: user['email'], phone: user['phone'], userType: user['userType'] })
     }
+
+
 
     async changePassword(req: any, body: ChangePassword) {
         let user = await this.userService.findOne(req.user.id);
@@ -50,7 +62,7 @@ export class AuthService {
             ...user['_doc'],
             token: this.sign(user),
         };
-        
+
     }
     async newPassword(req, body: ResetPassword) {
         let user = await this.userService.findOne(req.user.id);
@@ -227,7 +239,7 @@ export class AuthService {
         //create parent
         let parent = new Parent();
         parent.students = [savedSudent];
-        let savedParent =  await this.parentService.save(parent);
+        let savedParent = await this.parentService.save(parent);
         //create user
         let user = new User();
         user.userType = UserType.parent;

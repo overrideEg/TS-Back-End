@@ -18,6 +18,7 @@ import { Banner, BannerSchema } from '../../Models/banner.model';
     ]),
   ],
   controllers: [BannerController],
-  providers: [BannerService]
+  providers: [BannerService],
+  exports: [BannerService],
 })
 export class BannerModule {}

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { GlobalFilter, GlobalSearch } from '../../dtos/search.dto';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { Sort } from '../../enums/sort.enum';
+import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Course, CourseDocument } from '../../Models/course.model';
 import { Teacher, TeacherDocument } from '../../Models/teacher.model';
 import { UserType } from '../../Models/user.model';
@@ -16,6 +17,7 @@ export class SearchService {
     constructor(
         @InjectModel(Course.name) private CourseModel: Model<CourseDocument>,
         @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>,
+        @InjectModel(Checkout.name) private CheckoutModel: Model<CheckoutDocument>,
         private userService: UserService
     ) { }
 
@@ -69,7 +71,14 @@ export class SearchService {
             profile.name = user.name;
             profile.avatar = user.avatar ?? "";
             let teacherCourses = await this.CourseModel.find({ teacher: user.teacher });
-            profile.noOfStudents = +((Math.random() * 100).toFixed(0));
+            let registers = await this.CheckoutModel.countDocuments().populate({
+                "path": "lines.course",
+                'model': Course.name
+            }).populate({
+                path: 'lines.course.teacher',
+                "match": new ObjectId(user.teacher['_id'].toString())
+            });
+            profile.noOfStudents = registers
             profile.noOfCourses = teacherCourses.length
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
             profile.bio = user.teacher?.bio ?? user.name;
@@ -100,7 +109,13 @@ export class SearchService {
             profile.name = course.teacher.user.name;
             profile.avatar = course.teacher.user.avatar ?? "";
             let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
-            profile.noOfStudents = +((Math.random() * 100).toFixed(0));
+            profile.noOfStudents = await this.CheckoutModel.countDocuments().populate({
+                "path": "lines.course",
+                'model': Course.name
+            }).populate({
+                path: 'lines.course.teacher',
+                "match": new ObjectId(course.teacher['_id'].toString())
+            });
             profile.noOfCourses = teacherCourses.length
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
             profile.bio = course.teacher.user.teacher?.bio ?? course.teacher.user.name;

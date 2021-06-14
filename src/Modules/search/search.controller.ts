@@ -19,6 +19,7 @@ export class SearchController {
     @Query('limit') limit: number): Promise<GlobalSearch> {
     return this.searchService.globalSearch(req, search, (+page ?? 1) - 1, +limit ?? 15)
   }
+  
   @UseGuards(JwtAuthGuard)
   @Get(':subjectId')
   @ApiQuery({ name: 'rate', description: 'rate sorting', enum: [Sort.HTL, Sort.LTH] })

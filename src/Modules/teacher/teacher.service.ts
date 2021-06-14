@@ -3,9 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
+import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Course, CourseDocument } from '../../Models/course.model';
 import { Teacher, TeacherDocument } from '../../Models/teacher.model';
 import { UserService } from '../user/user.service';
+const ObjectId = require('mongoose').Types.ObjectId;
+
 @Injectable()
 export class TeacherService {
 
@@ -13,6 +16,7 @@ export class TeacherService {
     constructor(
         @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>,
         @InjectModel(Course.name) private CourseModel: Model<CourseDocument>,
+        @InjectModel(Checkout.name) private CheckoutModel: Model<CheckoutDocument>,
         private userService: UserService
     ) { }
     async save(req: Teacher) {
@@ -63,7 +67,13 @@ export class TeacherService {
         profile.userId = user['_id'];
         profile.avatar = user['avatar'] ?? '';
         profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
-                profile.noOfStudents = +((Math.random() * 100).toFixed(0));
+                profile.noOfStudents =  await this.CheckoutModel.countDocuments().populate({
+                    "path": "lines.course",
+                    'model': Course.name
+                }).populate({
+                    path: 'lines.course.teacher',
+                    "match": new ObjectId(teacher['_id'].toString())
+                });
         return profile;
     }
     async findOne(id: string): Promise<Teacher> {

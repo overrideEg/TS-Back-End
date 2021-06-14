@@ -20,7 +20,7 @@ export class CourseService {
 
 
     constructor(
-        @InjectModel(Course.name) private CourseModel: Model<CourseDocument>,
+        @InjectModel(Course.name) public CourseModel: Model<CourseDocument>,
         private userService: UserService,
         @InjectModel(Checkout.name) public CheckoutModel: Model<CheckoutDocument>,
 
@@ -70,11 +70,11 @@ export class CourseService {
         let course = await this.CourseModel.findById(courseId).lean().exec();
         let content = course.content.find(content => content.lessons.find(less => less.OId === lessonId));
         let lesson = content.lessons.find(less => less.OId === lessonId);
-        const expirationTimeInSeconds = 3600
-        const currentTimestamp = Math.floor(Date.now() / 1000)
-        const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId, req.user.email, RtcRole.PUBLISHER, privilegeExpiredTs);
-        lesson.liveToken = tokenA;
+            const expirationTimeInSeconds = 3600
+            const currentTimestamp = Math.floor(Date.now() / 1000)
+            const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+            const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId, req.user.email, RtcRole.PUBLISHER, privilegeExpiredTs);
+        // lesson.liveToken = tokenA;
         return lesson;
 
     }
@@ -88,7 +88,7 @@ export class CourseService {
         const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
         const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId, req.user.email, RtcRole.SUBSCRIBER, privilegeExpiredTs);
 
-        lesson.liveToken = tokenA;
+        // lesson.liveToken = tokenA;
         return lesson;
 
     }
@@ -138,6 +138,20 @@ export class CourseService {
         return course;
     }
 
+    async findById( id: string): Promise<Course | PromiseLike<Course>> {
+        let course = await this.CourseModel.findById(id).exec();
+        course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
+        course.related = await this.CourseModel.find({
+            $or: [
+                { subject: course.subject ? course.subject['_id'] : null },
+                { teacher: course.teacher['_id'] ?? '' },
+                { grade: course.grade['_id'] ?? '' },
+                { stage: course.stage['_id'] ?? '' }],
+            _id: { $ne: course['_id'] }
+        });
+        course.related = course.related.slice(0, 6);
+        return course;
+    }
 
     async getTeacherCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
         if (req.user.userType !== UserType.teacher.toString()) {
