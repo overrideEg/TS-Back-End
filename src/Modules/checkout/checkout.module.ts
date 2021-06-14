@@ -19,7 +19,6 @@ import { UserModule } from '../user/user.module';
         },
       },
       
-      
     ]),
     CourseModule,
     UserModule
