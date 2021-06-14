@@ -1,6 +1,7 @@
 type GenericObject = { [key: string]: any };
 import * as CryptoJS from 'crypto-js';
 import { jwtConstants } from '../Modules/auth/Security/constants';
+import { Day } from './enums/day.enum';
 
 export class OverrideUtils {
     /**
@@ -65,6 +66,27 @@ export class OverrideUtils {
         }
     }
 
+
+    public static dayOffDay(dayoff: Day) {
+
+        switch (dayoff) {
+            case Day.Sunday:
+                return 7;
+            case Day.Monday:
+                return 1;
+            case Day.Tuesday:
+                return 2;
+            case Day.Wednesday:
+                return 3;
+            case Day.Thursday:
+                return 4;
+            case Day.Friday:
+                return 5;
+            case Day.Saturday:
+                return 6;
+
+        }
+    }
     /**
      * Search in array
      *

@@ -54,20 +54,21 @@ export class Attachement {
     mimetype: string;
 }
 export class Lesson {
+    
     @ApiProperty({ required: false })
     @Prop({ required: true })
-    OId: string
+    OId: string;
+
     @ApiProperty()
     @Prop()
     @IsString()
     name: string;
-    @ApiProperty()
-    @Prop()
-    liveToken: string;
+
     @ApiProperty({ enum: [LessonType.excercice, LessonType.video] })
     @Prop({ enum: [LessonType.video, LessonType.excercice] })
     @IsEnum(LessonType)
     type: LessonType;
+
     @ApiProperty({ type: () => Attachement })
     @Prop({ required: false })
     @ValidateNested()
@@ -100,33 +101,33 @@ export class Course extends OBaseEntity {
 
     @ApiProperty()
     @Prop()
-    createdAt: number;
+    createdAt?: number;
 
     @ApiProperty()
     @Prop()
     @IsString()
-    cover: string
+    cover?: string
 
     @ApiProperty()
     @Prop()
     @IsString()
-    name: string;
+    name?: string;
     @ApiProperty()
     @Prop()
     @IsNumber()
-    price: number;
+    price?: number;
     @ApiProperty()
     @Prop()
     @IsString()
-    info: string;
+    info?: string;
     @ApiProperty()
     @Prop()
     @IsNumber()
-    startDate: number;
+    startDate?: number;
     @ApiProperty()
     @Prop()
     @IsString()
-    description: string
+    description?: string
     @ApiProperty({ type: () => Stage })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name, autopopulate: true })
     @IsNotEmpty()
@@ -142,23 +143,23 @@ export class Course extends OBaseEntity {
     @ApiProperty({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday], isArray: true })
     @Prop({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday], type: [String] })
     @IsEnum(Day, { each: true })
-    Days: Day[]
+    Days?: Day[]
     @ApiProperty()
     @Prop()
     @IsNumber()
-    hour: number;
+    hour?: number;
 
     @ApiProperty({ type: () => CourseContent, isArray: true })
     @Prop([CourseContent])
     @ValidateNested()
     @Type(() => CourseContent)
-    content: CourseContent[];
+    content?: CourseContent[];
 
     @ApiProperty({ type: () => CourseReview, isArray: true })
     @Prop([CourseReview])
     @ValidateNested()
     @Type(() => CourseReview)
-    reviews: CourseReview[];
+    reviews?: CourseReview[];
 
     @ApiProperty({ type: () => Teacher })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name, autopopulate: true })
@@ -166,16 +167,16 @@ export class Course extends OBaseEntity {
 
     @ApiProperty({ type: Number })
     @Prop({ default: 5 })
-    cRating: number
+    cRating?: number
     @ApiProperty({ type: Number })
     @Prop({ default: 0 })
-    progress: number
+    progress?: number
     @ApiProperty({ type: Number })
     @Prop({ default: 0 })
-    enrolled: number;
+    enrolled?: number;
     @ApiProperty()
     @Prop()
-    inCart: boolean;
+    inCart?: boolean;
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Course.name, autopopulate: true }])
     related?: Course[];
 }

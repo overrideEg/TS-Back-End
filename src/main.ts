@@ -11,10 +11,15 @@ import { AllExceptionsFilter } from './shared/exception.filter';
 // const numCPUs = require('os').cpus().length;
 import compression from 'fastify-compress';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import {WsAdapter} from '@nestjs/platform-ws'
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), { logger: true });
   app.setGlobalPrefix('v1')
+  // app.useWebSocketAdapter(new WsAdapter(app));
+  app.useWebSocketAdapter(new IoAdapter(app));
+
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(new ValidationPipe({errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }));
   app.enableShutdownHooks();

@@ -13,16 +13,16 @@ export class Teacher extends OBaseEntity {
     city?: City;
     @ApiProperty()
     @Prop()
-    additionalPhone: string;
+    additionalPhone?: string;
     @ApiProperty()
     @Prop()
-    resume: string
+    resume?: string
     @ApiProperty()
     @Prop()
-    coverletter: string
+    coverletter?: string
     @ApiProperty()
     @Prop()
-    bio: string
+    bio?: string
     @ApiProperty({ type: () => User })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
     user?: User;

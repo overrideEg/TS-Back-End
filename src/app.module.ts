@@ -24,6 +24,9 @@ import { OurContactsModule } from './Modules/our-contacts/our-contacts.module';
 import { CourseModule } from './Modules/course/course.module';
 import { SearchModule } from './Modules/search/search.module';
 import { CheckoutModule } from './Modules/checkout/checkout.module';
+import { LearningClassModule } from './Modules/learning-class/learning-class.module';
+import { PartnerModule } from './Modules/partner/partner.module';
+import { HomeModule } from './Modules/home/home.module';
 const overrideMoules = [
   FileModule,
   AuthModule,
@@ -41,7 +44,10 @@ const overrideMoules = [
   CourseModule,
   CartModule,
   SearchModule,
-  CheckoutModule
+  CheckoutModule,
+  PartnerModule,
+  HomeModule,
+  LearningClassModule
 ]
 @Module({
   imports: [
