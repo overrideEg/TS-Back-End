@@ -9,7 +9,7 @@ import { User } from './user.model';
 
 export class CheckoutLine {
     @ApiProperty({ type: () => Course, isArray: false, required: true })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Course.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Course.name , autopopulate: true})
     course: Course;
 
     @ApiProperty({ description: 'price', required: true })

@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
 import { Checkout, CheckoutDocument, CheckoutLine } from '../../Models/checkout.model';
 import { CourseService } from '../course/course.service';
+import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
@@ -13,7 +14,8 @@ export class CheckoutService {
 
     constructor(
         @InjectModel(Checkout.name) public CheckoutModel: Model<CheckoutDocument>,
-      private courseService: CourseService
+      private courseService: CourseService,
+      private userService: UserService
     ) { }
 
     private readonly log = new Logger(CheckoutService.name);
@@ -32,12 +34,10 @@ export class CheckoutService {
         checkout.lines = []
         for await (const course of body.courses) {
             let line = new CheckoutLine();
-
             line.course = await this.courseService.findOne(req, course['_id']);
             line.price = line.course.price;
             // TODO  if (line.course.startDate < Date.now())
             // throw new BadRequestException("can not purchace started course");
-
             checkout.lines.push(line)
         }
 
@@ -45,6 +45,9 @@ export class CheckoutService {
         checkout.valueDate = Date.now();
         checkout.priceBeforeDiscount = checkout.lines.reduce((acc, line) => acc + line.price, 0);
 
+        let user = await this.userService.findOne(req.user.id);
+        user.cart = [];
+        await this.userService.update(req.user.id,user)
         return await this.CheckoutModel.create(checkout);
     }
 
