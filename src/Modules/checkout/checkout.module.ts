@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../../Models/user.model';
 import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
 import { CourseModule } from '../course/course.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { CourseModule } from '../course/course.module';
       
     ]),
     CourseModule,
-
+    UserModule
   ],
   controllers: [CheckoutController],
   providers: [CheckoutService]
