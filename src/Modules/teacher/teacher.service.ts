@@ -67,13 +67,13 @@ export class TeacherService {
         profile.userId = user['_id'];
         profile.avatar = user['avatar'] ?? '';
         profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
-                profile.noOfStudents =  await this.CheckoutModel.countDocuments().populate({
-                    "path": "lines.course",
-                    'model': Course.name
-                }).populate({
-                    path: 'lines.course.teacher',
-                    "match": new ObjectId(teacher['_id'].toString())
-                });
+        profile.noOfStudents = await this.CheckoutModel.countDocuments().populate({
+            "path": "lines.course",
+            'model': Course.name
+        }).populate({
+            path: 'lines.course.teacher',
+            "match": new ObjectId(teacher['_id'].toString())
+        });
         return profile;
     }
     async findOne(id: string): Promise<Teacher> {

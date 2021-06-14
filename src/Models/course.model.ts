@@ -12,6 +12,7 @@ import { Subject } from './subject.model';
 import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from './user.model';
+import { Student } from './student.model';
 
 export enum LessonType {
     video = 'video',
@@ -179,5 +180,8 @@ export class Course extends OBaseEntity {
     inCart?: boolean;
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Course.name, autopopulate: true }])
     related?: Course[];
+    
+    @Prop([{ type: mongoose.Schema.Types.Mixed}])
+    students: any[]
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);

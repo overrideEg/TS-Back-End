@@ -34,18 +34,6 @@ export class CourseController {
 
 
   @UseGuards(JwtAuthGuard)
-  @Get('live/:courseId/:lessonId')
-  async startLive(@Req() req, @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<any> {
-    return this.service.startLive(req, courseId, lessonId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('join/:courseId/:lessonId')
-  async joinLive(@Req() req, @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<any> {
-    return this.service.joinLive(req, courseId, lessonId);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getOneCourse(@Req() req, @Param('id') id: string): Promise<Course> {
     return this.service.findOne(req, id)

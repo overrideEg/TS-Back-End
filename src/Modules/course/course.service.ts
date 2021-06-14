@@ -66,32 +66,7 @@ export class CourseService {
         return await this.CourseModel.findByIdAndDelete(id);
     }
 
-    async startLive(req, courseId, lessonId) {
-        let course = await this.CourseModel.findById(courseId).lean().exec();
-        let content = course.content.find(content => content.lessons.find(less => less.OId === lessonId));
-        let lesson = content.lessons.find(less => less.OId === lessonId);
-            const expirationTimeInSeconds = 3600
-            const currentTimestamp = Math.floor(Date.now() / 1000)
-            const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-            const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId, req.user.email, RtcRole.PUBLISHER, privilegeExpiredTs);
-        // lesson.liveToken = tokenA;
-        return lesson;
-
-    }
-
-    async joinLive(req, courseId, lessonId) {
-        let course = await this.CourseModel.findById(courseId).lean().exec();
-        let content = course.content.find(content => content.lessons.find(less => less.OId === lessonId));
-        let lesson = content.lessons.find(less => less.OId === lessonId);
-        const expirationTimeInSeconds = 3600
-        const currentTimestamp = Math.floor(Date.now() / 1000)
-        const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const tokenA = RtcTokenBuilder.buildTokenWithAccount(Agora.appId, Agora.appCertificate, lesson.OId, req.user.email, RtcRole.SUBSCRIBER, privilegeExpiredTs);
-
-        // lesson.liveToken = tokenA;
-        return lesson;
-
-    }
+  
 
 
     async addCourseContent(req: any, courseId: string, contents: CourseContent[]): Promise<CourseContent[] | PromiseLike<CourseContent[]>> {
@@ -123,6 +98,13 @@ export class CourseService {
     async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
 
+        let reservations = await this.CheckoutModel.find().populate({
+            "path": "lines.course",
+            'model': Course.name,
+            "match": new ObjectId(course['_id'].toString())
+        }).populate('user')
+
+        
         course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
 
         course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
@@ -134,6 +116,19 @@ export class CourseService {
                 { stage: course.stage['_id'] ?? '' }],
             _id: { $ne: course['_id'] }
         });
+        let students = []
+
+        for await (const res of reservations) {
+            let user = await this.userService.findOne(res.user['_id'].toString())
+            students.push({
+                name : user?.name,
+                _id : user['_id'],
+                stage : user.student?.stage,
+                grade : user.student?.grade,
+            })
+        }
+        course.students = students
+        
         course.related = course.related.slice(0, 6);
         return course;
     }
@@ -167,11 +162,13 @@ export class CourseService {
     async getStudentCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
         let purchased = await this.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
         let courses = []
-        purchased.map(purchase => {
-            return purchase.lines.map(line => {
-                courses.push(line.course);
-            })
-        });
+        for await (const check of purchased) {
+            
+        for await (const line of check.lines) {
+            courses.push(await this.findById(line.course['_id'].toString()))
+        }
+        }
+       
         
     
 

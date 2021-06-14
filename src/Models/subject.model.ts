@@ -5,7 +5,7 @@ import { OBaseEntity } from '../shared/base-entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Localized } from '../shared/localized';
 import { Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
+import { IsString, ValidateNested } from 'class-validator';
 export type SubjectDocument = Subject & Document;
 @Schema()
 export class Subject extends OBaseEntity {
@@ -14,5 +14,10 @@ export class Subject extends OBaseEntity {
     @ValidateNested()
     @Type(()=>Localized)
     name: Localized;
+
+    @ApiProperty({description: 'image', required: true })
+    @IsString()
+    @Prop()
+    image?: string;
 }
 export const SubjectSchema = SchemaFactory.createForClass(Subject);
