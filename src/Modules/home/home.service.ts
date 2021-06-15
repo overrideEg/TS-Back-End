@@ -11,6 +11,7 @@ import * as moment from 'moment';
 import { SubjectService } from '../subject/subject.service';
 import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { OverrideUtils } from '../../shared/override-utils';
+import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 @Injectable()
 export class HomeService {
 
@@ -50,6 +51,28 @@ export class HomeService {
 
         home.startSoon = startSoon;
         home.subjects = await this.subjectService.findAll();
+        home.topInstructors = []
+        for await (const course of featuresCourses) {
+
+            let profile = new TeacherProfile();
+            course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
+            profile.name = course.teacher.user.name;
+            profile.avatar = course.teacher.user.avatar ?? "";
+            let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
+            profile.noOfStudents = await this.CheckoutModel.countDocuments().populate({
+                "path": "lines.course",
+                'model': Course.name
+            }).populate({
+                path: 'lines.course.teacher',
+                "match": new ObjectId(course.teacher['_id'].toString())
+            });
+            profile.noOfCourses = teacherCourses.length
+            profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+            profile.bio = course.teacher.user.teacher?.bio ?? course.teacher.user.name;
+            profile.userId = course.teacher.user['_id']
+            profile.teacherId = course.teacher['_id']
+            home.topInstructors.push(profile);
+        }
 
         return home;
     }

@@ -17,5 +17,7 @@ export class TeacherProfile {
     @ApiProperty()
     userId: number;
     @ApiProperty()
+    teacherId: number;
+    @ApiProperty()
     avatar: string;
 }

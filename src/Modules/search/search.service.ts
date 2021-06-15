@@ -83,6 +83,7 @@ export class SearchService {
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
             profile.bio = user.teacher?.bio ?? user.name;
             profile.userId = user['_id']
+            profile.teacherId = user.teacher['_id']
             globalSearch.teachers.push(profile);
         }
         return globalSearch;
@@ -120,6 +121,7 @@ export class SearchService {
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
             profile.bio = course.teacher.user.teacher?.bio ?? course.teacher.user.name;
             profile.userId = course.teacher.user['_id']
+            profile.teacherId = course.teacher['_id']
             globalFilter.topInstructors.push(profile);
         }
 
