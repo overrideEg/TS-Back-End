@@ -13,6 +13,10 @@ export class UpdateProfile {
     @ApiProperty()
     @IsString()
     @IsOptional()
+    avatar: string;
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
     bio: string;
     @ApiProperty()
     @IsString()

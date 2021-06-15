@@ -127,6 +127,9 @@ export class CourseService {
                 grade : user.student?.grade,
             })
         }
+        for await (const rev of course.reviews) {
+            rev.user = await this.userService.findOne(rev.user['_id'])
+        }
         course.students = students
         
         course.related = course.related.slice(0, 6);

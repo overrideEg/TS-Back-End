@@ -49,6 +49,9 @@ export class UserService {
         if (profile.name) {
             user.name = profile.name;
         }
+        if (profile.avatar){
+            user.avatar = profile.avatar;
+        }
         if (profile.email) {
             let existsEmail = await this.UserModel.findOne({ email: profile.email })
             if (existsEmail && req.user.email != profile.email)
