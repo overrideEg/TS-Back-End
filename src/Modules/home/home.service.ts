@@ -111,6 +111,9 @@ export class HomeService {
         home.latestFeedback = home.latestFeedback.slice(0, 5)
 
 
+        for await (const feedback of home.latestFeedback) {
+            feedback.user = await this.userService.findOne(String(feedback.user))
+        }
         let todayCourses = teacherCourses;
         todayCourses =  todayCourses.filter(course => {
             let today = course.Days.find(day =>  OverrideUtils.dayOffDay(day)  === new Date().getDay());
