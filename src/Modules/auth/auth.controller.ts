@@ -32,6 +32,12 @@ export class AuthController {
   public refreshToken(@Body() refresh: refreshToken) {
     return this.service.refreshToken(refresh);
   }
+
+  @Put('/requestToken/:macAddress')
+  @UseGuards(ClientGuard)
+  public requestToken(@Param('macAddress') macAddress: string) {
+    return this.service.requestToken(macAddress);
+  }
   @Get('/resetPassword/:username')
   @UseGuards(ClientGuard)
   public resetPassword(@Param('username') username:string) {

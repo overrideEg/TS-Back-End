@@ -5,11 +5,44 @@ import { OBaseEntity } from '../shared/base-entity';
 import { City } from './city.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from './user.model';
+import { TransactionStatus, TransactionType } from '../enums/wallet.enum';
+
+
+export class Wallet {
+    @ApiProperty()
+    @Prop()
+    date: number;
+    @ApiProperty()
+    @Prop()
+    value: number;
+    @ApiProperty({ enum: [TransactionType.in, TransactionType.out] })
+    @Prop({ enum: [TransactionType.in, TransactionType.out] })
+    type: TransactionType;
+    @ApiProperty({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
+    @Prop({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
+    status: TransactionStatus
+}
+
+export class BankAccount {
+    @ApiProperty({ readOnly: true })
+    @Prop()
+    oId: string;
+    @ApiProperty()
+    @Prop()
+    accountNumber: string;
+    @ApiProperty()
+    @Prop()
+    bankName: string;
+    @ApiProperty()
+    @Prop()
+    accountHolderName: string;
+}
 export type TeacherDocument = Teacher & Document;
+
 @Schema()
 export class Teacher extends OBaseEntity {
     @ApiProperty({ type: () => City })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name, autopopulate: true })
     city?: City;
     @ApiProperty()
     @Prop()
@@ -26,5 +59,13 @@ export class Teacher extends OBaseEntity {
     @ApiProperty({ type: () => User })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
     user?: User;
+
+    @ApiProperty({ type: Wallet, isArray: true })
+    @Prop([Wallet])
+    wallet?: Wallet[];
+
+    @ApiProperty({ type: BankAccount, isArray: true })
+    @Prop([BankAccount])
+    bankAccounts?: BankAccount[]
 }
 export const TeacherSchema = SchemaFactory.createForClass(Teacher);

@@ -25,6 +25,7 @@ export class AuthService {
 
 
 
+
     constructor(
         private userService: UserService,
         private teacherService: TeacherService,
@@ -46,6 +47,12 @@ export class AuthService {
     }
 
 
+
+    requestToken(macAddress: string) {
+        return {
+            token: this.jwtService.sign({ id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress } ,{expiresIn: '1h'})
+        }
+    }
 
     async changePassword(req: any, body: ChangePassword) {
         let user = await this.userService.findOne(req.user.id);

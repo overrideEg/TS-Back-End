@@ -12,6 +12,7 @@ import { SubjectService } from '../subject/subject.service';
 import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
+import { CourseService } from '../course/course.service';
 @Injectable()
 export class HomeService {
 
@@ -82,7 +83,7 @@ export class HomeService {
         let home = new TeacherHome()
         let user = await this.userService.findOne(req.user.id);
 
-        let teacherCourses = await this.CourseModel.find({ teacher: user.teacher });
+        let teacherCourses = await this.CourseModel.find({ teacher: user.teacher }).exec();
         home.noOfCourses = teacherCourses.length
         home.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
         let feedbacks = [];
@@ -108,8 +109,6 @@ export class HomeService {
 
         home.latestFeedback = feedbacks.sort((a, b) => (a.time > b.time) ? -1 : ((b.time > a.time) ? 1 : 0));
         home.latestFeedback = home.latestFeedback.slice(0, 5)
-
-
 
 
         let todayCourses = teacherCourses;

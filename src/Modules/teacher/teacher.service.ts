@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Course, CourseDocument } from '../../Models/course.model';
-import { Teacher, TeacherDocument } from '../../Models/teacher.model';
+import { BankAccount, Teacher, TeacherDocument } from '../../Models/teacher.model';
+import { OverrideUtils } from '../../shared/override-utils';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -76,6 +77,33 @@ export class TeacherService {
         });
         return profile;
     }
+
+    async addBankAccount(req: any, body: BankAccount) {
+        let user = await this.userService.findOne(req.user.id);
+        if (!user)
+            throw new BadRequestException('no user found');
+        let teacher = user.teacher;
+
+        body.oId = OverrideUtils.generateGUID();
+        teacher.bankAccounts != null ? teacher.bankAccounts.push(body) : teacher.bankAccounts = [body];
+        await this.TeacherModel.updateOne({_id : teacher['_id']},teacher);
+
+        return teacher.bankAccounts;
+    }
+
+
+    async deleteBankAccount(req: any, accountId: string) {
+        let user = await this.userService.findOne(req.user.id);
+        if (!user)
+            throw new BadRequestException('no user found');
+        let teacher = user.teacher;
+
+        teacher.bankAccounts.splice(teacher.bankAccounts.findIndex((acc)=>acc.oId === accountId),1);
+        await this.TeacherModel.updateOne({_id : teacher['_id']},teacher);
+
+        return teacher.bankAccounts;
+    }
+
     async findOne(id: string): Promise<Teacher> {
         let teacher = await this.TeacherModel.findById(id).exec();
         teacher.user = await this.userService.findByTeacher(teacher['_id'])

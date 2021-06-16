@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
-import { Teacher } from '../../Models/teacher.model';
+import { BankAccount, Teacher } from '../../Models/teacher.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { Roles } from '../auth/Security/roles.decorator';
 import { TeacherService } from './teacher.service';
@@ -25,14 +25,6 @@ export class TeacherController {
     return this.service.findAll();
   }
 
-
-  /* GET One Teacher End Point */
-  @Roles('admin')
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<Teacher> {
-    return this.service.findOne(id);
-  }
   /* GET One Teacher End Point */
   @UseGuards(JwtAuthGuard)
   @Get('profile/:id')
@@ -41,24 +33,16 @@ export class TeacherController {
   }
 
 
-  /* PUT  Teacher End Point */
-  @Roles('admin')
   @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  updateTeacher(@Param('id') id: string, @Body() req: Teacher): Promise<any> {
-    return this.service.update(id, req);
+  @Post('account')
+  addBankAcount(@Req() req, @Body() body: BankAccount) {
+    return this.service.addBankAccount(req,body)
   }
 
-
-  /* Delete  Teacher End Point */
-  @Roles('admin')
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  deleteTeacher(@Param('id') id: string): Promise<any> {
-    return this.service.remove(id)
+  @Delete('account/:accountId')
+  deleteBankAcount(@Req() req, @Param('accountId') accountId: string) {
+    return this.service.deleteBankAccount(req,accountId)
   }
 
-  /* End of Teacher Controller Class 
-   
-   */
 }

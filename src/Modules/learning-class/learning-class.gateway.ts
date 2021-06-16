@@ -94,6 +94,7 @@ export class LearningClassGateway {
         studentToken: startedClass.startTime,
         courseId: startedClass.course['_id'],
         lessonId: startedClass.lesson.OId,
+        endTime: startedClass.endTime,
         startTime: startedClass.startTime,
         attenders: startedClass.attenders
       },
