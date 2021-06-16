@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { profile } from 'console';
+import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
-import { User, UserType } from '../../Models/user.model';
+import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
+import { BankAccount, User, UserType } from '../../Models/user.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { UserService } from './user.service';
 
@@ -65,6 +67,55 @@ export class UserController {
         return this.service.remove(id)
     }
 
+
+
+
+  /* GET One Teacher End Point */
+  @UseGuards(JwtAuthGuard)
+  @Get('profile/:id')
+  getTeacherProfile(@Param('id') id: string): Promise<TeacherProfile> {
+    return this.service.getTeacherProfile(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('account')
+  addBankAcount(@Req() req, @Body() body: BankAccount) {
+    return this.service.addBankAccount(req, body)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('account')
+  getBankAccounts(@Req() req) {
+    return this.service.getBankAccounts(req)
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Post('Withdraw/:accountId/:amount')
+  withdrawCash(@Req() req, @Param('accountId') accountId: string, @Param('amount') amount: number) {
+    return this.service.withDrawCash(req, accountId, +amount)
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('wallet')
+  @ApiQuery({ name: 'type', enum: [TransactionType.in, TransactionType.out] })
+  @ApiQuery({ name: 'status', enum: [TransactionStatus.approved, TransactionStatus.pending] })
+  getWallets(@Query('type') type: string, @Query('status') status: string) {
+    return this.service.getWallets( type ? TransactionType[type]: null,status? TransactionStatus[status]: null );
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Put('wallet/approve/:teacherId/:walletId')
+  approveTransaction( @Param('teacherId') teacherId: string, @Param('walletId') walletId: string) {
+    return this.service.approveTransaction(teacherId,walletId)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('account/:accountId')
+  deleteBankAcount(@Req() req, @Param('accountId') accountId: string) {
+    return this.service.deleteBankAccount(req, accountId)
+  }
     /* End of User Controller Class 
      
      */

@@ -5,10 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from '../../Models/course.model';
 import { UserModule } from '../user/user.module';
 import { CheckoutModule } from '../checkout/checkout.module';
-import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
-import { Teacher, TeacherSchema } from '../../Models/teacher.model';
-import { TeacherModule } from '../teacher/teacher.module';
-
 @Module({
   imports: [
     MongooseModule.forFeatureAsync([

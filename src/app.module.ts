@@ -14,8 +14,6 @@ import { UserModule } from './Modules/user/user.module';
 import { CityModule } from './Modules/city/city.module';
 import { StageModule } from './Modules/stage/stage.module';
 import { GradeModule } from './Modules/grade/grade.module';
-import { TeacherModule } from './Modules/teacher/teacher.module';
-import { StudentModule } from './Modules/student/student.module';
 import { OnBoardingModule } from './Modules/on-boarding/on-boarding.module';
 import { BannerModule } from './Modules/banner/banner.module';
 import { SubjectModule } from './Modules/subject/subject.module';
@@ -35,8 +33,6 @@ const overrideMoules = [
   CityModule,
   StageModule,
   GradeModule,
-  TeacherModule,
-  StudentModule,
   OnBoardingModule,
   BannerModule,
   SubjectModule,

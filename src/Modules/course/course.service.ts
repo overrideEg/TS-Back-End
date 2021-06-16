@@ -1,18 +1,13 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
-import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import { Model } from 'mongoose';
-import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Course, CourseContent, CourseDocument, CourseReview, Excercice, LessonType } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
-import { Agora } from '../auth/Security/constants';
 import { CheckoutService } from '../checkout/checkout.service';
-import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
-import * as moment from 'moment'
 @Injectable()
 export class CourseService {
 
@@ -31,7 +26,7 @@ export class CourseService {
         if (req.user.userType !== UserType.teacher.toString()) {
             throw new BadRequestException('only teacher can add courses');
         }
-        let teacher = (await this.userService.findOne(req.user.id)).teacher;
+        let teacher = await this.userService.findOne(req.user.id);
         body['teacher'] = teacher;
         body['createdAt'] = Date.now()
 
@@ -72,7 +67,7 @@ export class CourseService {
         if (req.user.userType !== UserType.teacher.toString()) {
             throw new BadRequestException('only teacher can add courses');
         }
-        let teacher = (await this.userService.findOne(req.user.id)).teacher;
+        let teacher = await this.userService.findOne(req.user.id);
         let course = await this.CourseModel.findById(courseId).exec()
         if (course.teacher['_id'].toString() !== teacher['_id'].toString())
             throw new BadRequestException('only teacher can add his content');
@@ -103,9 +98,6 @@ export class CourseService {
             "match": new ObjectId(course['_id'].toString())
         }).populate('user')
 
-
-        course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
-
         course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
         course.related = await this.CourseModel.find({
             $or: [
@@ -122,8 +114,8 @@ export class CourseService {
             students.push({
                 name: user?.name,
                 _id: user['_id'],
-                stage: user.student?.stage,
-                grade: user.student?.grade,
+                stage: user?.stage,
+                grade: user?.grade,
             })
         }
         for await (const rev of course.reviews) {
@@ -137,7 +129,6 @@ export class CourseService {
 
     async findById(id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
-        course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
         course.related = await this.CourseModel.find({
             $or: [
                 { subject: course.subject ? course.subject['_id'] : null },
@@ -154,7 +145,7 @@ export class CourseService {
         if (req.user.userType !== UserType.teacher.toString()) {
             throw new BadRequestException('only teacher can view this request');
         }
-        let teacher = (await this.userService.findOne(req.user.id))?.teacher;
+        let teacher = await this.userService.findOne(req.user.id);
         let courses = [];
         if (teacher) {
             courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
@@ -168,7 +159,7 @@ export class CourseService {
         if (req.user.userType !== UserType.teacher.toString()) {
             throw new BadRequestException('only teacher can view this request');
         }
-        let teacher = (await this.userService.findOne(req.user.id))?.teacher;
+        let teacher = await this.userService.findOne(req.user.id);
         let courses = [];
         if (teacher) {
             courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();

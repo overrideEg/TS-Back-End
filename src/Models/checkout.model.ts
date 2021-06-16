@@ -22,7 +22,7 @@ export type CheckoutDocument = Checkout & Document;
 @Schema()
 export class Checkout extends OBaseEntity {
     @ApiProperty({ type: () => User })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name, autopopulate: true })
     user?: User;
     
     @ApiProperty({ description: 'valueDate', required: true })

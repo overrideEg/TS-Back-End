@@ -5,9 +5,6 @@ import { jwtConstants } from './Security/constants';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
-import { TeacherModule } from '../teacher/teacher.module';
-import { ParentModule } from '../parent/parent.module';
-import { StudentModule } from '../student/student.module';
 import { JwtStrategy } from './Security/jwt.strategy';
 @Module({
   imports: [
@@ -18,10 +15,7 @@ import { JwtStrategy } from './Security/jwt.strategy';
         expiresIn:'1y'
       }
     }),
-    UserModule,
-    TeacherModule,
-    ParentModule,
-    StudentModule
+    UserModule
   ],
   controllers: [AuthController],
   providers: [AuthService,JwtStrategy],

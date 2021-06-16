@@ -1,18 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, SchemaTypes } from 'mongoose';
+import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { OBaseEntity } from '../shared/base-entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Grade } from './grade.model';
 import { Stage } from './stage.model';
 import { Day } from '../shared/enums/day.enum';
-import { Teacher } from './teacher.model';
-import { OverrideUtils } from '../shared/override-utils';
 import { Subject } from './subject.model';
-import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from './user.model';
-import { Student } from './student.model';
 
 
 
@@ -183,9 +180,9 @@ export class Course extends OBaseEntity {
     @Type(() => CourseReview)
     reviews?: CourseReview[];
 
-    @ApiProperty({ type: () => Teacher })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Teacher', autopopulate: true })
-    teacher?: Teacher;
+    @ApiProperty({ type: () => User })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
+    teacher?: User;
 
     @ApiProperty({ type: Number })
     @Prop({ default: 5 })

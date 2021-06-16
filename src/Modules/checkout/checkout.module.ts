@@ -6,8 +6,6 @@ import { User, UserSchema } from '../../Models/user.model';
 import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
 import { CourseModule } from '../course/course.module';
 import { UserModule } from '../user/user.module';
-import { Teacher, TeacherSchema } from '../../Models/teacher.model';
-import { TeacherModule } from '../teacher/teacher.module';
 
 @Module({
   imports: [
@@ -22,7 +20,6 @@ import { TeacherModule } from '../teacher/teacher.module';
       },
       
     ]),
-    forwardRef(()=>TeacherModule),
     forwardRef(()=>CourseModule),
     forwardRef(()=>UserModule),
     

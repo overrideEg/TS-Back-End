@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Course } from "../Models/course.model";
-import { Teacher } from "../Models/teacher.model";
 import { TeacherProfile } from "./teacher-profile.dto";
 
 export class GlobalSearch{

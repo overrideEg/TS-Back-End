@@ -36,7 +36,7 @@ export class LearningClassService {
     async startLive(user: User, body: StartLiveDTO) {
         let course = await this.courseService.findById(body.courseId);
 
-        if (course.teacher.user['_id'].toString() !== user['_id'].toString())
+        if (course.teacher['_id'].toString() !== user['_id'].toString())
             throw new WsException('only teacher can start his live');
 
         let content = course.content.find(content => content.lessons.find(less => less.OId === body.lessonId));
@@ -125,7 +125,7 @@ export class LearningClassService {
     async endLive(user: User, body: StartLiveDTO) {
         let course = await this.courseService.findById(body.courseId);
 
-        if (course.teacher.user['_id'].toString() !== user['_id'].toString())
+        if (course.teacher['_id'].toString() !== user['_id'].toString())
             throw new WsException('only teacher can end his live');
 
         let content = course.content.find(content => content.lessons.find(less => less.OId === body.lessonId));
@@ -152,7 +152,7 @@ export class LearningClassService {
     async sendMessage(user: User, body: sendLiveMessageDTO) {
         let course = await this.courseService.findById(body.courseId);
 
-        if (course.teacher.user['_id'].toString() !== user['_id'].toString())
+        if (course.teacher['_id'].toString() !== user['_id'].toString())
             throw new WsException('only teacher can start his live');
 
         let content = course.content.find(content => content.lessons.find(less => less.OId === body.lessonId));

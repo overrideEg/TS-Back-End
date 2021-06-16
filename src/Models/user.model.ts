@@ -3,16 +3,59 @@ import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { OBaseEntity } from '../shared/base-entity';
 import { Lang } from '../shared/enums/lang.enum';
-import { Student } from './student.model';
-import { Teacher } from './teacher.model';
-import { Parent } from './parent.model';
 import { Course } from './course.model';
+import { ApiProperty } from '@nestjs/swagger';
+import { City } from './city.model';
+import { Grade } from './grade.model';
+import { Stage } from './stage.model';
+import { TransactionStatus, TransactionType } from '../enums/wallet.enum';
 
 export enum UserType {
     admin = 'Admin',
     student = 'Student',
     teacher = 'Teacher',
     parent = 'Parent'
+}
+
+export class BankAccount {
+    @ApiProperty({ readOnly: true })
+    @Prop()
+    oId: string;
+    @ApiProperty()
+    @Prop()
+    accountNumber: string;
+    @ApiProperty()
+    @Prop()
+    bankName: string;
+    @ApiProperty()
+    @Prop()
+    accountHolderName: string;
+}
+export class Wallet {
+    @ApiProperty({ readOnly: true })
+    @Prop()
+    oId: string;
+    @ApiProperty()
+    @Prop()
+    date: number;
+    @ApiProperty()
+    @Prop()
+    value: number;
+    @ApiProperty({ enum: [TransactionType.in, TransactionType.out] })
+    @Prop({ enum: [TransactionType.in, TransactionType.out] })
+    type: TransactionType;
+    @ApiProperty({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
+    @Prop({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
+    status: TransactionStatus
+    @ApiProperty()
+    @Prop()
+    checkoutId: string;
+    @ApiProperty({ type: () => Course, isArray: false, required: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate: true })
+    course: Course;
+    @ApiProperty({ type: () => BankAccount, isArray: false, required: true })
+    @Prop({ type: BankAccount })
+    account: BankAccount;
 }
 
 export type UserDocument = User & Document;
@@ -41,15 +84,57 @@ export class User extends OBaseEntity {
     tempCode?: string;
     @Prop({ enum: [UserType.admin, UserType.parent, UserType.student, UserType.teacher], default: UserType.student })
     userType?: UserType;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Student', autopopulate: true })
-    student?: Student;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Teacher', autopopulate: true })
-    teacher?: Teacher;
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Parent.name, autopopulate: true })
-    parent?: Parent;
+  
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Course.name, autopopulate: true }])
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate: true }])
     cart?: Course[];
+    @ApiProperty({ type: () => City })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name, autopopulate: true })
+    city?: City;
+
+
+    //student
+    @ApiProperty()
+    @Prop({ default: (Math.random() * 100000).toFixed(0) })
+    studentId: string;
+    @ApiProperty({ type: () => Stage })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name, autopopulate: true })
+    stage?: Stage;
+    @ApiProperty({ type: () => Grade })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name, autopopulate: true })
+    grade?: Grade;
+
+
+
+    //teacher
+    @ApiProperty()
+    @Prop()
+    additionalPhone?: string;
+    @ApiProperty()
+    @Prop()
+    resume?: string
+    @ApiProperty()
+    @Prop()
+    coverletter?: string
+    @ApiProperty()
+    @Prop()
+    bio?: string
+
+    @ApiProperty({ type: Wallet, isArray: true })
+    @Prop([Wallet])
+    wallet?: Wallet[];
+
+    @ApiProperty({ type: BankAccount, isArray: true })
+    @Prop([BankAccount])
+    bankAccounts?: BankAccount[]
+
+
+
+
+    //parent
+    @ApiProperty({ type: () => User, isArray: true })
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true }])
+    students?: User[];
 
 
 }

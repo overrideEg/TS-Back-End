@@ -3,11 +3,8 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../../Models/user.model';
-import { Teacher, TeacherSchema } from '../../Models/teacher.model';
-import { Student, StudentSchema } from '../../Models/student.model';
-import { TeacherModule } from '../teacher/teacher.module';
-import { StudentModule } from '../student/student.module';
 import { CourseModule } from '../course/course.module';
+import { CheckoutModule } from '../checkout/checkout.module';
 
 @Module({
   imports: [
@@ -23,10 +20,9 @@ import { CourseModule } from '../course/course.module';
         },
       },
     ]),
-    forwardRef(() => TeacherModule),
-    forwardRef(() => StudentModule),
+ 
+    forwardRef(() => CheckoutModule),
     forwardRef(() => CourseModule),
-
   ],
   controllers: [UserController],
   providers: [UserService],

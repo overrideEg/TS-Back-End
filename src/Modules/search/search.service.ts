@@ -1,16 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { GlobalFilter, GlobalSearch } from '../../dtos/search.dto';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { Sort } from '../../enums/sort.enum';
-import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
-import { Course, CourseDocument } from '../../Models/course.model';
-import { Teacher, TeacherDocument } from '../../Models/teacher.model';
+import { Course } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { CheckoutService } from '../checkout/checkout.service';
 import { CourseService } from '../course/course.service';
-import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -19,9 +14,7 @@ export class SearchService {
 
     constructor(
         private courseService : CourseService,
-        private teacherService : TeacherService,
         private checkoutService : CheckoutService,
-      
         private userService: UserService
     ) { }
 
@@ -47,7 +40,6 @@ export class SearchService {
             .exec();
 
         for await (const course of courses) {
-            course.teacher.user = await this.userService.findByTeacher(course?.teacher['_id'])
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id']) })
             course.related = [];
 
@@ -74,20 +66,20 @@ export class SearchService {
             let profile = new TeacherProfile();
             profile.name = user.name;
             profile.avatar = user.avatar ?? "";
-            let teacherCourses = await this.courseService.CourseModel.find({ teacher: user.teacher });
+            let teacherCourses = await this.courseService.CourseModel.find({ teacher: user });
             let registers = await this.checkoutService.CheckoutModel.countDocuments().populate({
                 "path": "lines.course",
                 'model': Course.name
             }).populate({
                 path: 'lines.course.teacher',
-                "match": new ObjectId(user.teacher['_id'].toString())
+                "match": new ObjectId(user['_id'].toString())
             });
             profile.noOfStudents = registers
             profile.noOfCourses = teacherCourses.length
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-            profile.bio = user.teacher?.bio ?? user.name;
+            profile.bio = user?.bio ?? user.name;
             profile.userId = user['_id']
-            profile.teacherId = user.teacher['_id']
+            profile.teacherId = user['_id']
             globalSearch.teachers.push(profile);
         }
         return globalSearch;
@@ -110,9 +102,8 @@ export class SearchService {
         for await (const course of featuresCourses) {
 
             let profile = new TeacherProfile();
-            course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
-            profile.name = course.teacher.user.name;
-            profile.avatar = course.teacher.user.avatar ?? "";
+            profile.name = course.teacher.name;
+            profile.avatar = course.teacher.avatar ?? "";
             let teacherCourses = await this.courseService.CourseModel.find({ teacher: course.teacher });
             profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
                 "path": "lines.course",
@@ -123,9 +114,8 @@ export class SearchService {
             });
             profile.noOfCourses = teacherCourses.length
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-            profile.bio = course.teacher.user.teacher?.bio ?? course.teacher.user.name;
-            profile.userId = course.teacher.user['_id']
-            profile.teacherId = course.teacher['_id']
+            profile.bio = course.teacher?.bio ?? course.teacher.name;
+            profile.userId = course.teacher['_id']
             globalFilter.topInstructors.push(profile);
         }
 

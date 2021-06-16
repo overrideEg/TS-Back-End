@@ -5,12 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import { RegisterAdmin, RegisterParent, RegisterStudent, RegisterTeacher } from './DTOs/register.dto';
 import { User, UserType } from '../../Models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
-import { Teacher } from '../../Models/teacher.model';
-import { TeacherService } from '../teacher/teacher.service';
-import { Student } from '../../Models/student.model';
-import { StudentService } from '../student/student.service';
-import { Parent } from '../../Models/parent.model';
-import { ParentService } from '../parent/parent.service';
 import { City } from '../../Models/city.model';
 import { Grade } from '../../Models/grade.model';
 import { Stage } from '../../Models/stage.model';
@@ -28,9 +22,6 @@ export class AuthService {
 
     constructor(
         private userService: UserService,
-        private teacherService: TeacherService,
-        private studentService: StudentService,
-        private parentService: ParentService,
         private jwtService: JwtService) { }
 
     public async getUserFromAuthenticationToken(token: string) {
@@ -66,8 +57,6 @@ export class AuthService {
         user.tempCode = "";
         user = await this.userService.update(user['_id'], user);
 
-        delete user.teacher?.user?.teacher
-        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -84,9 +73,6 @@ export class AuthService {
         user.isActive = true;
         user.tempCode = "";
         user = await this.userService.update(user['_id'], user);
-
-        delete user.teacher?.user?.teacher
-        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -115,8 +101,6 @@ export class AuthService {
         if (decodedToken.email == refresh.email && decodedToken.exp <= new Date().getTime()) {
             const user = await this.userService.login(refresh.email, Lang.en)
 
-            delete user.teacher?.user?.teacher
-            delete user.student?.user?.student
             return {
                 ...user['_doc'],
                 token: this.sign(user),
@@ -133,8 +117,6 @@ export class AuthService {
         user.isActive = false;
         user = await this.userService.update(user['_id'], user);
 
-        delete user.teacher?.user?.teacher
-        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -150,9 +132,6 @@ export class AuthService {
         user.isActive = true;
         user.tempCode = "";
         user = await this.userService.update(user['_id'], user);
-
-        delete user.teacher?.user?.teacher
-        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -171,20 +150,17 @@ export class AuthService {
             if (!body.studentId)
                 throw new UnauthorizedException('please enter student id');
 
-            let student = await this.studentService.findByStudentId(body.studentId);
+            let student = await this.userService.UserModel.findOne({studentId: body.studentId}).exec();
             if (!student)
                 throw new UnauthorizedException('please enter correct student id');
 
-            if (!user.parent.students.find(st => st === student['_id'])) {
-                user.parent.students.push(student);
-                await this.parentService.update(user.parent['_id'], user.parent);
+            if (!user.students.find(st => st === student['_id'])) {
+                user.students.push(student);
+                await this.userService.UserModel.updateOne({_id: user['_id']}, user);
             }
         }
 
 
-
-        delete user.teacher?.user?.teacher
-        delete user.student?.user?.student
 
         return {
             ...user['_doc'],
@@ -226,14 +202,7 @@ export class AuthService {
             throw new BadRequestException('user already exists');
         }
         //create teacher
-        let teacher = new Teacher();
-        teacher.city = new City();
 
-        teacher.additionalPhone = body.additionalPhone;
-        teacher.city['_id'] = body.cityId;
-        teacher.coverletter = body.coverLetter;
-        teacher.resume = body.resume;
-        let savedTeacher = await this.teacherService.save(teacher);
         //create user
         let user = new User();
         user.userType = UserType.teacher;
@@ -243,14 +212,16 @@ export class AuthService {
         user.email = body.email;
         user.defaultLang = body.defaultLang;
         user.phone = body.phone;
-        user.teacher = savedTeacher;
+
+        user.city = new City();
+
+        user.additionalPhone = body.additionalPhone;
+        user.city['_id'] = body.cityId;
+        user.coverletter = body.coverLetter;
+        user.resume = body.resume;
         let savedUser = await this.userService.save(user).catch(reason => {
-            savedTeacher.deleteOne(savedTeacher._id)
             throw new BadRequestException('can not create user  ', reason)
         });
-
-        delete savedUser.teacher?.user?.teacher
-        delete savedUser.student?.user?.student
         //signed token
         return {
             ...savedUser['_doc'],
@@ -262,15 +233,12 @@ export class AuthService {
         if (await this.userService.ifUserExists(body.email, body.phone)) {
             throw new BadRequestException('user already exists');
         }
-        let savedSudent = await this.studentService.findByStudentId(body.studentId);
+        let savedSudent = await this.userService.UserModel.findOne({ studentId: body.studentId }).exec();
 
         if (!savedSudent) {
             throw new BadRequestException(`can not find student id ${body.studentId}`);
         }
         //create parent
-        let parent = new Parent();
-        parent.students = [savedSudent];
-        let savedParent = await this.parentService.save(parent);
         //create user
         let user = new User();
         user.userType = UserType.parent;
@@ -280,9 +248,8 @@ export class AuthService {
         user.email = body.email;
         user.defaultLang = body.defaultLang;
         user.phone = body.phone;
-        user.parent = savedParent;
+        user.students = [savedSudent];
         let savedUser = await this.userService.save(user).catch(reason => {
-            savedParent.deleteOne(savedParent._id)
             throw new BadRequestException('can not create user  ', reason);
         });
         //signed token
@@ -297,15 +264,7 @@ export class AuthService {
         if (await this.userService.ifUserExists(body.email, body.phone)) {
             throw new BadRequestException('user already exists');
         }
-        //create student
-        let student = new Student();
-        student.city = new City();
-        student.grade = new Grade();
-        student.stage = new Stage();
-        student['city']['_id'] = body.cityId;
-        student['grade']['_id'] = body.gradeId;
-        student['stage']['_id'] = body.stageId;
-        let savedSudent = await this.studentService.save(student);
+
         //create user
         let user = new User();
         user.userType = UserType.student;
@@ -315,15 +274,16 @@ export class AuthService {
         user.email = body.email;
         user.defaultLang = body.defaultLang;
         user.phone = body.phone;
-        user.student = savedSudent;
+        user.city = new City();
+        user.grade = new Grade();
+        user.stage = new Stage();
+        user['city']['_id'] = body.cityId;
+        user['grade']['_id'] = body.gradeId;
+        user['stage']['_id'] = body.stageId;
         let savedUser = await this.userService.save(user).catch(reason => {
-            savedSudent.deleteOne(savedSudent._id)
             throw new BadRequestException('can not create user  ', reason);
         });
         //signed token
-
-        delete savedUser.teacher?.user?.teacher
-        delete savedUser.student?.user?.student
         return {
             ...savedUser['_doc'],
             token: this.sign(savedUser),

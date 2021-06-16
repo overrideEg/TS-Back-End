@@ -57,9 +57,9 @@ export class HomeService {
         for await (const course of featuresCourses) {
 
             let profile = new TeacherProfile();
-            course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
-            profile.name = course.teacher.user.name;
-            profile.avatar = course.teacher.user.avatar ?? "";
+            course.teacher = await this.userService.findByTeacher(course.teacher['_id']);
+            profile.name = course.teacher.name;
+            profile.avatar = course.teacher.avatar ?? "";
             let teacherCourses = await this.courseService.CourseModel.find({ teacher: course.teacher });
             profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
                 "path": "lines.course",
@@ -70,8 +70,8 @@ export class HomeService {
             });
             profile.noOfCourses = teacherCourses.length
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-            profile.bio = course.teacher.user.teacher?.bio ?? course.teacher.user.name;
-            profile.userId = course.teacher.user['_id']
+            profile.bio = course.teacher?.bio ?? course.teacher.name;
+            profile.userId = course.teacher['_id']
             profile.teacherId = course.teacher['_id']
             home.topInstructors.push(profile);
         }
@@ -84,7 +84,7 @@ export class HomeService {
         let home = new TeacherHome()
         let user = await this.userService.findOne(req.user.id);
 
-        let teacherCourses = await this.courseService.CourseModel.find({ teacher: user.teacher }).exec();
+        let teacherCourses = await this.courseService.CourseModel.find({ teacher: user }).exec();
         home.noOfCourses = teacherCourses.length
         home.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
         let feedbacks = [];
@@ -95,7 +95,7 @@ export class HomeService {
             'model': Course.name
         }).populate({
             path: 'lines.course.teacher',
-            "match": new ObjectId(user.teacher['_id'].toString())
+            "match": new ObjectId(user['_id'].toString())
         });
         // registers = registers.filter(data=>data.lines.find(line=>line.course.teacher['_id'].toString() === user.teacher['_id'].toString()));
         home.noOfStudents = registers;
