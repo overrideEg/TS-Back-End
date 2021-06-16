@@ -163,7 +163,7 @@ export class Course extends OBaseEntity {
     reviews?: CourseReview[];
 
     @ApiProperty({ type: () => Teacher })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Teacher.name, autopopulate: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Teacher', autopopulate: true })
     teacher?: Teacher;
 
     @ApiProperty({ type: Number })

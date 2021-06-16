@@ -3,7 +3,10 @@ import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@ne
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
+import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
 import { Checkout, CheckoutDocument, CheckoutLine } from '../../Models/checkout.model';
+import { Teacher, TeacherDocument, Wallet } from '../../Models/teacher.model';
+import { OverrideUtils } from '../../shared/override-utils';
 import { CourseService } from '../course/course.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -14,8 +17,9 @@ export class CheckoutService {
 
     constructor(
         @InjectModel(Checkout.name) public CheckoutModel: Model<CheckoutDocument>,
-      private courseService: CourseService,
-      private userService: UserService
+        @InjectModel(Teacher.name) public TeacherModel: Model<TeacherDocument>,
+        private courseService: CourseService,
+        private userService: UserService
     ) { }
 
     private readonly log = new Logger(CheckoutService.name);
@@ -45,10 +49,28 @@ export class CheckoutService {
         checkout.valueDate = Date.now();
         checkout.priceBeforeDiscount = checkout.lines.reduce((acc, line) => acc + line.price, 0);
 
+
+        let checkoutSaved = await this.CheckoutModel.create(checkout);
+
+
+        for await (const line of checkout.lines) {
+            let wallet = new Wallet()
+            wallet.date = Date.now()
+            wallet.oId = OverrideUtils.generateGUID()
+            wallet.type = TransactionType.in;
+            wallet.status = TransactionStatus.approved;
+            wallet.value = line.price
+            wallet.checkoutId = checkoutSaved['_id']
+            line.course.teacher.wallet.push(wallet);
+            await this.TeacherModel.updateOne({_id: line.course.teacher['_id']},line.course.teacher)
+            // TODO send notification to teacher
+        }
+
         let user = await this.userService.findOne(req.user.id);
         user.cart = [];
-        await this.userService.update(req.user.id,user)
-        return await this.CheckoutModel.create(checkout);
+        await this.userService.update(req.user.id, user)
+
+        return checkoutSaved
     }
 
 }

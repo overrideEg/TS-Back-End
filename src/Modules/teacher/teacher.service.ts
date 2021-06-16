@@ -3,9 +3,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
+import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
 import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Course, CourseDocument } from '../../Models/course.model';
-import { BankAccount, Teacher, TeacherDocument } from '../../Models/teacher.model';
+import { BankAccount, Teacher, TeacherDocument, Wallet } from '../../Models/teacher.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -86,11 +87,59 @@ export class TeacherService {
 
         body.oId = OverrideUtils.generateGUID();
         teacher.bankAccounts != null ? teacher.bankAccounts.push(body) : teacher.bankAccounts = [body];
-        await this.TeacherModel.updateOne({_id : teacher['_id']},teacher);
+        await this.TeacherModel.updateOne({ _id: teacher['_id'] }, teacher);
 
         return teacher.bankAccounts;
     }
 
+    async withDrawCash(req: any, accountId: string, amount: number) {
+        let user = await this.userService.findOne(req.user.id);
+        if (!user)
+            throw new BadRequestException('no user found');
+        let teacher = user.teacher;
+        let account = teacher.bankAccounts.find((acc) => acc.oId === accountId);
+        let balance = teacher.wallet.reduce((acc, wall) => acc + (wall.type === TransactionType.in ? wall.value : (wall.status === TransactionStatus.approved ? wall.value : 0)), 0);
+        if (balance > amount)
+            throw new BadRequestException(`your balance is ${balance} and you requested ${amount}`);
+        let wallet = new Wallet();
+        wallet.account = account;
+        wallet.value = amount;
+        wallet.date = Date.now();
+        wallet.status = TransactionStatus.pending;
+        wallet.value = amount;
+        wallet.type = TransactionType.out;
+        wallet.oId = OverrideUtils.generateGUID()
+        teacher.wallet.push(wallet);
+        await this.TeacherModel.updateOne({ _id: teacher['_id'] }, teacher);
+        //TODO Send Notfifcation to teacher and admins
+        return teacher.wallet
+    }
+
+    async approveTransaction(teacherId: string, walletId: string) {
+        let teacher = await this.TeacherModel.findById(teacherId).exec();
+        let wallet = teacher?.wallet?.find(wall => wall.oId === walletId);
+
+        if (!teacher || !wallet)
+            throw new BadRequestException('Check sent IDs');
+        wallet.status = TransactionStatus.approved;
+        await this.TeacherModel.updateOne({ _id: teacher['_id'] }, teacher);
+        //TODO Send Notfifcation to teacher and admins
+        return wallet;
+    }
+
+
+    async getWallets(type: TransactionType, status: TransactionStatus) {
+        let teachers = await this.TeacherModel.find().exec();
+        let wallets = [];
+        teachers.forEach(teacher => {
+            teacher.wallet.forEach(wallet => {
+                if (wallet.type === type && wallet.status === status) {
+                    wallets.push(wallet)
+                }
+            })
+        })
+        return wallets;
+    }
 
     async deleteBankAccount(req: any, accountId: string) {
         let user = await this.userService.findOne(req.user.id);
@@ -98,8 +147,8 @@ export class TeacherService {
             throw new BadRequestException('no user found');
         let teacher = user.teacher;
 
-        teacher.bankAccounts.splice(teacher.bankAccounts.findIndex((acc)=>acc.oId === accountId),1);
-        await this.TeacherModel.updateOne({_id : teacher['_id']},teacher);
+        teacher.bankAccounts.splice(teacher.bankAccounts.findIndex((acc) => acc.oId === accountId), 1);
+        await this.TeacherModel.updateOne({ _id: teacher['_id'] }, teacher);
 
         return teacher.bankAccounts;
     }

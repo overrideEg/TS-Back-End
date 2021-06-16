@@ -41,6 +41,9 @@ export class CourseController {
 
 
 
+
+
+
   
   @UseGuards(JwtAuthGuard)
   @Put(':id')
@@ -53,6 +56,12 @@ export class CourseController {
   async teacher(@Req() req): Promise<Course[]> {
     return this.service.getTeacherCourses(req)
   }
+  @UseGuards(JwtAuthGuard)
+  @Get('byDate')
+  async getCoursesInDate(@Req() req, @Query('timeStamp') timeStamp: number): Promise<Course[]> {
+    return this.service.getCoursesInDate(req, +timeStamp)
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Get('student')

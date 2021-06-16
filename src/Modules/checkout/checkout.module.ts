@@ -6,6 +6,7 @@ import { User, UserSchema } from '../../Models/user.model';
 import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
 import { CourseModule } from '../course/course.module';
 import { UserModule } from '../user/user.module';
+import { Teacher, TeacherSchema } from '../../Models/teacher.model';
 
 @Module({
   imports: [
@@ -18,7 +19,14 @@ import { UserModule } from '../user/user.module';
           return schema;
         },
       },
-      
+      {
+        name: Teacher.name,
+        useFactory: () => {
+          const schema = TeacherSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
     ]),
     CourseModule,
     UserModule

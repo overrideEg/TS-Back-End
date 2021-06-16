@@ -6,22 +6,8 @@ import { City } from './city.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from './user.model';
 import { TransactionStatus, TransactionType } from '../enums/wallet.enum';
+import { Course } from './course.model';
 
-
-export class Wallet {
-    @ApiProperty()
-    @Prop()
-    date: number;
-    @ApiProperty()
-    @Prop()
-    value: number;
-    @ApiProperty({ enum: [TransactionType.in, TransactionType.out] })
-    @Prop({ enum: [TransactionType.in, TransactionType.out] })
-    type: TransactionType;
-    @ApiProperty({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
-    @Prop({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
-    status: TransactionStatus
-}
 
 export class BankAccount {
     @ApiProperty({ readOnly: true })
@@ -37,6 +23,34 @@ export class BankAccount {
     @Prop()
     accountHolderName: string;
 }
+export class Wallet {
+    @ApiProperty({ readOnly: true })
+    @Prop()
+    oId: string;
+    @ApiProperty()
+    @Prop()
+    date: number;
+    @ApiProperty()
+    @Prop()
+    value: number;
+    @ApiProperty({ enum: [TransactionType.in, TransactionType.out] })
+    @Prop({ enum: [TransactionType.in, TransactionType.out] })
+    type: TransactionType;
+    @ApiProperty({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
+    @Prop({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
+    status: TransactionStatus
+    @ApiProperty()
+    @Prop()
+    checkoutId: string;
+    @ApiProperty({ type: () => Course, isArray: false, required: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate: true })
+    course: Course;
+    @ApiProperty({ type: () => BankAccount, isArray: false, required: true })
+    @Prop({ type: BankAccount })
+
+    account: BankAccount;
+}
+
 export type TeacherDocument = Teacher & Document;
 
 @Schema()

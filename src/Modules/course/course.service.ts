@@ -12,9 +12,10 @@ import { CheckoutService } from '../checkout/checkout.service';
 import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
-
+import * as moment from 'moment'
 @Injectable()
 export class CourseService {
+
 
 
 
@@ -66,7 +67,7 @@ export class CourseService {
         return await this.CourseModel.findByIdAndDelete(id);
     }
 
-  
+
 
 
     async addCourseContent(req: any, courseId: string, contents: CourseContent[]): Promise<CourseContent[] | PromiseLike<CourseContent[]>> {
@@ -104,7 +105,7 @@ export class CourseService {
             "match": new ObjectId(course['_id'].toString())
         }).populate('user')
 
-        
+
         course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
 
         course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
@@ -121,22 +122,22 @@ export class CourseService {
         for await (const res of reservations) {
             let user = await this.userService.findOne(res.user['_id'].toString())
             students.push({
-                name : user?.name,
-                _id : user['_id'],
-                stage : user.student?.stage,
-                grade : user.student?.grade,
+                name: user?.name,
+                _id: user['_id'],
+                stage: user.student?.stage,
+                grade: user.student?.grade,
             })
         }
         for await (const rev of course.reviews) {
             rev.user = await this.userService.findOne(rev.user['_id'])
         }
         course.students = students
-        
+
         course.related = course.related.slice(0, 6);
         return course;
     }
 
-    async findById( id: string): Promise<Course | PromiseLike<Course>> {
+    async findById(id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
         course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
         course.related = await this.CourseModel.find({
@@ -162,21 +163,45 @@ export class CourseService {
         }
         return courses;
     }
+
+
+    async getCoursesInDate
+        (req: any, timeStamp: number): Promise<Course[] | PromiseLike<Course[]>> {
+        if (req.user.userType !== UserType.teacher.toString()) {
+            throw new BadRequestException('only teacher can view this request');
+        }
+        let teacher = (await this.userService.findOne(req.user.id))?.teacher;
+        let courses = [];
+        if (teacher) {
+            courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
+        }
+
+
+        let dayOfWeek = new Date(timeStamp).getDay()
+        courses = courses.filter(course => {
+            let today = course.Days.find(day =>  OverrideUtils.dayOffDay(day)  === dayOfWeek);
+            let notFinished = course.content.find(content => content.lessons.find(lesson => lesson.isDone == false || lesson.isDone == null || lesson.isDone == undefined));
+            return  today  && notFinished 
+        })
+
+        return courses;
+    }
+
     async getStudentCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
         let purchased = await this.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
         let courses = []
         for await (const check of purchased) {
-            
-        for await (const line of check.lines) {
-            courses.push(await this.findById(line.course['_id'].toString()))
+
+            for await (const line of check.lines) {
+                courses.push(await this.findById(line.course['_id'].toString()))
+            }
         }
-        }
-       
-        
-    
 
 
-       return courses;
+
+
+
+        return courses;
     }
 
 
