@@ -17,6 +17,7 @@ import { CourseModule } from '../course/course.module';
         name: Teacher.name,
         useFactory: () => {
           const schema = TeacherSchema;
+       
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },

@@ -14,17 +14,19 @@ import { CourseModule } from '../course/course.module';
     MongooseModule.forFeatureAsync([
       {
         name: User.name,
-        useFactory:  async () => {
+        useFactory: async () => {
           const schema = UserSchema;
+
+       
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
       },
     ]),
-    forwardRef(()=>TeacherModule),
-    forwardRef(()=>StudentModule),
-    forwardRef(()=>CourseModule),
-    
+    forwardRef(() => TeacherModule),
+    forwardRef(() => StudentModule),
+    forwardRef(() => CourseModule),
+
   ],
   controllers: [UserController],
   providers: [UserService],

@@ -70,7 +70,7 @@ export class Teacher extends OBaseEntity {
     @Prop()
     bio?: string
     @ApiProperty({ type: () => User })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate : { select : 'name' } })
     user?: User;
 
     @ApiProperty({ type: Wallet, isArray: true })
