@@ -40,7 +40,11 @@ export class TeacherController {
     return this.service.addBankAccount(req, body)
   }
 
-
+  @UseGuards(JwtAuthGuard)
+  @Get('account')
+  getBankAccounts(@Req() req) {
+    return this.service.getBankAccounts(req)
+  }
   @UseGuards(JwtAuthGuard)
   @Post('Withdraw/:accountId/:amount')
   withdrawCash(@Req() req, @Param('accountId') accountId: string, @Param('amount') amount: number) {

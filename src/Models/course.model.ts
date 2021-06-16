@@ -14,10 +14,14 @@ import { Type } from 'class-transformer';
 import { User } from './user.model';
 import { Student } from './student.model';
 
+
+
 export enum LessonType {
     video = 'video',
     excercice = 'excercice'
 }
+
+
 
 export class CourseReview {
     @Prop({ required: true })
@@ -55,7 +59,7 @@ export class Attachement {
     mimetype: string;
 }
 export class Lesson {
-    
+
     @ApiProperty({ required: false })
     @Prop({ required: true })
     OId: string;
@@ -98,7 +102,7 @@ export type CourseDocument = Course & Document;
 @Schema()
 export class Course extends OBaseEntity {
 
-  
+
 
     @ApiProperty()
     @Prop()
@@ -180,8 +184,8 @@ export class Course extends OBaseEntity {
     inCart?: boolean;
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Course.name, autopopulate: true }])
     related?: Course[];
-    
-    @Prop([{ type: mongoose.Schema.Types.Mixed}])
+
+    @Prop([{ type: mongoose.Schema.Types.Mixed }])
     students: any[]
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);

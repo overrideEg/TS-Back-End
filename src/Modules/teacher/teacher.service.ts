@@ -13,6 +13,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class TeacherService {
+   
 
 
     constructor(
@@ -91,6 +92,14 @@ export class TeacherService {
 
         return teacher.bankAccounts;
     }
+
+    async getBankAccounts(req: any) {
+        let user = await this.userService.findOne(req.user.id);
+        if (!user)
+            throw new BadRequestException('no user found');
+        let teacher = user.teacher;
+        return teacher.bankAccounts
+      }
 
     async withDrawCash(req: any, accountId: string, amount: number) {
         let user = await this.userService.findOne(req.user.id);

@@ -47,7 +47,6 @@ export class Wallet {
     course: Course;
     @ApiProperty({ type: () => BankAccount, isArray: false, required: true })
     @Prop({ type: BankAccount })
-
     account: BankAccount;
 }
 
