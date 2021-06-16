@@ -86,9 +86,8 @@ export class UserService {
         return await this.update(req.user.id, user);
     }
 
-    validate(payload: any) {
-        this.logger.debug(payload)
-        return true;
+    async validate(payload: any) {
+        return await this.UserModel.exists({_id: payload.id});
     }
     ifUserExists(email: string, phone: string) {
         return this.UserModel.exists({ $or: [{ email: email }, { phone: phone }] })
