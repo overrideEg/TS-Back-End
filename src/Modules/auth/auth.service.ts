@@ -50,7 +50,7 @@ export class AuthService {
 
     requestToken(macAddress: string) {
         return {
-            token: this.jwtService.sign({ id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress } ,{expiresIn: '1h'})
+            token: this.jwtService.sign({ id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress }, { expiresIn: '1h' })
         }
     }
 
@@ -65,6 +65,9 @@ export class AuthService {
         user.isActive = true;
         user.tempCode = "";
         user = await this.userService.update(user['_id'], user);
+
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -81,6 +84,9 @@ export class AuthService {
         user.isActive = true;
         user.tempCode = "";
         user = await this.userService.update(user['_id'], user);
+
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -96,6 +102,9 @@ export class AuthService {
         user.tempCode = "00000";
         user.isActive = false;
         user = await this.userService.update(user['_id'], user);
+
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -105,6 +114,9 @@ export class AuthService {
         const decodedToken = this.jwtService.decode(refresh.oldtoken) as any
         if (decodedToken.email == refresh.email && decodedToken.exp <= new Date().getTime()) {
             const user = await this.userService.login(refresh.email, Lang.en)
+
+            delete user.teacher?.user?.teacher
+            delete user.student?.user?.student
             return {
                 ...user['_doc'],
                 token: this.sign(user),
@@ -120,6 +132,9 @@ export class AuthService {
         user.tempCode = '54321';
         user.isActive = false;
         user = await this.userService.update(user['_id'], user);
+
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -135,6 +150,9 @@ export class AuthService {
         user.isActive = true;
         user.tempCode = "";
         user = await this.userService.update(user['_id'], user);
+
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
         return {
             ...user['_doc'],
             token: this.sign(user),
@@ -164,6 +182,9 @@ export class AuthService {
         }
 
 
+
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
 
         return {
             ...user['_doc'],
@@ -227,6 +248,9 @@ export class AuthService {
             savedTeacher.deleteOne(savedTeacher._id)
             throw new BadRequestException('can not create user  ', reason)
         });
+
+        delete savedUser.teacher?.user?.teacher
+        delete savedUser.student?.user?.student
         //signed token
         return {
             ...savedUser['_doc'],
@@ -297,6 +321,9 @@ export class AuthService {
             throw new BadRequestException('can not create user  ', reason);
         });
         //signed token
+
+        delete savedUser.teacher?.user?.teacher
+        delete savedUser.student?.user?.student
         return {
             ...savedUser['_doc'],
             token: this.sign(savedUser),

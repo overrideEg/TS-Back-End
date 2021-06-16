@@ -26,18 +26,28 @@ export class UserService {
     ) { }
 
     async findByParent(parentId: any) {
-        return await this.UserModel.findOne({ parent: new ObjectId(parentId) }).exec() as User;
+        let user =  await this.UserModel.findOne({ parent: new ObjectId(parentId) }).exec() as User;
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
+        return user
     }
     async findByStudent(studentId: any) {
-        return await this.UserModel.findOne({ student: new ObjectId(studentId) }).exec() as User;
+        let user = await this.UserModel.findOne({ student: new ObjectId(studentId) }).exec() as User;
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
+        return user
     }
     async findByTeacher(teacherId: any) {
-        return await this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).exec() as User;
+        let user = await this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).exec() as User;
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student
+        return user
     }
 
 
     async login(username: string, defaultLang?: Lang) {
         let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).exec();
+ 
         if (user) {
             user.defaultLang = defaultLang ?? Lang.en;
             user.updateOne(user)
@@ -103,7 +113,10 @@ export class UserService {
         return userType ? this.UserModel.find({ userType: userType }).exec() : this.UserModel.find().exec();
     }
     async findOne(id: string): Promise<User> {
-        return this.UserModel.findById(id).exec();
+        let user = await this.UserModel.findById(id).exec();
+        delete user.teacher?.user?.teacher
+        delete user.student?.user?.student;
+        return user;
     }
     async update(id: string, req: User): Promise<User> {
         await this.UserModel.findByIdAndUpdate(id, req);

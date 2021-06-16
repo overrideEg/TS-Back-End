@@ -13,27 +13,27 @@ export type StudentDocument = Student & Document;
 export class Student extends OBaseEntity {
 
     @ApiProperty()
-    @Prop({default: (Math.random()*100000).toFixed(0)})
+    @Prop({ default: (Math.random() * 100000).toFixed(0) })
     studentId: string;
 
-    @ApiProperty({type:()=>City})
+    @ApiProperty({ type: () => City })
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name, autopopulate: true })
     city?: City;
 
-    @ApiProperty({type:()=>Stage})
+    @ApiProperty({ type: () => Stage })
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name ,autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name, autopopulate: true })
     stage?: Stage;
-    @ApiProperty({type:()=>Grade})
+    @ApiProperty({ type: () => Grade })
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name,autopopulate: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name, autopopulate: true })
     grade?: Grade;
 
     @ApiProperty({ type: () => User })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
     user?: User;
-    
+
 
 }
 export const StudentSchema = SchemaFactory.createForClass(Student);
