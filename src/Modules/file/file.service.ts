@@ -112,7 +112,7 @@ export class FileService {
     }
 
     if (request.headers.range) {
-      const range = request?.headers?.range?.substr(6).split('-')
+      const range = request?.headers?.range?.substr(6)?.split('-')
       const start = parseInt(range[0], 10)
       const end = parseInt(range[1], 10) || null
       const readstream = this.bucket?.openDownloadStream(oId, {
