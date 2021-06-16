@@ -112,10 +112,10 @@ export class FileService {
     }
 
     if (request.headers.range) {
-      const range = request.headers.range.substr(6).split('-')
+      const range = request?.headers?.range?.substr(6).split('-')
       const start = parseInt(range[0], 10)
       const end = parseInt(range[1], 10) || null
-      const readstream = this.bucket.openDownloadStream(oId, {
+      const readstream = this.bucket?.openDownloadStream(oId, {
         start,
         end,
       })
@@ -123,14 +123,14 @@ export class FileService {
       response.status(206)
       response.headers({
         'Accept-Ranges': 'bytes',
-        'Content-Type': fileInfo.contentType,
-        'Content-Range': `bytes ${start}-${end ? end : fileInfo.length - 1}/${fileInfo.length
+        'Content-Type': fileInfo?.contentType,
+        'Content-Range': `bytes ${start}-${end ? end : fileInfo?.length - 1}/${fileInfo?.length
           }`,
-        'Content-Length': (end ? end : fileInfo.length) - start
+        'Content-Length': (end ? end : fileInfo?.length) - start
         // 'Content-Disposition': `attachment; filename="${fileInfo.filename}"`,
       })
 
-      response.raw.on('close', () => {
+      response?.raw?.on('close', () => {
         readstream.destroy()
       })
 
