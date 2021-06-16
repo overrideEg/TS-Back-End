@@ -46,7 +46,6 @@ export class CourseService {
         if (teacher['_id'].toString() !== req.user.id) {
             throw new BadRequestException('only teacher can update his courses');
         }
-        //TODO:
         await this.CourseModel.updateOne({ _id: id }, body).exec();
         return await this.CourseModel.findById(id).exec();
     }

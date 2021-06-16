@@ -142,6 +142,9 @@ export class TeacherService {
         let wallets = [];
         teachers.forEach(teacher => {
             teacher.wallet.forEach(wallet => {
+                if (! type || ! status){
+                    wallets.push(wallet)
+                }
                 if (wallet.type === type && wallet.status === status) {
                     wallets.push(wallet)
                 }

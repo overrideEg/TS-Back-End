@@ -57,7 +57,7 @@ export class TeacherController {
   @ApiQuery({ name: 'type', enum: [TransactionType.in, TransactionType.out] })
   @ApiQuery({ name: 'status', enum: [TransactionStatus.approved, TransactionStatus.pending] })
   getWallets(@Query('type') type: string, @Query('status') status: string) {
-    return this.service.getWallets(type ? TransactionType[type]: TransactionType.out, status ?  TransactionStatus[status] : TransactionStatus.pending);
+    return this.service.getWallets( type ? TransactionType[type]: null,status? TransactionStatus[status]: null );
   }
 
 
