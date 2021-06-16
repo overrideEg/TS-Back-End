@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import { Model } from 'mongoose';
 import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
-import { Course, CourseContent, CourseDocument, CourseReview, LessonType } from '../../Models/course.model';
+import { Course, CourseContent, CourseDocument, CourseReview, Excercice, LessonType } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { Agora } from '../auth/Security/constants';
@@ -22,9 +22,8 @@ export class CourseService {
 
     constructor(
         @InjectModel(Course.name) public CourseModel: Model<CourseDocument>,
-        private userService: UserService,
-        @InjectModel(Checkout.name) public CheckoutModel: Model<CheckoutDocument>,
-
+        @Inject(forwardRef(()=>UserService)) private userService :UserService,
+        @Inject(forwardRef(()=>CheckoutService))  private checkoutService :CheckoutService
     ) { }
 
 
@@ -98,7 +97,7 @@ export class CourseService {
     async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
 
-        let reservations = await this.CheckoutModel.find().populate({
+        let reservations = await this.checkoutService.CheckoutModel.find().populate({
             "path": "lines.course",
             'model': Course.name,
             "match": new ObjectId(course['_id'].toString())
@@ -178,16 +177,16 @@ export class CourseService {
 
         let dayOfWeek = new Date(timeStamp).getDay()
         courses = courses.filter(course => {
-            let today = course.Days.find(day =>  OverrideUtils.dayOffDay(day)  === dayOfWeek);
+            let today = course.Days.find(day => OverrideUtils.dayOffDay(day) === dayOfWeek);
             let notFinished = course.content.find(content => content.lessons.find(lesson => lesson.isDone == false || lesson.isDone == null || lesson.isDone == undefined));
-            return  today  && notFinished 
+            return today && notFinished
         })
 
         return courses;
     }
 
     async getStudentCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
-        let purchased = await this.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
+        let purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
         let courses = []
         for await (const check of purchased) {
 
@@ -196,12 +195,29 @@ export class CourseService {
             }
         }
 
-
-
-
-
         return courses;
     }
 
+
+
+    async applyExcercice(req: any, courseId: string, lessonId: string, body: string[]): Promise<Excercice[] | PromiseLike<Excercice[]>> {
+        let course = await this.CourseModel.findById(courseId);
+        let content = course?.content?.find(content => content.lessons.find(less => less.OId === lessonId));
+        let lesson = content?.lessons?.find(less => less.OId === lessonId);
+        if (!course || !content || !lesson) {
+            throw new BadRequestException('course Is Invalid');
+        }
+        if (lesson.type === LessonType.excercice) {
+            for await (const link of body) {
+                let excersise = new Excercice();
+                excersise.oId = OverrideUtils.generateGUID()
+                excersise.user = await this.userService.findOne(req.user.id)
+                excersise.link = link;
+                lesson.exersices == null ? lesson.exersices = [excersise] : lesson.exersices.push(excersise)
+            }
+            await this.CourseModel.updateOne({ _id: courseId }, course)
+        }
+        return lesson.exersices;
+    }
 
 }

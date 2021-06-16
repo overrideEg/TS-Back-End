@@ -22,6 +22,18 @@ export enum LessonType {
 }
 
 
+export class Excercice {
+    @ApiProperty()
+    @Prop({})
+    oId: string
+    @ApiProperty({ type:()=> User, readOnly: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
+    user?: User;
+    @ApiProperty({ description: 'link', required: true })
+    @Prop()
+    link?: string;
+}
+
 
 export class CourseReview {
     @Prop({ required: true })
@@ -79,6 +91,11 @@ export class Lesson {
     @ValidateNested()
     @Type(() => Attachement)
     attachement: Attachement;
+
+
+    @ApiProperty({ description: 'Excercice', type: Excercice, isArray: true, readOnly: true })
+    @Prop([Excercice])
+    exersices?: Excercice[];
 
     @Prop({ default: false })
     isDone: boolean;

@@ -8,6 +8,7 @@ import { Checkout, CheckoutDocument, CheckoutLine } from '../../Models/checkout.
 import { Teacher, TeacherDocument, Wallet } from '../../Models/teacher.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { CourseService } from '../course/course.service';
+import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -17,8 +18,11 @@ export class CheckoutService {
 
     constructor(
         @InjectModel(Checkout.name) public CheckoutModel: Model<CheckoutDocument>,
-        @InjectModel(Teacher.name) public TeacherModel: Model<TeacherDocument>,
+        @Inject(forwardRef(() => TeacherService))
+        private teacherService :TeacherService,
+        @Inject(forwardRef(()=>CourseService))
         private courseService: CourseService,
+        @Inject(forwardRef(()=>UserService))
         private userService: UserService
     ) { }
 
@@ -62,7 +66,7 @@ export class CheckoutService {
             wallet.value = line.price
             wallet.checkoutId = checkoutSaved['_id']
             line.course.teacher.wallet.push(wallet);
-            await this.TeacherModel.updateOne({_id: line.course.teacher['_id']},line.course.teacher)
+            await this.teacherService.TeacherModel.updateOne({_id: line.course.teacher['_id']},line.course.teacher)
             // TODO send notification to teacher
         }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,7 +10,8 @@ import { UserService } from '../user/user.service';
 export class StudentService {
    
     constructor(
-        @InjectModel(Student.name) private StudentModel: Model<StudentDocument>,
+        @InjectModel(Student.name) public StudentModel: Model<StudentDocument>,
+        @Inject(forwardRef(()=>UserService))
         private userService: UserService
     ) { }
     async save(req: Student) {

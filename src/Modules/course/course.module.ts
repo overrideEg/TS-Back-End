@@ -7,10 +7,10 @@ import { UserModule } from '../user/user.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
 import { Teacher, TeacherSchema } from '../../Models/teacher.model';
+import { TeacherModule } from '../teacher/teacher.module';
 
 @Module({
   imports: [
-
     MongooseModule.forFeatureAsync([
       {
         name: Course.name,
@@ -42,25 +42,13 @@ import { Teacher, TeacherSchema } from '../../Models/teacher.model';
         },
       },
 
-      {
-        name: Teacher.name,
-        useFactory: () => {
-          const schema = TeacherSchema;
-          schema.plugin(require('mongoose-autopopulate'));
-          return schema;
-        },
-      },
-      {
-        name: Checkout.name,
-        useFactory: async () => {
-          const schema = CheckoutSchema;
-          schema.plugin(require('mongoose-autopopulate'));
-          return schema;
-        },
-      },
+     
       
     ]),
-    UserModule,
+    
+    forwardRef(()=>UserModule),
+
+    forwardRef(()=>CheckoutModule)
   ],
   controllers: [CourseController],
   providers: [CourseService],

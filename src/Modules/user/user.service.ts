@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,6 +8,9 @@ import { Student, StudentDocument } from '../../Models/student.model';
 import { Teacher, TeacherDocument } from '../../Models/teacher.model';
 import { User, UserDocument, UserType } from '../../Models/user.model';
 import { Lang } from '../../shared/enums/lang.enum';
+import { CourseService } from '../course/course.service';
+import { StudentService } from '../student/student.service';
+import { TeacherService } from '../teacher/teacher.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
@@ -17,8 +20,9 @@ export class UserService {
 
     constructor(
         @InjectModel(User.name) public UserModel: Model<UserDocument>,
-        @InjectModel(Student.name) private StudentModel: Model<StudentDocument>,
-        @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>
+        @Inject(forwardRef(()=>StudentService)) private studentService :StudentService,
+        @Inject(forwardRef(()=>CourseService)) private CourseService :CourseService,
+        @Inject(forwardRef(()=>TeacherService)) private teacherService :TeacherService
     ) { }
 
     async findByParent(parentId: any) {
@@ -69,7 +73,7 @@ export class UserService {
             if (profile.cityId) {
                 student.city['_id'] = profile.cityId
             }
-            await this.StudentModel.updateOne({ _id: student['_id'] }, student)
+            await this.studentService.StudentModel.updateOne({ _id: student['_id'] }, student)
         }
         if (user.userType === UserType.teacher) {
             let teacher = user.teacher;
@@ -80,7 +84,7 @@ export class UserService {
             if (profile.bio) {
                 teacher.bio = profile.bio;
             }
-            await this.TeacherModel.updateOne({ _id: teacher['_id'] }, teacher);
+            await this.teacherService.TeacherModel.updateOne({ _id: teacher['_id'] }, teacher);
         }
 
         return await this.update(req.user.id, user);

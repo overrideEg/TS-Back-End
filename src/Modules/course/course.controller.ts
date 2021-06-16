@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Course, CourseContent, CourseReview } from '../../Models/course.model';
+import { Course, CourseContent, CourseReview, Excercice } from '../../Models/course.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { CourseService } from './course.service';
 
@@ -34,6 +34,13 @@ export class CourseController {
 
 
   @UseGuards(JwtAuthGuard)
+  @Post('review/:courseId/:lessonId')
+  async applyExcercice(@Req() req, @Body() body: string[], @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<Excercice[]> {
+    return this.service.applyExcercice(req, courseId,lessonId, body)
+  }
+
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getOneCourse(@Req() req, @Param('id') id: string): Promise<Course> {
     return this.service.findOne(req, id)
@@ -44,7 +51,7 @@ export class CourseController {
 
 
 
-  
+
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(@Req() req, @Body() body: Course, @Param('id') id: string): Promise<Course> {

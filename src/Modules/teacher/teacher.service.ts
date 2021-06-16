@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,19 +8,21 @@ import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Course, CourseDocument } from '../../Models/course.model';
 import { BankAccount, Teacher, TeacherDocument, Wallet } from '../../Models/teacher.model';
 import { OverrideUtils } from '../../shared/override-utils';
+import { CheckoutService } from '../checkout/checkout.service';
+import { CourseService } from '../course/course.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class TeacherService {
-   
+
 
 
     constructor(
-        @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>,
-        @InjectModel(Course.name) private CourseModel: Model<CourseDocument>,
-        @InjectModel(Checkout.name) private CheckoutModel: Model<CheckoutDocument>,
-        private userService: UserService
+        @InjectModel(Teacher.name) public TeacherModel: Model<TeacherDocument>, 
+        @Inject(forwardRef(() => CourseService))  private courseService: CourseService,
+        @Inject(forwardRef(() => CheckoutService)) private checkoutService: CheckoutService,
+        @Inject(forwardRef(() => UserService)) private userService: UserService
     ) { }
     async save(req: Teacher) {
         let saved = await this.TeacherModel.create(req);
@@ -39,7 +41,7 @@ export class TeacherService {
     async getTeacherProfile(id: string): Promise<TeacherProfile> {
         let teacher = await this.TeacherModel.findById(id).exec();
         let user = await this.userService.findByTeacher(teacher['_id']);
-        let courses = await this.CourseModel.find({ teacher: teacher }).sort({ createdAt: 'desc' }).exec();
+        let courses = await this.courseService.CourseModel.find({ teacher: teacher }).sort({ createdAt: 'desc' }).exec();
         for await (const course of courses) {
             course.teacher = teacher;
             course.teacher.user = user;
@@ -70,7 +72,7 @@ export class TeacherService {
         profile.userId = user['_id'];
         profile.avatar = user['avatar'] ?? '';
         profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
-        profile.noOfStudents = await this.CheckoutModel.countDocuments().populate({
+        profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
             "path": "lines.course",
             'model': Course.name
         }).populate({
@@ -99,7 +101,7 @@ export class TeacherService {
             throw new BadRequestException('no user found');
         let teacher = user.teacher;
         return teacher.bankAccounts
-      }
+    }
 
     async withDrawCash(req: any, accountId: string, amount: number) {
         let user = await this.userService.findOne(req.user.id);
@@ -142,7 +144,7 @@ export class TeacherService {
         let wallets = [];
         teachers.forEach(teacher => {
             teacher.wallet.forEach(wallet => {
-                if (! type || ! status){
+                if (!type || !status) {
                     wallets.push(wallet)
                 }
                 if (wallet.type === type && wallet.status === status) {

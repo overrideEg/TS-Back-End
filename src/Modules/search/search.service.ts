@@ -8,6 +8,9 @@ import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Course, CourseDocument } from '../../Models/course.model';
 import { Teacher, TeacherDocument } from '../../Models/teacher.model';
 import { UserType } from '../../Models/user.model';
+import { CheckoutService } from '../checkout/checkout.service';
+import { CourseService } from '../course/course.service';
+import { TeacherService } from '../teacher/teacher.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -15,16 +18,17 @@ const ObjectId = require('mongoose').Types.ObjectId;
 export class SearchService {
 
     constructor(
-        @InjectModel(Course.name) private CourseModel: Model<CourseDocument>,
-        @InjectModel(Teacher.name) private TeacherModel: Model<TeacherDocument>,
-        @InjectModel(Checkout.name) private CheckoutModel: Model<CheckoutDocument>,
+        private courseService : CourseService,
+        private teacherService : TeacherService,
+        private checkoutService : CheckoutService,
+      
         private userService: UserService
     ) { }
 
 
     async globalSearch(req: any, search: string, page: number, limit: number): Promise<GlobalSearch | PromiseLike<GlobalSearch>> {
         let globalSearch = new GlobalSearch()
-        let courses = await this.CourseModel.find(
+        let courses = await this.courseService.CourseModel.find(
             {
                 $or: [
                     { "name": { $regex: '^' + search, $options: 'i' } },
@@ -70,8 +74,8 @@ export class SearchService {
             let profile = new TeacherProfile();
             profile.name = user.name;
             profile.avatar = user.avatar ?? "";
-            let teacherCourses = await this.CourseModel.find({ teacher: user.teacher });
-            let registers = await this.CheckoutModel.countDocuments().populate({
+            let teacherCourses = await this.courseService.CourseModel.find({ teacher: user.teacher });
+            let registers = await this.checkoutService.CheckoutModel.countDocuments().populate({
                 "path": "lines.course",
                 'model': Course.name
             }).populate({
@@ -92,7 +96,7 @@ export class SearchService {
     async filter(req: any, subjectId: string, gradeId: string, stageId: string, cityId: string, rate: Sort, page: number, limit: number): Promise<GlobalFilter | PromiseLike<GlobalFilter>> {
         let globalFilter = new GlobalFilter();
 
-        let featuresCourses = await this.CourseModel.find({
+        let featuresCourses = await this.courseService.CourseModel.find({
             subject: new ObjectId(subjectId),
 
         }).sort({ 'cRating': 'desc' }).exec();
@@ -109,8 +113,8 @@ export class SearchService {
             course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
             profile.name = course.teacher.user.name;
             profile.avatar = course.teacher.user.avatar ?? "";
-            let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
-            profile.noOfStudents = await this.CheckoutModel.countDocuments().populate({
+            let teacherCourses = await this.courseService.CourseModel.find({ teacher: course.teacher });
+            profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
                 "path": "lines.course",
                 'model': Course.name
             }).populate({
@@ -127,7 +131,7 @@ export class SearchService {
 
         globalFilter.featuresCourses = featuresCourses.slice(0, 10);
 
-        let allCourses = await this.CourseModel.find({
+        let allCourses = await this.courseService.CourseModel.find({
 
             $and: [
                 { subject: new ObjectId(subjectId) },

@@ -13,6 +13,7 @@ import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { CourseService } from '../course/course.service';
+import { CheckoutService } from '../checkout/checkout.service';
 @Injectable()
 export class HomeService {
 
@@ -21,8 +22,8 @@ export class HomeService {
         private partnerService: PartnerService,
         private userService: UserService,
         private subjectService: SubjectService,
-        @InjectModel(Course.name) private CourseModel: Model<CourseDocument>,
-        @InjectModel(Checkout.name) private CheckoutModel: Model<CheckoutDocument>,
+        private courseService :CourseService,
+        private checkoutService: CheckoutService
     ) { }
     async getStudentHome(req: any): Promise<StudentHome | PromiseLike<StudentHome>> {
 
@@ -30,13 +31,13 @@ export class HomeService {
         home.banners = await this.bannerService.findAll();
 
         home.partners = await this.partnerService.findAll();
-        let featuresCourses = await this.CourseModel.find().sort({ 'cRating': 'desc' }).limit(20).exec();
+        let featuresCourses = await this.courseService.CourseModel.find().sort({ 'cRating': 'desc' }).limit(20).exec();
 
         for await (const course of featuresCourses) {
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
         }
         home.featuresCourses = featuresCourses;
-        let addedRecently = await this.CourseModel.find().sort({ 'createdAt': 'desc' }).limit(20).exec();
+        let addedRecently = await this.courseService.CourseModel.find().sort({ 'createdAt': 'desc' }).limit(20).exec();
         for await (const course of addedRecently) {
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
         }
@@ -45,7 +46,7 @@ export class HomeService {
         let afterWeek = moment();
         afterWeek.add(1, 'week');
 
-        let startSoon = await this.CourseModel.find({ startDate: { $gte: now.unix() * 1000, $lte: afterWeek.unix() * 1000 } }).limit(20).exec();
+        let startSoon = await this.courseService.CourseModel.find({ startDate: { $gte: now.unix() * 1000, $lte: afterWeek.unix() * 1000 } }).limit(20).exec();
         for await (const course of startSoon) {
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
         }
@@ -59,8 +60,8 @@ export class HomeService {
             course.teacher.user = await this.userService.findByTeacher(course.teacher['_id']);
             profile.name = course.teacher.user.name;
             profile.avatar = course.teacher.user.avatar ?? "";
-            let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
-            profile.noOfStudents = await this.CheckoutModel.countDocuments().populate({
+            let teacherCourses = await this.courseService.CourseModel.find({ teacher: course.teacher });
+            profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
                 "path": "lines.course",
                 'model': Course.name
             }).populate({
@@ -83,15 +84,13 @@ export class HomeService {
         let home = new TeacherHome()
         let user = await this.userService.findOne(req.user.id);
 
-        let teacherCourses = await this.CourseModel.find({ teacher: user.teacher }).exec();
+        let teacherCourses = await this.courseService.CourseModel.find({ teacher: user.teacher }).exec();
         home.noOfCourses = teacherCourses.length
         home.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
         let feedbacks = [];
 
 
-
-
-        let registers = await this.CheckoutModel.countDocuments().populate({
+        let registers = await this.checkoutService.CheckoutModel.countDocuments().populate({
             "path": "lines.course",
             'model': Course.name
         }).populate({
