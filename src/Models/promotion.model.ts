@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { OBaseEntity } from '../shared/base-entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsNumber, IsString, Max, Min, MinLength } from 'class-validator';
 export type PromotionDocument = Promotion & Document;
 @Schema()
 export class Promotion extends OBaseEntity {
@@ -20,6 +20,11 @@ export class Promotion extends OBaseEntity {
     @Prop()
     @IsNumber()
     toDate: number;
+    @ApiProperty()
+    @Prop()
+    @IsNumber()
+    @Min(1) @Max(100)
+    discountPercent: number;
     @ApiProperty()
     @Prop()
     @IsBoolean()
