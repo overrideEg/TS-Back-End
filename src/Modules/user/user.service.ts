@@ -25,22 +25,7 @@ export class UserService {
         @Inject(forwardRef(() => CheckoutService)) private checkoutService: CheckoutService,
     ) { }
 
-    async findByParent(parentId: any) {
-        let user =  await this.UserModel.findOne({ parent: new ObjectId(parentId) }).exec() as User;
-
-        return user
-    }
-    async findByStudent(studentId: any) {
-        let user = await this.UserModel.findOne({ student: new ObjectId(studentId) }).exec() as User;
-    
-        return user
-    }
-    async findByTeacher(teacherId: any) {
-        let user = await this.UserModel.findOne({ teacher: new ObjectId(teacherId) }).exec() as User;
-
-        return user
-    }
-
+   
 
     async login(username: string, defaultLang?: Lang) {
         let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).exec();
