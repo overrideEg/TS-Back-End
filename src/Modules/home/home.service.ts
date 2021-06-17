@@ -57,7 +57,6 @@ export class HomeService {
         for await (const course of featuresCourses) {
 
             let profile = new TeacherProfile();
-            course.teacher = await this.userService.findByTeacher(course.teacher['_id']);
             profile.name = course?.teacher?.name;
             profile.avatar = course.teacher.avatar ?? "";
             let teacherCourses = await this.courseService.CourseModel.find({ teacher: course.teacher });
