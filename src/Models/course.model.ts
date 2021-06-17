@@ -7,7 +7,7 @@ import { Grade } from './grade.model';
 import { Stage } from './stage.model';
 import { Day } from '../shared/enums/day.enum';
 import { Subject } from './subject.model';
-import { IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from './user.model';
 
@@ -94,6 +94,8 @@ export class Lesson {
     @Prop([Excercice])
     exersices?: Excercice[];
 
+    @ApiProperty()
+    @IsBoolean()
     @Prop({ default: false })
     isDone: boolean;
 }
