@@ -22,7 +22,7 @@ export class HomeService {
         private partnerService: PartnerService,
         private userService: UserService,
         private subjectService: SubjectService,
-        private courseService :CourseService,
+        private courseService: CourseService,
         private checkoutService: CheckoutService
     ) { }
     async getStudentHome(req: any): Promise<StudentHome | PromiseLike<StudentHome>> {
@@ -72,7 +72,8 @@ export class HomeService {
             profile.bio = course.teacher?.bio ?? course?.teacher?.name;
             profile.userId = course.teacher['_id']
             profile.teacherId = course.teacher['_id']
-            home.topInstructors.push(profile);
+            if (!home.topInstructors.find((instructor) => instructor.userId === course.teacher['_id']))
+                home.topInstructors.push(profile);
         }
 
         return home;
@@ -113,10 +114,10 @@ export class HomeService {
             feedback.user = await this.userService.findOne(String(feedback.user))
         }
         let todayCourses = teacherCourses;
-        todayCourses =  todayCourses.filter(course => {
-            let today = course.Days.find(day =>  OverrideUtils.dayOffDay(day)  === new Date().getDay());
+        todayCourses = todayCourses.filter(course => {
+            let today = course.Days.find(day => OverrideUtils.dayOffDay(day) === new Date().getDay());
             let notFinished = course.content.find(content => content.lessons.find(lesson => lesson.isDone == false || lesson.isDone == null || lesson.isDone == undefined));
-            return today  && notFinished 
+            return today && notFinished
         })
         home.todayCourses = todayCourses;
         return home
