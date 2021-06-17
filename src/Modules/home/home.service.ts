@@ -58,7 +58,7 @@ export class HomeService {
 
             let profile = new TeacherProfile();
             course.teacher = await this.userService.findByTeacher(course.teacher['_id']);
-            profile.name = course.teacher.name;
+            profile.name = course?.teacher?.name;
             profile.avatar = course.teacher.avatar ?? "";
             let teacherCourses = await this.courseService.CourseModel.find({ teacher: course.teacher });
             profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
@@ -70,7 +70,7 @@ export class HomeService {
             });
             profile.noOfCourses = teacherCourses.length
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-            profile.bio = course.teacher?.bio ?? course.teacher.name;
+            profile.bio = course.teacher?.bio ?? course?.teacher?.name;
             profile.userId = course.teacher['_id']
             profile.teacherId = course.teacher['_id']
             home.topInstructors.push(profile);
