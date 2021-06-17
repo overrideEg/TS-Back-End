@@ -95,7 +95,6 @@ export class Lesson {
     exersices?: Excercice[];
 
     @ApiProperty()
-    @IsBoolean()
     @Prop({ default: false })
     isDone: boolean;
 }
