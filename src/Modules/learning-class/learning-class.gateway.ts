@@ -23,12 +23,10 @@ export class LearningClassGateway {
   async startLive(
     @MessageBody() body: StartLiveDTO,
     @ConnectedSocket() socket: Socket
-  ): Promise<WsResponse<unknown>> {
+  ){
    
-    console.log('startLive Event',body);
     
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
-    console.log(user);
     
     let startedClass = await this.service.startLive(user, body)
     socket.join(startedClass.lesson.OId);
@@ -54,16 +52,7 @@ export class LearningClassGateway {
       attenders: startedClass.attenders
     });
 
-    return {
-      event: 'startLive', data: {
-        teacherToken: startedClass.teacherToken,
-        studentToken: startedClass.startTime,
-        courseId: startedClass.course['_id'],
-        lessonId: startedClass.lesson.OId,
-        startTime: startedClass.startTime,
-        attenders: startedClass.attenders
-      },
-    };
+  
 
 
 
@@ -74,7 +63,7 @@ export class LearningClassGateway {
   async endLive(
     @MessageBody() body: StartLiveDTO,
     @ConnectedSocket() socket: Socket
-  ): Promise<WsResponse<unknown>> {
+  ) {
    
 
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
@@ -91,18 +80,7 @@ export class LearningClassGateway {
       attenders: startedClass.attenders
     });
 
-    return {
-      event: 'endLive', data: {
-        teacherToken: startedClass.teacherToken,
-        studentToken: startedClass.startTime,
-        courseId: startedClass.course['_id'],
-        lessonId: startedClass.lesson.OId,
-        endTime: startedClass.endTime,
-        startTime: startedClass.startTime,
-        attenders: startedClass.attenders
-      },
-    };
-
+   
   }
 
 
@@ -110,7 +88,7 @@ export class LearningClassGateway {
   async joinLive(
     @MessageBody() body: StartLiveDTO,
     @ConnectedSocket() socket: Socket
-  ): Promise<WsResponse<unknown>> {
+  ){
    
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
     let startedClass = await this.service.joinLive(user, body)
@@ -134,16 +112,7 @@ export class LearningClassGateway {
       attenders: startedClass.attenders
     });
 
-    return {
-      event: 'join', data: {
-        teacherToken: startedClass.teacherToken,
-        studentToken: startedClass.startTime,
-        courseId: startedClass.course['_id'],
-        lessonId: startedClass.lesson.OId,
-        startTime: startedClass.startTime,
-        attenders: startedClass.attenders
-      },
-    };
+  
 
 
 
@@ -152,7 +121,7 @@ export class LearningClassGateway {
   async sendMessage(
     @MessageBody() body: sendLiveMessageDTO,
     @ConnectedSocket() socket: Socket
-  ): Promise<WsResponse<unknown>> {
+  ){
    
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
     let msg = await this.service.sendMessage(user, body)
@@ -168,18 +137,7 @@ export class LearningClassGateway {
         time: msg.time
       })
   
-    return {
-      event: 'sendMessage', data: {
-        user: {
-          name : msg.user.name,
-          avatar : msg.user.avatar,
-          _id : msg.user['_id']
-        },
-        message: msg.message,
-        time: msg.time
-      },
-    };
-
+   
 
 
   }
