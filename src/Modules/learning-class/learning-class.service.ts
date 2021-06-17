@@ -35,8 +35,6 @@ export class LearningClassService {
 
     async startLive(user: User, body: StartLiveDTO) {
         let course = await this.courseService.findById(body.courseId);
-
-        console.log('course',course);
         
         if (course.teacher['_id'].toString() !== user['_id'].toString())
             throw new WsException('only teacher can start his live');
