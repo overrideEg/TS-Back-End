@@ -179,11 +179,9 @@ export class Course extends OBaseEntity {
     @ValidateNested()
     @Type(() => CourseReview)
     reviews?: CourseReview[];
-
     @ApiProperty({ type: () => User })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
     teacher?: User;
-
     @ApiProperty({ type: Number })
     @Prop({ default: 5 })
     cRating?: number

@@ -63,8 +63,8 @@ const overrideMoules = [
     CacheModule.register(),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
+      ttl: 10,
+      limit: 999999,
     }),
 
     ...overrideMoules

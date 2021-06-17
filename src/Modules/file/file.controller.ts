@@ -23,7 +23,7 @@ export class FileController {
     return await this.fileService.uploadMultiple({ request: req, file: files })
   }
 
-  
+
   @Get(':id')
   downloadFile(@Param('id') id: string, @Req() request, @Res() response) {
     return this.fileService.download(id, request, response)
