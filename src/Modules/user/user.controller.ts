@@ -39,6 +39,27 @@ export class UserController {
         return this.service.myProfile(req);
     }
 
+     /* GET One Teacher End Point */
+  @UseGuards(JwtAuthGuard)
+  @Get('teacher/:id')
+  getTeacherProfile(@Param('id') id: string): Promise<TeacherProfile> {
+    return this.service.getTeacherProfile(id);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('account')
+  getBankAccounts(@Req() req) {
+    return this.service.getBankAccounts(req)
+  }
+  
+   @UseGuards(JwtAuthGuard)
+  @Get('wallet')
+  @ApiQuery({ name: 'type', enum: [TransactionType.in, TransactionType.out] })
+  @ApiQuery({ name: 'status', enum: [TransactionStatus.approved, TransactionStatus.pending] })
+  getWallets(@Query('type') type: string, @Query('status') status: string) {
+    return this.service.getWallets( type ? TransactionType[type]: null,status? TransactionStatus[status]: null );
+  }
+
+
     /* GET One User End Point */
     @UseGuards(JwtAuthGuard)
     @Get(':id')
@@ -70,12 +91,6 @@ export class UserController {
 
 
 
-  /* GET One Teacher End Point */
-  @UseGuards(JwtAuthGuard)
-  @Get('profile/:id')
-  getTeacherProfile(@Param('id') id: string): Promise<TeacherProfile> {
-    return this.service.getTeacherProfile(id);
-  }
 
   @UseGuards(JwtAuthGuard)
   @Post('account')
@@ -83,12 +98,8 @@ export class UserController {
     return this.service.addBankAccount(req, body)
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('account')
-  getBankAccounts(@Req() req) {
-    return this.service.getBankAccounts(req)
-  }
-  
+
+ 
   @UseGuards(JwtAuthGuard)
   @Post('Withdraw/:accountId/:amount')
   withdrawCash(@Req() req, @Param('accountId') accountId: string, @Param('amount') amount: number) {
@@ -96,14 +107,7 @@ export class UserController {
   }
 
 
-  @UseGuards(JwtAuthGuard)
-  @Get('wallet')
-  @ApiQuery({ name: 'type', enum: [TransactionType.in, TransactionType.out] })
-  @ApiQuery({ name: 'status', enum: [TransactionStatus.approved, TransactionStatus.pending] })
-  getWallets(@Query('type') type: string, @Query('status') status: string) {
-    return this.service.getWallets( type ? TransactionType[type]: null,status? TransactionStatus[status]: null );
-  }
-
+ 
 
   @UseGuards(JwtAuthGuard)
   @Put('wallet/approve/:teacherId/:walletId')
