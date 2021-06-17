@@ -132,9 +132,9 @@ export class CourseService {
         course.related = await this.CourseModel.find({
             $or: [
                 { subject: course.subject ? course.subject['_id'] : null },
-                { teacher: course.teacher['_id'] ?? '' },
-                { grade: course.grade['_id'] ?? '' },
-                { stage: course.stage['_id'] ?? '' }],
+                { teacher: course.teacher['_id'] ?? null },
+                { grade: course.grade['_id'] ?? null },
+                { stage: course.stage['_id'] ?? null }],
             _id: { $ne: course['_id'] }
         });
         course.related = course.related.slice(0, 6);

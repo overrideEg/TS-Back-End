@@ -25,8 +25,6 @@ export class LearningClassGateway {
     @ConnectedSocket() socket: Socket
   ): Promise<WsResponse<unknown>> {
    
-
-
     console.log('startLive Event',body);
     
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);

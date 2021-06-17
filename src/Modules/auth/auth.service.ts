@@ -24,11 +24,15 @@ export class AuthService {
 
     public async getUserFromAuthenticationToken(token: string) {
         token = token.substr(7);
-        const payload = this.jwtService.verify(token, {
-            secret: jwtConstants.secret
-        });
-        if (payload.id) {
-            return this.userService.findOne(payload.id);
+        try {
+            const payload = this.jwtService.verify(token, {
+                secret: jwtConstants.secret
+            });
+            if (payload.id) {
+                return this.userService.findOne(payload.id);
+            }
+        } catch (exception ){
+            throw new Error('token is invalid')
         }
     }
     sign(user: User) {
