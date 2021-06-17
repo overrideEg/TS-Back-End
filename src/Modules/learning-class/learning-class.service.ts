@@ -118,7 +118,13 @@ export class LearningClassService {
         joinChatMessage.message = `${user.name} joined`
         existsClass.chat.push(joinChatMessage);
         await this.model.updateOne({ _id: existsClass['_id'] }, existsClass);
+        const expirationTimeInSeconds = 5184000 * 60
+        const currentTimestamp = Math.floor(Date.now() / 1000)
+        const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+        const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+        existsClass.studentToken = studentToken;
         return existsClass;
+        
     }
 
 
