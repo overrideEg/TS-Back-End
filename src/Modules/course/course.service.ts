@@ -36,6 +36,7 @@ export class CourseService {
                 content.lessons.forEach(lesson => {
                     lesson['OId'] = OverrideUtils.generateGUID();
                     lesson.uId = random(100,99999);
+                    lesson.isDone = false
                 });
             })
         }
@@ -94,6 +95,8 @@ export class CourseService {
             content.lessons.forEach(lesson => {
                 lesson['OId'] = OverrideUtils.generateGUID();
                 lesson.uId = random(100,99999);
+                lesson.isDone = false
+
             });
         })
         course.content = contents;
