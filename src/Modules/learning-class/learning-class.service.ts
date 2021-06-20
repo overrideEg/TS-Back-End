@@ -197,7 +197,7 @@ export class LearningClassService {
         message.user = user;
         existsClass.chat.push(message)
         await this.model.updateOne({ _id: existsClass['_id'] }, existsClass)
-        return message
+        return  (await this.model.findById(existsClass['_id'])).chat
     }
 
 
