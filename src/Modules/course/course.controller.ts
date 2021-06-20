@@ -49,8 +49,6 @@ export class CourseController {
 
 
 
-
-
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getOneCourse(@Req() req, @Param('id') id: string): Promise<Course> {

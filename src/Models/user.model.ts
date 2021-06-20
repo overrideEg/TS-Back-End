@@ -9,6 +9,9 @@ import { City } from './city.model';
 import { Grade } from './grade.model';
 import { Stage } from './stage.model';
 import { TransactionStatus, TransactionType } from '../enums/wallet.enum';
+import { StudentReview } from './student-review.model';
+
+
 
 export enum UserType {
     admin = 'Admin',
@@ -84,7 +87,7 @@ export class User extends OBaseEntity {
     tempCode?: string;
     @Prop({ enum: [UserType.admin, UserType.parent, UserType.student, UserType.teacher], default: UserType.student })
     userType?: UserType;
-  
+
 
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate: true }])
     cart?: Course[];
@@ -103,6 +106,9 @@ export class User extends OBaseEntity {
     @ApiProperty({ type: () => Grade })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name, autopopulate: true })
     grade?: Grade;
+    @ApiProperty({ type: () => StudentReview, isArray: true })
+    @Prop([StudentReview])
+    reviews?: StudentReview;
 
 
 
