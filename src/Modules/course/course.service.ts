@@ -30,6 +30,15 @@ export class CourseService {
         body['teacher'] = teacher;
         body['createdAt'] = Date.now()
 
+        if (body.content){
+            body.content.forEach(content => {
+                content.OId = OverrideUtils.generateGUID();
+                content.lessons.forEach(lesson => {
+                    lesson['OId'] = OverrideUtils.generateGUID();
+                    lesson.uId = random(100,99999);
+                });
+            })
+        }
         return this.CourseModel.create(body)
     }
     async update(req: any, id: string, body: Course): Promise<Course | PromiseLike<Course>> {
