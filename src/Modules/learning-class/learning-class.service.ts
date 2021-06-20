@@ -63,8 +63,8 @@ export class LearningClassService {
                 await this.model.updateOne({ _id: existsClass['_id'] }, existsClass)
             }
 
-       const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, lesson.uId, RtcRole.PUBLISHER, privilegeExpiredTs);
-        const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, lesson.uId, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+       const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
+        const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
             existsClass.teacherToken = teacherToken;
             existsClass.studentToken = studentToken;
 
@@ -76,8 +76,8 @@ export class LearningClassService {
         lClass.lesson = lesson;
         lClass.startTime = Date.now();
 
-        const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, lesson.uId, RtcRole.PUBLISHER, privilegeExpiredTs);
-        const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, lesson.uId, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+        const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
+        const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
         lClass.teacherToken = teacherToken;
         lClass.studentToken = studentToken;
         lClass.attenders = 0;
@@ -135,8 +135,8 @@ export class LearningClassService {
         const expirationTimeInSeconds = 3600
         const currentTimestamp = Math.floor(Date.now() / 1000)
         const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-        const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, lesson.uId, RtcRole.PUBLISHER, privilegeExpiredTs);
-        const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, lesson.uId, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+        const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
+        const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
         // const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
         existsClass.studentToken = studentToken;
         existsClass.teacherToken = teacherToken;
