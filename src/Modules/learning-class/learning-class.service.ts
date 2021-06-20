@@ -35,7 +35,7 @@ export class LearningClassService {
 
     async startLive(user: User, body: StartLiveDTO) {
         let course = await this.courseService.findById(body.courseId);
-        
+
         if (course.teacher['_id'].toString() !== user['_id'].toString())
             throw new WsException('only teacher can start his live');
 
@@ -104,6 +104,12 @@ export class LearningClassService {
             course: new ObjectId(body.courseId),
             lesson: lesson
         }).exec();
+
+
+        if (!existsClass) {
+            throw new WsException(`this course not started yet`)
+
+        }
         if (existsClass.endTime) {
             throw new WsException(`lesson ended at ${new Date(existsClass.endTime).toTimeString()}`)
         }
@@ -124,7 +130,7 @@ export class LearningClassService {
         const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, lesson.OId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
         existsClass.studentToken = studentToken;
         return existsClass;
-        
+
     }
 
 

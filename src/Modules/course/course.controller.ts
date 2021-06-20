@@ -34,10 +34,21 @@ export class CourseController {
 
 
   @UseGuards(JwtAuthGuard)
-  @Post('review/:courseId/:lessonId')
+  @Post('excercice/:courseId/:lessonId')
   async applyExcercice(@Req() req, @Body() body: string[], @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<Excercice[]> {
-    return this.service.applyExcercice(req, courseId,lessonId, body)
+    return this.service.applyExcercice(req, courseId, lessonId, body)
   }
+
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('excercice/:courseId/:lessonId')
+  async getExcercices(@Req() req,  @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<Excercice[]> {
+    return this.service.getExcercices(req, courseId, lessonId, )
+  }
+
+
+
 
 
   @UseGuards(JwtAuthGuard)
@@ -45,10 +56,6 @@ export class CourseController {
   async getOneCourse(@Req() req, @Param('id') id: string): Promise<Course> {
     return this.service.findOne(req, id)
   }
-
-
-
-
 
 
 

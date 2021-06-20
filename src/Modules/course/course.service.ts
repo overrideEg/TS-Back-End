@@ -17,8 +17,8 @@ export class CourseService {
 
     constructor(
         @InjectModel(Course.name) public CourseModel: Model<CourseDocument>,
-        @Inject(forwardRef(()=>UserService)) private userService :UserService,
-        @Inject(forwardRef(()=>CheckoutService))  private checkoutService :CheckoutService
+        @Inject(forwardRef(() => UserService)) private userService: UserService,
+        @Inject(forwardRef(() => CheckoutService)) private checkoutService: CheckoutService
     ) { }
 
 
@@ -210,5 +210,17 @@ export class CourseService {
         }
         return lesson.exersices;
     }
+
+
+    async getExcercices(req: any, courseId: string, lessonId: string): Promise<Excercice[] | PromiseLike<Excercice[]>> {
+        let course = await this.CourseModel.findById(courseId);
+        let content = course?.content?.find(content => content.lessons.find(less => less.OId === lessonId));
+        let lesson = content?.lessons?.find(less => less.OId === lessonId);
+        if (!course || !content || !lesson) {
+            throw new BadRequestException('course Is Invalid');
+        }
+        return lesson.exersices ?? []
+    }
+
 
 }
