@@ -11,6 +11,8 @@ import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min, ValidateNe
 import { Type } from 'class-transformer';
 import { User } from './user.model';
 
+export const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
 
 
 export enum LessonType {
@@ -23,7 +25,7 @@ export class Excercice {
     @ApiProperty()
     @Prop({})
     oId: string
-    @ApiProperty({ type:()=> User, readOnly: true })
+    @ApiProperty({ type: () => User, readOnly: true })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
     user?: User;
     @ApiProperty({ description: 'link', required: true })
@@ -72,6 +74,9 @@ export class Lesson {
     @ApiProperty({ required: false })
     @Prop({ required: true })
     OId: string;
+
+    @Prop({ required: true, default: random(10, 999999) })
+    uId: number;
 
     @ApiProperty()
     @Prop()

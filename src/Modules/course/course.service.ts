@@ -2,7 +2,7 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Course, CourseContent, CourseDocument, CourseReview, Excercice, LessonType } from '../../Models/course.model';
+import { Course, CourseContent, CourseDocument, CourseReview, Excercice, LessonType, random } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { CheckoutService } from '../checkout/checkout.service';
@@ -82,7 +82,10 @@ export class CourseService {
             throw new BadRequestException('only teacher can add his content');
         contents.forEach(content => {
             content.OId = OverrideUtils.generateGUID();
-            content.lessons.forEach(lesson => lesson['OId'] = OverrideUtils.generateGUID());
+            content.lessons.forEach(lesson => {
+                lesson['OId'] = OverrideUtils.generateGUID();
+                lesson.uId = random(100,99999);
+            });
         })
         course.content = contents;
         await this.CourseModel.updateOne({ _id: course['_id'] }, course).exec();
