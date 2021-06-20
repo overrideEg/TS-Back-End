@@ -65,14 +65,14 @@ export class CourseService {
         if (course.startDate < Date.now()) {
             throw new BadRequestException('you can not delete started course');
         }
-        let reservations = await this.checkoutService.CheckoutModel.find().populate({
-            "path": "lines.course",
-            'model': Course.name,
-            "match": new ObjectId(course['_id'].toString())
-        }).populate('user')
-        if (reservations.length>0){
-            throw new BadRequestException(`you have ${reservations.length}  reservation on your course you can't delete`);
-        }
+        // let reservations = await this.checkoutService.CheckoutModel.find().populate({
+        //     "path": "lines.course",
+        //     'model': Course.name,
+        //     "match": new ObjectId(course['_id'].toString())
+        // }).populate('user')
+        // if (reservations.length>0){
+        //     throw new BadRequestException(`you have ${reservations.length}  reservation on your course you can't delete`);
+        // }
     
 
         return await this.CourseModel.findByIdAndDelete(id);
