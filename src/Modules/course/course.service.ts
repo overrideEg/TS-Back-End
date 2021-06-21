@@ -202,15 +202,9 @@ export class CourseService {
 
     async getStudentCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
         let purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
-        let courses = []
-        for await (const check of purchased) {
+        
 
-            for await (const line of check.lines) {
-                courses.push(await this.findById(line.course['_id'].toString()))
-            }
-        }
-
-        return courses;
+        return purchased.map((checkout)=>checkout.course);
     }
 
 
