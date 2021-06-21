@@ -61,11 +61,11 @@ export class HomeService {
             profile.avatar = course.teacher.avatar ?? "";
             let teacherCourses = await this.courseService.CourseModel.find({ teacher: course.teacher });
             profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
-                "path": "lines.course",
+                "path": "course",
                 'model': Course.name
             }).populate({
-                path: 'lines.course.teacher',
-                "match": new ObjectId(course.teacher['_id'].toString())
+                path: 'course.teacher._id',
+                "match": new ObjectId(course.teacher['_id'])
             });
             profile.noOfCourses = teacherCourses.length
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;

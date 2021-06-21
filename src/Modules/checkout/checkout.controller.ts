@@ -17,7 +17,7 @@ export class CheckoutController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  async checkAndPay(@Req() req,@Body() body: CheckoutDTO): Promise<Checkout> {
+  async checkAndPay(@Req() req,@Body() body: CheckoutDTO): Promise<Checkout[]> {
     return this.service.checkAndPay(req,body)
   }
 

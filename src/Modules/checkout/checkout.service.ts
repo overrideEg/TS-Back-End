@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
 import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
-import { Checkout, CheckoutDocument, CheckoutLine } from '../../Models/checkout.model';
+import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Wallet } from '../../Models/wallet-model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { CourseService } from '../course/course.service';
@@ -30,41 +30,44 @@ export class CheckoutService {
         return saved;
     }
 
-    async checkAndPay(req, body: CheckoutDTO): Promise<Checkout | PromiseLike<Checkout>> {
-        let checkout = new Checkout();
+    async checkAndPay(req, body: CheckoutDTO): Promise<Checkout[] | PromiseLike<Checkout[]>> {
 
-        checkout.user = new ObjectId(req.user.id)
 
         //TODO promocode check
-        checkout.lines = []
+        let checkouts = []
         for await (const course of body.courses) {
-            let line = new CheckoutLine();
-            line.course = await this.courseService.findOne(req, course['_id']);
-            line.price = line.course.price;
+
+            let checkout = new Checkout();
+
+            checkout.user = new ObjectId(req.user.id)
+
+            checkout.course = await this.courseService.findOne(req, course['_id']);
+            checkout.price = checkout.course.price;
+
+            checkout.valueDate = Date.now();
+            checkout.priceBeforeDiscount = checkout.price;
+    
+    
+            let checkoutSaved = await this.CheckoutModel.create(checkout);
+    
+    
+            await this.userService.createWalletForCheckout(checkoutSaved)
+
             // TODO  if (line.course.startDate < Date.now())
             // throw new BadRequestException("can not purchace started course");
-            checkout.lines.push(line)
+            checkouts.push(checkout)
         }
 
         //TODO Payment
-        checkout.valueDate = Date.now();
-        checkout.priceBeforeDiscount = checkout.lines.reduce((acc, line) => acc + line.price, 0);
+      
 
 
-        let checkoutSaved = await this.CheckoutModel.create(checkout);
-
-
-        for await (const line of checkout.lines) {
-            await this.userService.createWalletForCheckout(line,checkoutSaved)
-           
-            // TODO send notification to teacher
-        }
 
         let user = await this.userService.findOne(req.user.id);
         user.cart = [];
         await this.userService.update(req.user.id, user)
 
-        return checkoutSaved
+        return checkouts
     }
 
 }

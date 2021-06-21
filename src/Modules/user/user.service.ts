@@ -6,7 +6,7 @@ import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
 import { TransactionType, TransactionStatus } from '../../enums/wallet.enum';
 import { BankAccount, BankAccountDocument } from '../../Models/bank-account.model';
-import { CheckoutLine, CheckoutDocument } from '../../Models/checkout.model';
+import {  CheckoutDocument } from '../../Models/checkout.model';
 import { Course } from '../../Models/course.model';
 import { StudentReview, StudentReviewDocument, StudentReviewSchema } from '../../Models/student-review.model';
 import { User, UserDocument, UserType } from '../../Models/user.model';
@@ -143,12 +143,13 @@ export class UserService {
         profile.userId = user['_id'];
         profile.avatar = user['avatar'] ?? '';
         profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
+        
         profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
-            "path": "lines.course",
+            "path": "course",
             'model': Course.name
         }).populate({
-            path: 'lines.course.teacher',
-            "match": new ObjectId(user['_id'].toString())
+            path: 'course.teacher._id',
+            "match": new ObjectId(user['_id'])
         });
         return profile;
     }
@@ -202,16 +203,16 @@ export class UserService {
     }
 
 
-    async createWalletForCheckout(line: CheckoutLine, checkoutSaved: CheckoutDocument) {
+    async createWalletForCheckout( checkoutSaved: CheckoutDocument) {
         let wallet = new Wallet()
         wallet.date = Date.now()
         wallet.type = TransactionType.in;
         wallet.status = TransactionStatus.approved;
-        wallet.value = line.price
+        wallet.value = checkoutSaved.price
         wallet.checkout = checkoutSaved;
         wallet = await this.WalletModel.create(wallet);
-        line.course.teacher.wallet.push(wallet);
-        await this.UserModel.updateOne({ _id: line.course.teacher['_id'] }, line.course.teacher)
+        checkoutSaved.course.teacher.wallet.push(wallet);
+        await this.UserModel.updateOne({ _id: checkoutSaved.course.teacher['_id'] }, checkoutSaved.course.teacher)
     }
     async getWallets(type: TransactionType, status: TransactionStatus) {
         let teachers = await this.UserModel.find({ userType: UserType.teacher }).exec();
