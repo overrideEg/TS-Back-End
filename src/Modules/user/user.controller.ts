@@ -62,6 +62,22 @@ export class UserController {
   }
 
 
+  @UseGuards(JwtAuthGuard)
+  @Post('reviewStudent/:studentId/:courseId')
+  @ApiBody({ type: () => StudentReview })
+  ReviewStudent(@Req() req, @Param('studentId') studentId: string, @Param('courseId') courseId: string, @Body() body: StudentReview) {
+    return this.service.reviewStudent(req,studentId, courseId, body)
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('review/:studentId/:subjectId')
+  @ApiBody({ type: () => StudentReview })
+  studentReview(@Req() req, @Param('studentId') studentId: string, @Param('subjectId') subjectId: string) {
+    return this.service.getStudentReviews(req,studentId, subjectId)
+  }
+
+
   /* GET One User End Point */
   @UseGuards(JwtAuthGuard)
   @Get(':id')
@@ -99,12 +115,7 @@ export class UserController {
   addBankAcount(@Req() req, @Body() body: BankAccount) {
     return this.service.addBankAccount(req, body)
   }
-  @UseGuards(JwtAuthGuard)
-  @Post('reviewStudent/:studentId/:courseId')
-  @ApiBody({ type: () => StudentReview })
-  ReviewStudent(@Req() req, @Param('studentId') studentId: string, @Param('courseId') courseId: string, @Body() body: StudentReview) {
-    return this.service.reviewStudent(req,studentId, courseId, body)
-  }
+ 
 
 
 

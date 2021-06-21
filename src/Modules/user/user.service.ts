@@ -6,7 +6,7 @@ import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
 import { TransactionType, TransactionStatus } from '../../enums/wallet.enum';
 import { BankAccount, BankAccountDocument } from '../../Models/bank-account.model';
-import {  CheckoutDocument } from '../../Models/checkout.model';
+import { CheckoutDocument } from '../../Models/checkout.model';
 import { Course } from '../../Models/course.model';
 import { StudentReview, StudentReviewDocument, StudentReviewSchema } from '../../Models/student-review.model';
 import { User, UserDocument, UserType } from '../../Models/user.model';
@@ -17,10 +17,10 @@ import { OverrideUtils } from '../../shared/override-utils';
 import { CheckoutService } from '../checkout/checkout.service';
 import { CourseService } from '../course/course.service';
 const ObjectId = require('mongoose').Types.ObjectId;
+import * as moment from 'moment'
 
 @Injectable()
 export class UserService {
-
 
 
     private readonly logger = new Logger(UserService.name);
@@ -143,7 +143,7 @@ export class UserService {
         profile.userId = user['_id'];
         profile.avatar = user['avatar'] ?? '';
         profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
-        
+
         profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
             "path": "course",
             'model': Course.name
@@ -203,7 +203,7 @@ export class UserService {
     }
 
 
-    async createWalletForCheckout( checkoutSaved: CheckoutDocument) {
+    async createWalletForCheckout(checkoutSaved: CheckoutDocument) {
         let wallet = new Wallet()
         wallet.date = Date.now()
         wallet.type = TransactionType.in;
@@ -248,4 +248,54 @@ export class UserService {
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);
         return teacher.bankAccounts;
     }
+
+    async getStudentReviews(req: any, studentId: string, subjectId: string) {
+        let student = await this.UserModel.findById(studentId).exec();
+        let reviews = student.studentReviews.filter((rev) => rev?.course?.subject['_id'].toString() === subjectId);
+
+        let now = moment();
+        let lastMonth = now;
+        lastMonth.subtract(1, 'month');
+
+        let thisMonthString = moment().format('MM-yyyy')
+        let lastMonthString = moment().subtract(1, 'month').format('MM-yyyy')
+        let reviewResponse = {
+
+        }
+        reviewResponse[thisMonthString] = {
+            attendance: 0,
+            grades: 0,
+            performance: 0,
+            understanding: 0
+        }
+        reviewResponse[lastMonthString] = {
+            attendance: 0,
+            grades: 0,
+            performance: 0,
+            understanding: 0
+        }
+        let thisMonthReviews = reviews.filter(rev => rev.valueDate >= moment().startOf('month').unix() * 1000 && rev.valueDate <= moment().endOf('month').unix() * 1000)
+
+        if (thisMonthReviews.length>0)
+        reviewResponse[thisMonthString] = {
+            attendance: thisMonthReviews.filter((rev) => rev.attendance === true).length / thisMonthReviews.length * 100 ,
+            grades: thisMonthReviews.reduce((acc, rev) => acc + rev.grades,0) / thisMonthReviews.length ,
+            performance: thisMonthReviews.reduce((acc, rev) => acc + rev.performance,0)/ thisMonthReviews.length ,
+            understanding: thisMonthReviews.reduce((acc, rev) => acc + rev.understanding,0) / thisMonthReviews.length
+        }
+
+        let lastMonthReviews = reviews.filter(rev => rev.valueDate >= moment().subtract(1,'month').startOf('month').unix() * 1000 && rev.valueDate <= moment().subtract(1,'month').endOf('month').unix() * 1000)
+
+        if (lastMonthReviews.length>0)
+        reviewResponse[lastMonthString] = {
+            attendance: lastMonthReviews.filter((rev) => rev.attendance === true).length / lastMonthReviews.length * 100 ,
+            grades: lastMonthReviews.reduce((acc, rev) => acc + rev.grades,0) / lastMonthReviews.length  ,
+            performance: lastMonthReviews.reduce((acc, rev) => acc + rev.performance,0)/ lastMonthReviews.length  ,
+            understanding: lastMonthReviews.reduce((acc, rev) => acc + rev.understanding,0) / lastMonthReviews.length 
+        }
+
+        return reviewResponse
+    }
+
+
 }

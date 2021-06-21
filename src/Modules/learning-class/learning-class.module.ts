@@ -6,6 +6,7 @@ import { LearningClass, LearningClassSchema } from '../../Models/learning-class.
 import { LearningClassController } from './learning-class.controller';
 import { AuthModule } from '../auth/auth.module';
 import { CourseModule } from '../course/course.module';
+import { CheckoutModule } from '../checkout/checkout.module';
 
 @Module({
   imports:[
@@ -20,6 +21,7 @@ import { CourseModule } from '../course/course.module';
       },
     ]),
     AuthModule,
+    CheckoutModule,
     CourseModule
   ],
   controllers: [LearningClassController],

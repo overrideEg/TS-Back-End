@@ -50,7 +50,8 @@ export class CheckoutService {
     
             let checkoutSaved = await this.CheckoutModel.create(checkout);
     
-    
+            checkout.course['enrolled'] = await this.CheckoutModel.count({course: checkout.course}).exec()
+            await this.courseService.CourseModel.updateOne({_id: checkout.course['_id']},course);
             await this.userService.createWalletForCheckout(checkoutSaved)
 
             // TODO  if (line.course.startDate < Date.now())

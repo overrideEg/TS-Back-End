@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from '../../Models/course.model';
 import { UserModule } from '../user/user.module';
 import { CheckoutModule } from '../checkout/checkout.module';
+import * as mongoose from 'mongoose';
 @Module({
   imports: [
     MongooseModule.forFeatureAsync([
@@ -14,10 +15,7 @@ import { CheckoutModule } from '../checkout/checkout.module';
           const schema = CourseSchema;
           schema.plugin(require('mongoose-autopopulate'));
 
-          schema.pre('updateOne', async function (next) {
-            let course = this;
-            course = course['_update']
-            course['cRating'] = course['reviews'].length == 0 ? 5 : course['reviews'].reduce((acc, review) => acc + review.stars, 0) / course['reviews'].length;
+          schema.pre('init', async function (course) {
             let progress = 0;
             let videos = 0;
             course['content'].forEach(cont => {
@@ -29,9 +27,6 @@ import { CheckoutModule } from '../checkout/checkout.module';
               progress += contentProgress;
             });
             course['progress'] = videos === 0 ? 0 : progress / videos * 100;
-            course['enrolled'] = Number((Math.random() * 100).toFixed(0))
-
-            next();
           })
 
           return schema;

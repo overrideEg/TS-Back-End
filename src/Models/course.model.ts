@@ -75,8 +75,6 @@ export class Lesson {
     @Prop({ required: true })
     OId: string;
 
-    @Prop({ required: true, default: random(10, 999999) })
-    uId: number;
 
     @ApiProperty()
     @Prop()
@@ -200,6 +198,9 @@ export class Course extends OBaseEntity {
     @ApiProperty()
     @Prop()
     inCart?: boolean;
+    @ApiProperty()
+    @Prop()
+    purchased?: boolean;
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Course.name, autopopulate: true }])
     related?: Course[];
 

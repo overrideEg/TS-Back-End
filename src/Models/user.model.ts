@@ -70,7 +70,7 @@ export class User extends OBaseEntity {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name, autopopulate: true })
     grade?: Grade;
     @ApiProperty({ type: () => StudentReview,isArray:true })
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: StudentReview.name }])
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: StudentReview.name, autopopulate: true }])
     studentReviews?: StudentReview[];
 
 

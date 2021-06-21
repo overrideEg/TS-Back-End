@@ -1,4 +1,4 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { parse } from 'cookie';
 import { AuthService } from '../auth/auth.service';
@@ -11,6 +11,7 @@ import { User } from '../../Models/user.model';
 import { CourseService } from '../course/course.service';
 import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import { Agora } from '../auth/Security/constants';
+import { CheckoutService } from '../checkout/checkout.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
@@ -22,6 +23,7 @@ export class LearningClassService {
     constructor(
         @InjectModel(LearningClass.name) private model: Model<LearningClassDocument>,
         public authenticationService: AuthService,
+        private checkoutService: CheckoutService,
         private courseService: CourseService) { }
 
     async getUserFromSocket(socket: Socket) {
@@ -90,7 +92,10 @@ export class LearningClassService {
 
 
     async joinLive(user: User, body: StartLiveDTO) {
-        let course = await this.courseService.findById(body.courseId);
+        let checkout = await this.checkoutService.CheckoutModel.findOne({ course: new ObjectId(body.courseId), user: new ObjectId(user['_id'].toString()) })
+        if (!checkout)
+        throw new BadRequestException('you dont purchased this course');
+        let course = checkout.course;
 
         let content = course.content.find(content => content.lessons.find(less => less.OId === body.lessonId));
         if (!content) {
