@@ -35,11 +35,15 @@ export class HomeService {
 
         for await (const course of featuresCourses) {
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
+            course.purchased = await this.checkoutService.CheckoutModel.exists({ course: course, user: new ObjectId(req.user.id) });
+
         }
         home.featuresCourses = featuresCourses;
         let addedRecently = await this.courseService.CourseModel.find().sort({ 'createdAt': 'desc' }).limit(20).exec();
         for await (const course of addedRecently) {
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
+            course.purchased = await this.checkoutService.CheckoutModel.exists({ course: course, user: new ObjectId(req.user.id) });
+
         }
         home.addedRecently = addedRecently;
         let now = moment();
@@ -49,6 +53,8 @@ export class HomeService {
         let startSoon = await this.courseService.CourseModel.find({ startDate: { $gte: now.unix() * 1000, $lte: afterWeek.unix() * 1000 } }).limit(20).exec();
         for await (const course of startSoon) {
             course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
+            course.purchased = await this.checkoutService.CheckoutModel.exists({ course: course, user: new ObjectId(req.user.id) });
+
         }
 
         home.startSoon = startSoon;
