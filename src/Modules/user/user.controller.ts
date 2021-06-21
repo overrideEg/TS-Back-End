@@ -1,10 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { profile } from 'console';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
 import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
-import { BankAccount, User, UserType } from '../../Models/user.model';
+import { BankAccount } from '../../Models/bank-account.model';
+import { StudentReview } from '../../Models/student-review.model';
+import { User, UserType } from '../../Models/user.model';
 import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
 import { UserService } from './user.service';
 
@@ -12,34 +14,34 @@ import { UserService } from './user.service';
 @Controller('User')
 export class UserController {
 
-    /* CRUD End Points for User Created By Override */
+  /* CRUD End Points for User Created By Override */
 
 
-    constructor(private service: UserService) { }
-    /* POST User End Point */
-    @UseGuards(JwtAuthGuard)
-    @Post()
-    async saveUser(@Body() req: User): Promise<User> {
-        return this.service.save(req)
-    }
+  constructor(private service: UserService) { }
+  /* POST User End Point */
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async saveUser(@Body() req: User): Promise<User> {
+    return this.service.save(req)
+  }
 
 
-    /* GET All Users End Point */
-    @UseGuards(JwtAuthGuard)
-    @Get('/all')
-    @ApiQuery({ name: 'userType', enum: [UserType.admin,UserType.parent,UserType.student,UserType.teacher], required: false })
-    getAllUsers(@Query('userType') userType: string): Promise<User[]> {
-        return this.service.findAll(userType);
-    }
+  /* GET All Users End Point */
+  @UseGuards(JwtAuthGuard)
+  @Get('/all')
+  @ApiQuery({ name: 'userType', enum: [UserType.admin, UserType.parent, UserType.student, UserType.teacher], required: false })
+  getAllUsers(@Query('userType') userType: string): Promise<User[]> {
+    return this.service.findAll(userType);
+  }
 
 
-    @UseGuards(JwtAuthGuard)
-    @Get('/profile')
-    getMyProfile(@Req() req): Promise<User> {
-        return this.service.myProfile(req);
-    }
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  getMyProfile(@Req() req): Promise<User> {
+    return this.service.myProfile(req);
+  }
 
-     /* GET One Teacher End Point */
+  /* GET One Teacher End Point */
   @UseGuards(JwtAuthGuard)
   @Get('teacher/:id')
   getTeacherProfile(@Param('id') id: string): Promise<TeacherProfile> {
@@ -50,43 +52,43 @@ export class UserController {
   getBankAccounts(@Req() req) {
     return this.service.getBankAccounts(req)
   }
-  
-   @UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Get('wallet')
   @ApiQuery({ name: 'type', enum: [TransactionType.in, TransactionType.out] })
   @ApiQuery({ name: 'status', enum: [TransactionStatus.approved, TransactionStatus.pending] })
   getWallets(@Query('type') type: string, @Query('status') status: string) {
-    return this.service.getWallets( type ? TransactionType[type]: null,status? TransactionStatus[status]: null );
+    return this.service.getWallets(type ? TransactionType[type] : null, status ? TransactionStatus[status] : null);
   }
 
 
-    /* GET One User End Point */
-    @UseGuards(JwtAuthGuard)
-    @Get(':id')
-    findOne(@Param('id') id: string): Promise<User> {
-        return this.service.findOne(id);
-    }
+  /* GET One User End Point */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  findOne(@Param('id') id: string): Promise<User> {
+    return this.service.findOne(id);
+  }
 
 
-    /* PUT  User End Point */
-    @UseGuards(JwtAuthGuard)
-    @Put(':id')
-    updateUser(@Param('id') id: string, @Body() req: User): Promise<any> {
-        return this.service.update(id, req);
-    }
+  /* PUT  User End Point */
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  updateUser(@Param('id') id: string, @Body() req: User): Promise<any> {
+    return this.service.update(id, req);
+  }
 
-    @UseGuards(JwtAuthGuard)
-    @Put('/profile')
-    updateProfile(@Req() req, @Body() profile: UpdateProfile): Promise<User> {
-        return this.service.updateProfile(req, profile);
-    }
+  @UseGuards(JwtAuthGuard)
+  @Put('/profile')
+  updateProfile(@Req() req, @Body() profile: UpdateProfile): Promise<User> {
+    return this.service.updateProfile(req, profile);
+  }
 
-    /* Delete  User End Point */
-    @UseGuards(JwtAuthGuard)
-    @Delete(':id')
-    deleteUser(@Param('id') id: string): Promise<any> {
-        return this.service.remove(id)
-    }
+  /* Delete  User End Point */
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  deleteUser(@Param('id') id: string): Promise<any> {
+    return this.service.remove(id)
+  }
 
 
 
@@ -97,9 +99,15 @@ export class UserController {
   addBankAcount(@Req() req, @Body() body: BankAccount) {
     return this.service.addBankAccount(req, body)
   }
+  @UseGuards(JwtAuthGuard)
+  @Post('reviewStudent/:studentId/:courseId')
+  @ApiBody({ type: () => StudentReview })
+  ReviewStudent(@Req() req, @Param('studentId') studentId: string, @Param('courseId') courseId: string, @Body() body: StudentReview) {
+    return this.service.reviewStudent(req,studentId, courseId, body)
+  }
 
 
- 
+
   @UseGuards(JwtAuthGuard)
   @Post('Withdraw/:accountId/:amount')
   withdrawCash(@Req() req, @Param('accountId') accountId: string, @Param('amount') amount: number) {
@@ -107,12 +115,12 @@ export class UserController {
   }
 
 
- 
+
 
   @UseGuards(JwtAuthGuard)
   @Put('wallet/approve/:teacherId/:walletId')
-  approveTransaction( @Param('teacherId') teacherId: string, @Param('walletId') walletId: string) {
-    return this.service.approveTransaction(teacherId,walletId)
+  approveTransaction(@Param('teacherId') teacherId: string, @Param('walletId') walletId: string) {
+    return this.service.approveTransaction(teacherId, walletId)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -120,7 +128,7 @@ export class UserController {
   deleteBankAcount(@Req() req, @Param('accountId') accountId: string) {
     return this.service.deleteBankAccount(req, accountId)
   }
-    /* End of User Controller Class 
-     
-     */
+  /* End of User Controller Class 
+   
+   */
 }

@@ -10,6 +10,8 @@ import { Grade } from './grade.model';
 import { Stage } from './stage.model';
 import { TransactionStatus, TransactionType } from '../enums/wallet.enum';
 import { StudentReview } from './student-review.model';
+import { BankAccount } from './bank-account.model';
+import { Wallet } from './wallet-model';
 
 
 
@@ -20,46 +22,7 @@ export enum UserType {
     parent = 'Parent'
 }
 
-export class BankAccount {
-    @ApiProperty({ readOnly: true })
-    @Prop()
-    oId: string;
-    @ApiProperty()
-    @Prop()
-    accountNumber: string;
-    @ApiProperty()
-    @Prop()
-    bankName: string;
-    @ApiProperty()
-    @Prop()
-    accountHolderName: string;
-}
-export class Wallet {
-    @ApiProperty({ readOnly: true })
-    @Prop()
-    oId: string;
-    @ApiProperty()
-    @Prop()
-    date: number;
-    @ApiProperty()
-    @Prop()
-    value: number;
-    @ApiProperty({ enum: [TransactionType.in, TransactionType.out] })
-    @Prop({ enum: [TransactionType.in, TransactionType.out] })
-    type: TransactionType;
-    @ApiProperty({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
-    @Prop({ enum: [TransactionStatus.pending, TransactionStatus.approved] })
-    status: TransactionStatus
-    @ApiProperty()
-    @Prop()
-    checkoutId: string;
-    @ApiProperty({ type: () => Course, isArray: false, required: true })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate: true })
-    course: Course;
-    @ApiProperty({ type: () => BankAccount, isArray: false, required: true })
-    @Prop({ type: BankAccount })
-    account: BankAccount;
-}
+
 
 export type UserDocument = User & Document;
 @Schema()
@@ -106,10 +69,9 @@ export class User extends OBaseEntity {
     @ApiProperty({ type: () => Grade })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name, autopopulate: true })
     grade?: Grade;
-    @ApiProperty({ type: () => StudentReview, isArray: true })
-    @Prop([StudentReview])
-    reviews?: StudentReview;
-
+    @ApiProperty({ type: () => StudentReview,isArray:true })
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: StudentReview.name }])
+    studentReviews?: StudentReview[];
 
 
     //teacher
@@ -126,14 +88,15 @@ export class User extends OBaseEntity {
     @Prop()
     bio?: string
 
-    @ApiProperty({ type: Wallet, isArray: true })
-    @Prop([Wallet])
+
+    @ApiProperty({ type: () => Wallet, isArray: true })
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Wallet.name ,autopopulate: true}])
     wallet?: Wallet[];
 
-    @ApiProperty({ type: BankAccount, isArray: true })
-    @Prop([BankAccount])
-    bankAccounts?: BankAccount[]
 
+    @ApiProperty({ type: () => BankAccount, isArray: true })
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: BankAccount.name,autopopulate: true }])
+    bankAccounts?: BankAccount[];
 
 
 

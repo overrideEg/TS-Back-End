@@ -9,7 +9,7 @@ import { User } from './user.model';
 
 export class CheckoutLine {
     @ApiProperty({ type: () => Course, isArray: false, required: true })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Course.name , autopopulate: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course' , autopopulate: true})
     course: Course;
 
     @ApiProperty({ description: 'price', required: true })
@@ -22,7 +22,7 @@ export type CheckoutDocument = Checkout & Document;
 @Schema()
 export class Checkout extends OBaseEntity {
     @ApiProperty({ type: () => User })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name, autopopulate: true })
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
     user?: User;
     
     @ApiProperty({ description: 'valueDate', required: true })

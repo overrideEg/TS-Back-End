@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
 import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
 import { Checkout, CheckoutDocument, CheckoutLine } from '../../Models/checkout.model';
-import { Wallet } from '../../Models/user.model';
+import { Wallet } from '../../Models/wallet-model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { CourseService } from '../course/course.service';
 import { UserService } from '../user/user.service';
@@ -55,15 +55,8 @@ export class CheckoutService {
 
 
         for await (const line of checkout.lines) {
-            let wallet = new Wallet()
-            wallet.date = Date.now()
-            wallet.oId = OverrideUtils.generateGUID()
-            wallet.type = TransactionType.in;
-            wallet.status = TransactionStatus.approved;
-            wallet.value = line.price
-            wallet.checkoutId = checkoutSaved['_id']
-            line.course.teacher.wallet.push(wallet);
-            await this.userService.UserModel.updateOne({_id: line.course.teacher['_id']},line.course.teacher)
+            await this.userService.createWalletForCheckout(line,checkoutSaved)
+           
             // TODO send notification to teacher
         }
 

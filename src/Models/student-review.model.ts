@@ -1,15 +1,15 @@
-import { Prop } from "@nestjs/mongoose";
-import { ApiProperty } from "@nestjs/swagger";
-import { Course } from "./course.model";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-
-export class StudentReview {
-    @ApiProperty({ type: () => Course, isArray: false, required: true })
+import { OBaseEntity } from '../shared/base-entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { Course } from './course.model';
+export type StudentReviewDocument = StudentReview & Document;
+@Schema()
+export class StudentReview extends OBaseEntity {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate: true })
     course: Course;
 
-
-    @ApiProperty({description: 'valueDate', required: true })
     @Prop()
     valueDate?: number;
 
@@ -21,7 +21,6 @@ export class StudentReview {
     @Prop({ default: 0 })
     grades?: number;
 
-
     @ApiProperty({ description: 'performance', required: true })
     @Prop({ default: 0 })
     performance?: number;
@@ -29,5 +28,5 @@ export class StudentReview {
     @ApiProperty({ description: 'understanding', required: true })
     @Prop({ default: 0 })
     understanding?: number;
-
 }
+export const StudentReviewSchema = SchemaFactory.createForClass(StudentReview);

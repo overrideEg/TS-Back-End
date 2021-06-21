@@ -5,9 +5,13 @@ import { Model } from 'mongoose';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
 import { TransactionType, TransactionStatus } from '../../enums/wallet.enum';
+import { BankAccount, BankAccountDocument } from '../../Models/bank-account.model';
+import { CheckoutLine, CheckoutDocument } from '../../Models/checkout.model';
 import { Course } from '../../Models/course.model';
+import { StudentReview, StudentReviewDocument, StudentReviewSchema } from '../../Models/student-review.model';
+import { User, UserDocument, UserType } from '../../Models/user.model';
+import { Wallet, WalletDocument } from '../../Models/wallet-model';
 
-import { BankAccount, User, UserDocument, UserType, Wallet } from '../../Models/user.model';
 import { Lang } from '../../shared/enums/lang.enum';
 import { OverrideUtils } from '../../shared/override-utils';
 import { CheckoutService } from '../checkout/checkout.service';
@@ -17,19 +21,24 @@ const ObjectId = require('mongoose').Types.ObjectId;
 @Injectable()
 export class UserService {
 
+
+
     private readonly logger = new Logger(UserService.name);
 
     constructor(
         @InjectModel(User.name) public UserModel: Model<UserDocument>,
+        @InjectModel(BankAccount.name) public BankAccountModel: Model<BankAccountDocument>,
+        @InjectModel(Wallet.name) public WalletModel: Model<WalletDocument>,
+        @InjectModel(StudentReview.name) public StudentReviewModel: Model<StudentReviewDocument>,
         @Inject(forwardRef(() => CourseService)) private courseService: CourseService,
         @Inject(forwardRef(() => CheckoutService)) private checkoutService: CheckoutService,
     ) { }
 
-   
+
 
     async login(username: string, defaultLang?: Lang) {
         let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).exec();
- 
+
         if (user) {
             user.defaultLang = defaultLang ?? Lang.en;
             user.updateOne(user)
@@ -45,7 +54,7 @@ export class UserService {
         if (profile.name) {
             user.name = profile.name;
         }
-        if (profile.avatar){
+        if (profile.avatar) {
             user.avatar = profile.avatar;
         }
         if (profile.email) {
@@ -79,7 +88,7 @@ export class UserService {
     }
 
     async validate(payload: any) {
-        return await this.UserModel.exists({_id: payload.id});
+        return await this.UserModel.exists({ _id: payload.id });
     }
     ifUserExists(email: string, phone: string) {
         return this.UserModel.exists({ $or: [{ email: email }, { phone: phone }] })
@@ -101,10 +110,6 @@ export class UserService {
     async remove(id: string): Promise<User> {
         return await this.UserModel.findByIdAndRemove(id);
     }
-
-
-
-
 
 
     async getTeacherProfile(id: string): Promise<TeacherProfile> {
@@ -150,8 +155,8 @@ export class UserService {
 
     async addBankAccount(req: any, body: BankAccount) {
         let teacher = await this.findOne(req.user.id);
-        body.oId = OverrideUtils.generateGUID();
-        teacher.bankAccounts != null ? teacher.bankAccounts.push(body) : teacher.bankAccounts = [body];
+        let BankAccount = await this.BankAccountModel.create(body);
+        teacher.bankAccounts.push(BankAccount);
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);
         return teacher.bankAccounts;
     }
@@ -167,7 +172,7 @@ export class UserService {
         let teacher = await this.findOne(req.user.id);
         if (!teacher)
             throw new BadRequestException('no user found');
-        let account = teacher.bankAccounts.find((acc) => acc.oId === accountId);
+        let account = teacher.bankAccounts.find((acc) => acc['_id'] === accountId);
         let balance = teacher.wallet.reduce((acc, wall) => acc + (wall.type === TransactionType.in ? wall.value : (wall.status === TransactionStatus.approved ? wall.value : 0)), 0);
         if (balance > amount)
             throw new BadRequestException(`your balance is ${balance} and you requested ${amount}`);
@@ -178,7 +183,7 @@ export class UserService {
         wallet.status = TransactionStatus.pending;
         wallet.value = amount;
         wallet.type = TransactionType.out;
-        wallet.oId = OverrideUtils.generateGUID()
+        wallet = await this.WalletModel.create(wallet);
         teacher.wallet.push(wallet);
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);
         //TODO Send Notfifcation to teacher and admins
@@ -187,7 +192,7 @@ export class UserService {
 
     async approveTransaction(teacherId: string, walletId: string) {
         let teacher = await this.UserModel.findById(teacherId).exec();
-        let wallet = teacher?.wallet?.find(wall => wall.oId === walletId);
+        let wallet = teacher?.wallet?.find(wall => wall['_id'] === walletId);
         if (!teacher || !wallet)
             throw new BadRequestException('Check sent IDs');
         wallet.status = TransactionStatus.approved;
@@ -197,6 +202,17 @@ export class UserService {
     }
 
 
+    async createWalletForCheckout(line: CheckoutLine, checkoutSaved: CheckoutDocument) {
+        let wallet = new Wallet()
+        wallet.date = Date.now()
+        wallet.type = TransactionType.in;
+        wallet.status = TransactionStatus.approved;
+        wallet.value = line.price
+        wallet.checkout = checkoutSaved;
+        wallet = await this.WalletModel.create(wallet);
+        line.course.teacher.wallet.push(wallet);
+        await this.UserModel.updateOne({ _id: line.course.teacher['_id'] }, line.course.teacher)
+    }
     async getWallets(type: TransactionType, status: TransactionStatus) {
         let teachers = await this.UserModel.find({ userType: UserType.teacher }).exec();
         let wallets = [];
@@ -213,13 +229,22 @@ export class UserService {
         return wallets;
     }
 
+
+    async reviewStudent(req: any, studentId: string, courseId: string, body: StudentReview) {
+        body.course = new ObjectId(courseId);
+        body.valueDate = Date.now();
+        let student = await this.UserModel.findById(studentId);
+        let savedReview = await this.StudentReviewModel.create(body)
+        student.studentReviews.push(savedReview);
+        await this.UserModel.updateOne({ _id: studentId }, student);
+        return student.studentReviews;
+    }
+
     async deleteBankAccount(req: any, accountId: string) {
         let teacher = await this.findOne(req.user.id);
-        
-
-        teacher.bankAccounts.splice(teacher.bankAccounts.findIndex((acc) => acc.oId === accountId), 1);
+        teacher.bankAccounts.splice(teacher.bankAccounts.findIndex((acc) => acc['_id'] === accountId), 1);
+        await this.BankAccountModel.deleteOne({ _id: accountId });
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);
-
         return teacher.bankAccounts;
     }
 }

@@ -5,6 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../../Models/user.model';
 import { CourseModule } from '../course/course.module';
 import { CheckoutModule } from '../checkout/checkout.module';
+import { BankAccount, BankAccountSchema } from '../../Models/bank-account.model';
+import { Wallet, WalletSchema } from '../../Models/wallet-model';
+import { StudentReview, StudentReviewSchema } from '../../Models/student-review.model';
 
 @Module({
   imports: [
@@ -13,8 +16,30 @@ import { CheckoutModule } from '../checkout/checkout.module';
         name: User.name,
         useFactory: async () => {
           const schema = UserSchema;
-
-       
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+      {
+        name: BankAccount.name,
+        useFactory: async () => {
+          const schema = BankAccountSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+      {
+        name: Wallet.name,
+        useFactory: async () => {
+          const schema = WalletSchema; 
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+      {
+        name: StudentReview.name,
+        useFactory: async () => {
+          const schema = StudentReviewSchema;
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
