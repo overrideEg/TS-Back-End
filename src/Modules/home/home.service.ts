@@ -73,8 +73,8 @@ export class HomeService {
                 path: 'course.teacher._id',
                 "match": new ObjectId(course.teacher['_id'])
             });
-            profile.noOfCourses = teacherCourses.length
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+            profile.noOfCourses = teacherCourses.length
             profile.bio = course.teacher?.bio ?? course?.teacher?.name;
             profile.userId = course.teacher['_id']
             profile.teacherId = course.teacher['_id']

@@ -87,6 +87,8 @@ export class User extends OBaseEntity {
     @ApiProperty()
     @Prop()
     bio?: string
+    @ApiProperty({ type: Number })
+    cRating?: number
 
 
     @ApiProperty({ type: () => Wallet, isArray: true })

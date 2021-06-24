@@ -101,6 +101,7 @@ export class UserService {
     }
     async findOne(id: string): Promise<User> {
         let user = await this.UserModel.findById(id).exec();
+
         return user;
     }
     async update(id: string, req: User): Promise<User> {
