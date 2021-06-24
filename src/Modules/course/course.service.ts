@@ -130,8 +130,7 @@ export class CourseService {
 
         let reservations = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(id) });
 
-        let user = await this.userService.UserModel.findOne({ _id: new ObjectId(req.user.id)})
-        course.inCart = user.cart.find((cart)=>cart['_id'].toString() === id) !== null && user.cart.find((cart)=>cart['_id'].toString() === id)!=undefined
+        course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(id) })
         course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(id)}, {user: new ObjectId(req.user.id)}] });
         let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
         course.teacher['cRating'] = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
