@@ -88,6 +88,7 @@ export class User extends OBaseEntity {
     @Prop()
     bio?: string
     @ApiProperty({ type: Number })
+    @Prop()
     cRating?: number
 
 
