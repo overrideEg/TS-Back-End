@@ -143,6 +143,8 @@ export class AuthService {
         let user = await this.userService.login(body.username, body.defaultLang);
         if (!user)
             throw new UnauthorizedException('check your credintials');
+            console.log('pass',OverrideUtils.dycreptPassword(user.password));
+            
         // if (!user.isActive)
         //     throw new UnauthorizedException('please activate your account');
         if (OverrideUtils.dycreptPassword(user.password) !== body.password)
