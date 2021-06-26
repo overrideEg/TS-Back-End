@@ -26,6 +26,7 @@ import { LearningClassModule } from './Modules/learning-class/learning-class.mod
 import { PartnerModule } from './Modules/partner/partner.module';
 import { HomeModule } from './Modules/home/home.module';
 import { ContactUsModule } from './Modules/contact-us/contact-us.module';
+import { NoticeModule } from './Modules/notice/notice.module';
 const overrideMoules = [
   FileModule,
   AuthModule,
@@ -45,7 +46,8 @@ const overrideMoules = [
   PartnerModule,
   HomeModule,
   LearningClassModule,
-  ContactUsModule
+  ContactUsModule,
+  NoticeModule
 ]
 @Module({
   imports: [

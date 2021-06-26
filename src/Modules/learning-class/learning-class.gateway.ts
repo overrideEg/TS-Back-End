@@ -53,6 +53,7 @@ export class LearningClassGateway {
     @MessageBody() body: StartLiveDTO,
     @ConnectedSocket() socket: Socket
   ) {
+    
    
 
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);

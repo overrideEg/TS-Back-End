@@ -7,6 +7,7 @@ import { LearningClassController } from './learning-class.controller';
 import { AuthModule } from '../auth/auth.module';
 import { CourseModule } from '../course/course.module';
 import { CheckoutModule } from '../checkout/checkout.module';
+import { NoticeModule } from '../notice/notice.module';
 
 @Module({
   imports:[
@@ -22,7 +23,8 @@ import { CheckoutModule } from '../checkout/checkout.module';
     ]),
     AuthModule,
     CheckoutModule,
-    CourseModule
+    CourseModule,
+    NoticeModule
   ],
   controllers: [LearningClassController],
   providers: [LearningClassGateway, LearningClassService]

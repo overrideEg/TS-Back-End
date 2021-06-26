@@ -12,6 +12,8 @@ import { CourseService } from '../course/course.service';
 import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import { Agora } from '../auth/Security/constants';
 import { CheckoutService } from '../checkout/checkout.service';
+import { NoticeService } from '../notice/notice.service';
+import { Lang } from '../../shared/enums/lang.enum';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
@@ -24,7 +26,8 @@ export class LearningClassService {
         @InjectModel(LearningClass.name) private model: Model<LearningClassDocument>,
         public authenticationService: AuthService,
         private checkoutService: CheckoutService,
-        private courseService: CourseService) { }
+        private courseService: CourseService,
+        private noticeService: NoticeService) { }
 
     async getUserFromSocket(socket: Socket) {
         let token = socket.request.headers.authorization;
@@ -61,10 +64,9 @@ export class LearningClassService {
 
         if (existsClass) {
             if (existsClass.endTime) {
-               throw new Error(`This Lesson has Ended At ${new Date(existsClass.endTime)}`);
-               
-            }
+                throw new Error(`This Lesson has Ended At ${new Date(existsClass.endTime).toTimeString()}`);
 
+            }
             return existsClass;
         }
 
@@ -85,6 +87,14 @@ export class LearningClassService {
         lClass.chat = [firstChatMessage];
 
         //TODO: send notification to subscribers;
+        var checkouts = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(body.courseId) }).exec()
+        for await (const checkout of checkouts) {
+
+            this.noticeService.sendSpecificNotification({ userId: checkout.user['_id'].toString(),
+             notification: { title: checkout.user.defaultLang == Lang.en ? 'Live Lesson Stated':'بدأ البث المباشر للدرس',
+              body: checkout.user.defaultLang == Lang.en ? `${course.teacher.name} started live session on lesson ${lesson.name}, join now` : `${course.teacher.name} بدأ بث مباشر لدرس ${lesson.name}` },data:{entityType:'Course',entityId:course['_id'].toString()},imageURL : course.cover })
+
+        }
 
         return await this.model.create(lClass);
     }
@@ -94,7 +104,7 @@ export class LearningClassService {
     async joinLive(user: User, body: StartLiveDTO) {
         let checkout = await this.checkoutService.CheckoutModel.findOne({ course: new ObjectId(body.courseId), user: new ObjectId(user['_id'].toString()) })
         if (!checkout)
-        throw new BadRequestException('you dont purchased this course');
+            throw new BadRequestException('you dont purchased this course');
         let course = checkout.course;
 
         let content = course.content.find(content => content.lessons.find(less => less.OId === body.lessonId));
@@ -192,7 +202,7 @@ export class LearningClassService {
         message.user = user;
         existsClass.chat.push(message)
         await this.model.updateOne({ _id: existsClass['_id'] }, existsClass)
-        return  (await this.model.findById(existsClass['_id'])).chat
+        return (await this.model.findById(existsClass['_id'])).chat
     }
 
 
