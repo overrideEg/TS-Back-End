@@ -47,7 +47,7 @@ export class NoticeService {
   async sendSpecificNotification({userId,notification,data,imageURL}:{userId: string, notification: { title: string, body: string }, data?: { entityType: string, entityId: string }, imageURL ?:string}) {
     let user = await (await this.userService.UserModel.findById(userId).exec()).toObject();
     let notice = new Notice();
-    if (user.fcmTokens) {
+    if (user.fcmTokens.length >0) {
       const message: admin.messaging.MessagingPayload = {
         notification: {
           title: notification.title,
@@ -67,7 +67,7 @@ export class NoticeService {
       }
 
 
-      admin.messaging().sendToDevice(user.fcmTokens,message).then(res => {
+      admin.messaging().sendToDevice(user.fcmTokens.filter(tok => tok != ""),message).then(res => {
         if (res.successCount>0){
           this.logger.log(`success notification sent to user ${user.email} success ${res.successCount}` )
         }
