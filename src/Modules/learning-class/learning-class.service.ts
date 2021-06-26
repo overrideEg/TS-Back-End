@@ -61,8 +61,8 @@ export class LearningClassService {
 
         if (existsClass) {
             if (existsClass.endTime) {
-                existsClass.endTime = null;
-                await this.model.updateOne({ _id: existsClass['_id'] }, existsClass)
+               throw new Error(`This Lesson has Ended At ${new Date(existsClass.endTime)}`);
+               
             }
 
             return existsClass;
