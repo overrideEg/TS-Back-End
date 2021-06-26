@@ -121,10 +121,11 @@ export class LearningClassGateway  {
     @ConnectedSocket() socket: Socket
   ){    
    
+    console.log(body);
+
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
     let msg = await this.service.sendMessage(user, body)
     socket.join(body.lessonId);
-    console.log(socket);
     
     
       this.server.to(body.lessonId).emit('chat', msg.map(message => {
