@@ -123,8 +123,8 @@ export class LearningClassGateway  {
     
     
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
+    console.log(body,socket,user);
     let msg = await this.service.sendMessage(user, body)
-    console.log(body,socket,user,msg);
     socket.join(body.lessonId);
     
     

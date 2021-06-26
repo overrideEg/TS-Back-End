@@ -223,9 +223,6 @@ export class LearningClassService {
     async sendMessage(user: User, body: sendLiveMessageDTO) {
         let course = await this.courseService.findById(body.courseId);
 
-        if (course.teacher['_id'].toString() !== user['_id'].toString())
-            throw new WsException('only teacher can start his live');
-
         let content = course.content.find(content => content.lessons.find(less => less.OId === body.lessonId));
         if (!content) {
             throw new WsException('lesson content is invalid');
