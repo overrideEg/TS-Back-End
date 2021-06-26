@@ -39,6 +39,8 @@ export class UserService {
     async login(username: string, defaultLang?: Lang) {
         let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).exec();
 
+        console.log('user',user);
+        
         if (user) {
             user.defaultLang = defaultLang ?? Lang.en;
             user.updateOne(user)
