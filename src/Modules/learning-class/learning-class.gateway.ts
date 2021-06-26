@@ -181,6 +181,42 @@ export class LearningClassGateway  {
 
   }
 
+    @SubscribeMessage('leave')
+  async leave(
+    @MessageBody() body: StartLiveDTO,
+    @ConnectedSocket() socket: Socket
+  ) {
+    
+   
+
+    let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
+    let startedClass = await this.service.leave(user, body)
+    socket.join(startedClass.lesson.OId);
+
+    this.server.to(startedClass.lesson.OId).emit('live', {
+      teacherToken: startedClass.teacherToken,
+      studentToken: startedClass.startTime,
+      courseId: startedClass.course['_id'],
+      lessonId: startedClass.lesson.OId,
+      endTime: startedClass.endTime,
+      startTime: startedClass.startTime,
+      attenders: startedClass.attenders
+    });
+
+   
+    this.server.to(body.lessonId).emit('chat', startedClass.chat.map(message => {
+      return {
+        user: {
+          name : message.user.name,
+          avatar : message.user.avatar,
+          _id : message.user['_id']
+        },
+        message: message.message,
+        time: message.time
+      }
+    }))
+  }
+
 
 
 

@@ -18,7 +18,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class LearningClassService {
-
+  
 
 
 
@@ -149,6 +149,45 @@ export class LearningClassService {
 
     }
 
+
+    async leave(user: User, body: StartLiveDTO) {
+        let checkout = await this.checkoutService.CheckoutModel.findOne({ course: new ObjectId(body.courseId), user: new ObjectId(user['_id'].toString()) })
+        if (!checkout)
+            throw new BadRequestException('you dont purchased this course');
+        let course = checkout.course;
+
+        let content = course.content.find(content => content.lessons.find(less => less.OId === body.lessonId));
+        if (!content) {
+            throw new WsException('lesson content is invalid');
+        }
+        let lesson = content.lessons.find(less => less.OId === body.lessonId);
+        if (!lesson) {
+            throw new WsException('lesson is invalid');
+        }
+
+        //TODO: check if user subscribed
+
+        let existsClass = await this.model.findOne({
+            course: new ObjectId(body.courseId),
+            lesson: lesson
+        }).exec();
+
+
+        if (!existsClass) {
+            throw new WsException(`this course not started yet`)
+
+        }
+        existsClass.attenders -= 1;
+        const leaveMessage = new ChatMessage();
+        leaveMessage.time = Date.now();
+        leaveMessage.user = user;
+        leaveMessage.message = `${user.name} leaved`
+        existsClass.chat.push(leaveMessage);
+        await this.model.updateOne({ _id: existsClass['_id'] }, existsClass);
+
+        return existsClass;
+      }
+  
 
     async endLive(user: User, body: StartLiveDTO) {
         let course = await this.courseService.findById(body.courseId);
