@@ -5,8 +5,8 @@ import { Model } from 'mongoose';
 
 import { Notice, NoticeDocument } from '../../Models/notice.model';
 import * as admin from 'firebase-admin';
-import { UserService } from '../User/user.service';
 import { UserType } from '../../Models/user.model';
+import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
