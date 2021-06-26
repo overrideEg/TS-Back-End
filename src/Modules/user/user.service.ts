@@ -37,7 +37,7 @@ export class UserService {
 
 
     async login(username: string, defaultLang?: Lang) {
-        let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).exec();
+        let user = await this.UserModel.findOne( [{ email: username }, { phone: username }] ).exec();
 
         console.log('user',user);
         
