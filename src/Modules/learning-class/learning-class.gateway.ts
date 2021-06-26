@@ -119,9 +119,7 @@ export class LearningClassGateway  {
   async sendMessage(
     @MessageBody() body: sendLiveMessageDTO,
     @ConnectedSocket() socket: Socket
-  ){
-    console.log('body',body);
-    
+  ){    
    
     let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
     let msg = await this.service.sendMessage(user, body)

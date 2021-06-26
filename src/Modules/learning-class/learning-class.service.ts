@@ -177,6 +177,7 @@ export class LearningClassService {
             throw new WsException(`this course not started yet`)
 
         }
+        if (existsClass.attenders>0)
         existsClass.attenders -= 1;
         const leaveMessage = new ChatMessage();
         leaveMessage.time = Date.now();
@@ -185,7 +186,10 @@ export class LearningClassService {
         existsClass.chat.push(leaveMessage);
         await this.model.updateOne({ _id: existsClass['_id'] }, existsClass);
 
-        return existsClass;
+        return await this.model.findOne({
+            course: new ObjectId(body.courseId),
+            lesson: lesson
+        }).exec();;
       }
   
 
