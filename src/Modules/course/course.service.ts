@@ -222,7 +222,16 @@ export class CourseService {
     }
 
     async getStudentCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
-        let purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
+        let purchased  = [];
+        if (req.user.userType === UserType.parent){
+
+            let parent = await this.userService.findOne(req.user.id);
+            for await (const student of parent.students ) {
+                purchased.push(  await this.checkoutService.CheckoutModel.find({ user: student }).sort({ 'valueDate': 'desc' }).exec());
+
+            }
+        }
+         purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
 
         purchased.forEach(checkout => {
             checkout.course.progress = this.calculateProgress(checkout.course);
