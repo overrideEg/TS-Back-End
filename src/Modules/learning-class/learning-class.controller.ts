@@ -29,4 +29,26 @@ export class LearningClassController {
         let startedClass = await this.service.joinLive(user, body)
         return startedClass
     }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Post('endLive')
+    async endLive(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
+
+        let user = await this.service.authenticationService.getUserFromAuthenticationToken(body.token);
+
+        let startedClass = await this.service.endLive(user, body)
+        return startedClass
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('leave')
+    async leave(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
+
+        let user = await this.service.authenticationService.getUserFromAuthenticationToken(body.token);
+
+        let startedClass = await this.service.leave(user, body)
+        return startedClass
+    }
+    
 }
