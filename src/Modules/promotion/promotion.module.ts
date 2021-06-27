@@ -20,6 +20,7 @@ import { Promotion, PromotionSchema } from '../../Models/promotion.model';
 
   ],
   controllers: [PromotionController],
-  providers: [PromotionService]
+  providers: [PromotionService],
+  exports: [PromotionService],
 })
 export class PromotionModule {}
