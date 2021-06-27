@@ -162,6 +162,12 @@ export class AuthService {
             }
         }
 
+        if (body.fcmToken){
+            user.fcmTokens.push(body.fcmToken)
+            await this.userService.UserModel.updateOne({_id: user['_id']}, user);
+
+        }
+
 
 
         return {

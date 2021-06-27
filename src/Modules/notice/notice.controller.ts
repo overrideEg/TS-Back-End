@@ -20,6 +20,7 @@ export class NoticeController {
   }
 
 
+
   /* GET All Notices End Point */
   @UseGuards(JwtAuthGuard)
   @Get('/my')
