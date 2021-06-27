@@ -8,6 +8,9 @@ export class CheckoutDTO {
     @ApiProperty({ description: 'promoCode', required: false })
     promoCode?: string;
 
+    @ApiProperty()
+    purchasedFor : string
+
     @ApiProperty({ type: () => Course, isArray: true, required: true })
     courses: Course[];
 

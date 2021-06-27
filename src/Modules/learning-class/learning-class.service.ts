@@ -86,7 +86,6 @@ export class LearningClassService {
         firstChatMessage.message = `${user.name} started ${content.chapter} session`
         lClass.chat = [firstChatMessage];
 
-        //TODO: send notification to subscribers;
         var checkouts = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(body.courseId) }).exec()
         for await (const checkout of checkouts) {
 
@@ -116,7 +115,6 @@ export class LearningClassService {
             throw new WsException('lesson is invalid');
         }
 
-        //TODO: check if user subscribed
 
         let existsClass = await this.model.findOne({
             course: new ObjectId(body.courseId),
@@ -164,8 +162,6 @@ export class LearningClassService {
         if (!lesson) {
             throw new WsException('lesson is invalid');
         }
-
-        //TODO: check if user subscribed
 
         let existsClass = await this.model.findOne({
             course: new ObjectId(body.courseId),

@@ -8,6 +8,7 @@ import { CheckoutModule } from '../checkout/checkout.module';
 import { BankAccount, BankAccountSchema } from '../../Models/bank-account.model';
 import { Wallet, WalletSchema } from '../../Models/wallet-model';
 import { StudentReview, StudentReviewSchema } from '../../Models/student-review.model';
+import { NoticeModule } from '../notice/notice.module';
 
 @Module({
   imports: [
@@ -48,6 +49,8 @@ import { StudentReview, StudentReviewSchema } from '../../Models/student-review.
  
     forwardRef(() => CheckoutModule),
     forwardRef(() => CourseModule),
+    forwardRef(()=>NoticeModule)
+
   ],
   controllers: [UserController],
   providers: [UserService],

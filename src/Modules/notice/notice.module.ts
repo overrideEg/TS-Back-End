@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { NoticeService } from './notice.service';
 import { NoticeController } from './notice.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -19,7 +19,8 @@ import { UserModule } from '../user/user.module';
       },
       
     ]),
-    UserModule
+    
+    forwardRef(()=>UserModule)
     ],
   controllers: [NoticeController],
   providers: [NoticeService],

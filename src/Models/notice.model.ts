@@ -8,6 +8,11 @@ import { User } from './user.model';
 export type NoticeDocument = Notice & Document;
 @Schema()
 export class Notice extends OBaseEntity {
+
+    @ApiProperty({description: 'valueDate', required: true })
+    @Prop()
+    valueDate?: number;
+
     @ApiProperty({ type: () => User })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name,autopopulate: true })
     @Allow()

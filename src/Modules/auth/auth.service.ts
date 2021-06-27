@@ -36,14 +36,14 @@ export class AuthService {
         }
     }
     sign(user: User) {
-        return this.jwtService.sign({ id: user['_id'], email: user['email'], phone: user['phone'], userType: user['userType'] })
+        return this.jwtService.sign({ id: user['_id'], email: user['email'], phone: user['phone'], userType: user['userType'] ,defaultLang : user['defaultLang']})
     }
 
 
 
     requestToken(macAddress: string) {
         return {
-            token: this.jwtService.sign({ id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress }, { expiresIn: '1h' })
+            token: this.jwtService.sign({ id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress, defaultLang : Lang.ar }, { expiresIn: '1h' })
         }
     }
 

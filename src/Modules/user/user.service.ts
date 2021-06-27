@@ -18,6 +18,7 @@ import { CheckoutService } from '../checkout/checkout.service';
 import { CourseService } from '../course/course.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 import * as moment from 'moment'
+import { NoticeService } from '../notice/notice.service';
 
 @Injectable()
 export class UserService {
@@ -32,6 +33,8 @@ export class UserService {
         @InjectModel(StudentReview.name) public StudentReviewModel: Model<StudentReviewDocument>,
         @Inject(forwardRef(() => CourseService)) private courseService: CourseService,
         @Inject(forwardRef(() => CheckoutService)) private checkoutService: CheckoutService,
+        @Inject(forwardRef(() => NoticeService)) private noticeService: NoticeService,
+
     ) { }
 
 
@@ -39,7 +42,7 @@ export class UserService {
     async login(username: string, defaultLang?: Lang) {
         let user = await this.UserModel.findOne({ $or: [{ email: username }, { phone: username }] }).exec();
 
-        
+
         if (user) {
             user.defaultLang = defaultLang ?? Lang.en;
             user.updateOne(user)
@@ -189,7 +192,39 @@ export class UserService {
         wallet = await this.WalletModel.create(wallet);
         teacher.wallet.push(wallet);
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);
-        //TODO Send Notfifcation to teacher and admins
+
+        this.noticeService.sendSpecificNotification(
+            {
+                userId: req.user.id,
+                notification: {
+                    title: teacher.defaultLang === Lang.en ? 'request saved successfullty' : 'تم تسجيل طلبك',
+                    body: teacher.defaultLang === Lang.en ? `your request to withdraw cach with amount (${amount}) has been recorded and its status ${wallet.status.toString()}` :
+                        `طلبك لسحب مبلغ ${amount} قيد التنفيذ`
+                },
+                data:{
+                    entityType: 'Wallet',
+                    entityId: wallet['_id'].toString()
+                }
+            }
+        )
+
+        let admins = await this.UserModel.find({userType: UserType.admin}).exec();
+        for await (const admin of admins) {
+            this.noticeService.sendSpecificNotification(
+                {
+                    userId: admin['_id'].toString(),
+                    notification: {
+                        title: admin.defaultLang === Lang.en ? 'you have new withdraw request' : 'لديك طلب سحب جديد',
+                        body: admin.defaultLang === Lang.en ? `you have request to withdraw (${amount}) from ${teacher.name} with status ${wallet.status.toString()}` :
+                            `لديك طلب سحب مبلغ ${amount} من ${teacher.name} وحالته ${wallet.status.toString()}`
+                    },
+                    data:{
+                        entityType: 'Wallet',
+                        entityId: wallet['_id'].toString()
+                    }
+                }
+            )
+        }
         return teacher.wallet
     }
 
@@ -200,7 +235,25 @@ export class UserService {
             throw new BadRequestException('Check sent IDs');
         wallet.status = TransactionStatus.approved;
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);
-        //TODO Send Notfifcation to teacher and admins
+
+
+
+        this.noticeService.sendSpecificNotification(
+            {
+                userId: teacher['_id'].toString(),
+                notification: {
+                    title: teacher.defaultLang === Lang.en ? `your request has been approved` : 'تمت الموافقة على طلبك',
+                    body: teacher.defaultLang === Lang.en ? `your request to withdraw ${wallet.value} has been approved` :
+                       `طلبك لسحب ${wallet.value} تمت الموافقة عليه`
+                },
+                data:{
+                    entityType: 'Wallet',
+                    entityId: wallet['_id'].toString()
+                }
+            }
+        )
+
+       
         return wallet;
     }
 
@@ -278,23 +331,23 @@ export class UserService {
         }
         let thisMonthReviews = reviews.filter(rev => rev.valueDate >= moment().startOf('month').unix() * 1000 && rev.valueDate <= moment().endOf('month').unix() * 1000)
 
-        if (thisMonthReviews.length>0)
-        reviewResponse[thisMonthString] = {
-            attendance: thisMonthReviews.filter((rev) => rev.attendance === true).length / thisMonthReviews.length * 100 ,
-            grades: thisMonthReviews.reduce((acc, rev) => acc + rev.grades,0) / thisMonthReviews.length ,
-            performance: thisMonthReviews.reduce((acc, rev) => acc + rev.performance,0)/ thisMonthReviews.length ,
-            understanding: thisMonthReviews.reduce((acc, rev) => acc + rev.understanding,0) / thisMonthReviews.length
-        }
+        if (thisMonthReviews.length > 0)
+            reviewResponse[thisMonthString] = {
+                attendance: thisMonthReviews.filter((rev) => rev.attendance === true).length / thisMonthReviews.length * 100,
+                grades: thisMonthReviews.reduce((acc, rev) => acc + rev.grades, 0) / thisMonthReviews.length,
+                performance: thisMonthReviews.reduce((acc, rev) => acc + rev.performance, 0) / thisMonthReviews.length,
+                understanding: thisMonthReviews.reduce((acc, rev) => acc + rev.understanding, 0) / thisMonthReviews.length
+            }
 
-        let lastMonthReviews = reviews.filter(rev => rev.valueDate >= moment().subtract(1,'month').startOf('month').unix() * 1000 && rev.valueDate <= moment().subtract(1,'month').endOf('month').unix() * 1000)
+        let lastMonthReviews = reviews.filter(rev => rev.valueDate >= moment().subtract(1, 'month').startOf('month').unix() * 1000 && rev.valueDate <= moment().subtract(1, 'month').endOf('month').unix() * 1000)
 
-        if (lastMonthReviews.length>0)
-        reviewResponse[lastMonthString] = {
-            attendance: lastMonthReviews.filter((rev) => rev.attendance === true).length / lastMonthReviews.length * 100 ,
-            grades: lastMonthReviews.reduce((acc, rev) => acc + rev.grades,0) / lastMonthReviews.length  ,
-            performance: lastMonthReviews.reduce((acc, rev) => acc + rev.performance,0)/ lastMonthReviews.length  ,
-            understanding: lastMonthReviews.reduce((acc, rev) => acc + rev.understanding,0) / lastMonthReviews.length 
-        }
+        if (lastMonthReviews.length > 0)
+            reviewResponse[lastMonthString] = {
+                attendance: lastMonthReviews.filter((rev) => rev.attendance === true).length / lastMonthReviews.length * 100,
+                grades: lastMonthReviews.reduce((acc, rev) => acc + rev.grades, 0) / lastMonthReviews.length,
+                performance: lastMonthReviews.reduce((acc, rev) => acc + rev.performance, 0) / lastMonthReviews.length,
+                understanding: lastMonthReviews.reduce((acc, rev) => acc + rev.understanding, 0) / lastMonthReviews.length
+            }
 
         return reviewResponse
     }

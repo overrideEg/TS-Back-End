@@ -6,7 +6,7 @@ import { Promotion, PromotionDocument } from '../../Models/promotion.model';
 export class PromotionService {
 
     constructor(
-        @InjectModel(Promotion.name) private PromotionModel: Model<PromotionDocument>
+        @InjectModel(Promotion.name) public PromotionModel: Model<PromotionDocument>
     ) { }
 
     async save(req: Promotion) {
