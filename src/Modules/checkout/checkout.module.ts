@@ -6,6 +6,8 @@ import { User, UserSchema } from '../../Models/user.model';
 import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
 import { CourseModule } from '../course/course.module';
 import { UserModule } from '../user/user.module';
+import { PromotionModule } from '../promotion/promotion.module';
+import { NoticeModule } from '../notice/notice.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { UserModule } from '../user/user.module';
     ]),
     forwardRef(()=>CourseModule),
     forwardRef(()=>UserModule),
+    PromotionModule,
+    NoticeModule
     
   ],
   controllers: [CheckoutController],
