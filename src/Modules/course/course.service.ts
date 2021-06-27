@@ -188,7 +188,7 @@ export class CourseService {
         if (teacher) {
             courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
             courses.forEach(course => {
-                course.progress = this.calculateProgress(course);
+                course['progress'] = this.calculateProgress(course);
             })
         }
         return courses;
