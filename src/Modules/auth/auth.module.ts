@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { jwtConstants } from './Security/constants';
@@ -15,7 +15,8 @@ import { JwtStrategy } from './Security/jwt.strategy';
         expiresIn:'1y'
       }
     }),
-    UserModule
+    UserModule,
+    HttpModule
   ],
   controllers: [AuthController],
   providers: [AuthService,JwtStrategy],

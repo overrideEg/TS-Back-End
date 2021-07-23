@@ -1,3 +1,9 @@
 export enum PaymentMethod {
-    creditCard = 'creditCard'
+    VISA = 'VISA',
+    MASTER = 'MASTER',
+    MADA = 'MADA',
+}
+export enum PaymentStatus {
+    Paid = 'Paid',
+    Wait = 'Wait'
 }

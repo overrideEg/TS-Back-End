@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpService, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { Login } from './DTOs/login.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -11,7 +11,7 @@ import { Stage } from '../../Models/stage.model';
 import { refreshToken } from './DTOs/refreshToken.dto';
 import { Lang } from '../../shared/enums/lang.enum';
 import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
-import { jwtConstants } from './Security/constants';
+import { jwtConstants, sms } from './Security/constants';
 
 
 @Injectable()
@@ -20,7 +20,9 @@ export class AuthService {
 
     constructor(
         private userService: UserService,
-        private jwtService: JwtService) { }
+        private jwtService: JwtService,
+        private httpService: HttpService
+    ) { }
 
     public async getUserFromAuthenticationToken(token: string) {
         token = token.substr(7);
@@ -31,19 +33,19 @@ export class AuthService {
             if (payload.id) {
                 return this.userService.findOne(payload.id);
             }
-        } catch (exception ){
+        } catch (exception) {
             throw new Error('token is invalid')
         }
     }
     sign(user: User) {
-        return this.jwtService.sign({ id: user['_id'], email: user['email'], phone: user['phone'], userType: user['userType'] ,defaultLang : user['defaultLang']})
+        return this.jwtService.sign({ id: user['_id'], email: user['email'], phone: user['phone'], userType: user['userType'], defaultLang: user['defaultLang'] })
     }
 
 
 
     requestToken(macAddress: string) {
         return {
-            token: this.jwtService.sign({ id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress, defaultLang : Lang.ar }, { expiresIn: '1h' })
+            token: this.jwtService.sign({ id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress, defaultLang: Lang.ar }, { expiresIn: '1h' })
         }
     }
 
@@ -88,6 +90,7 @@ export class AuthService {
         if (!user)
             throw new UnauthorizedException('check your credintials');
         user.tempCode = "00000";
+        await this.sendOTPSMS(user.phone,user.tempCode)
         user.isActive = false;
         user = await this.userService.update(user['_id'], user);
 
@@ -116,15 +119,21 @@ export class AuthService {
         if (!user)
             throw new UnauthorizedException('check your credintials');
         user.tempCode = '54321';
+       await  this.sendOTPSMS(user.phone,user.tempCode)
         user.isActive = false;
         user = await this.userService.update(user['_id'], user);
-
         return {
             ...user['_doc'],
             token: this.sign(user),
         };
     }
 
+
+    async sendOTPSMS(number: string, tempCode: string) {
+        const msg = `${tempCode} is your verification code for TS-Academy App`;
+        const baseURL = `https://apps.gateway.sa/vendorsms/pushsms.aspx?user=${sms.user}&password=${sms.password}&msisdn=${number}&sid=${sms.sid}&fl=${sms.fl}&msg=${msg}`;
+       await this.httpService.get(baseURL).toPromise();
+    }
     async activate(req: any, code: string) {
         let user = await this.userService.findOne(req.user.id);
         if (!user)
@@ -142,7 +151,7 @@ export class AuthService {
     async login(body: Login) {
         let user = await this.userService.login(body.username, body.defaultLang);
         if (!user)
-            throw new UnauthorizedException('user not found');            
+            throw new UnauthorizedException('user not found');
         // if (!user.isActive)
         //     throw new UnauthorizedException('please activate your account');
         if (OverrideUtils.dycreptPassword(user.password) !== body.password)
@@ -152,19 +161,19 @@ export class AuthService {
             if (!body.studentId)
                 throw new UnauthorizedException('please enter student id');
 
-            let student = await this.userService.UserModel.findOne({studentId: body.studentId}).exec();
+            let student = await this.userService.UserModel.findOne({ studentId: body.studentId }).exec();
             if (!student)
                 throw new UnauthorizedException('please enter correct student id');
 
             if (!user.students.find(st => st === student['_id'])) {
                 user.students.push(student);
-                await this.userService.UserModel.updateOne({_id: user['_id']}, user);
+                await this.userService.UserModel.updateOne({ _id: user['_id'] }, user);
             }
         }
 
-        if (body.fcmToken){
+        if (body.fcmToken) {
             user.fcmTokens.push(body.fcmToken)
-            await this.userService.UserModel.updateOne({_id: user['_id']}, user);
+            await this.userService.UserModel.updateOne({ _id: user['_id'] }, user);
 
         }
 
@@ -227,6 +236,8 @@ export class AuthService {
         user.city['_id'] = body.cityId;
         user.coverletter = body.coverLetter;
         user.resume = body.resume;
+        user.tempCode = '12345';
+        await this.sendOTPSMS(user.phone,user.tempCode);
         let savedUser = await this.userService.save(user).catch(reason => {
             throw new BadRequestException('can not create user  ', reason)
         });
@@ -257,6 +268,8 @@ export class AuthService {
         user.defaultLang = body.defaultLang;
         user.phone = body.phone;
         user.students = [savedSudent];
+        user.tempCode = '12345';
+        await this.sendOTPSMS(user.phone,user.tempCode);
         let savedUser = await this.userService.save(user).catch(reason => {
             throw new BadRequestException('can not create user  ', reason);
         });
@@ -269,6 +282,7 @@ export class AuthService {
 
     async registerStudent(body: RegisterStudent) {
         //check if user exists;
+
         if (await this.userService.ifUserExists(body.email, body.phone)) {
             throw new BadRequestException('user already exists');
         }
@@ -288,10 +302,13 @@ export class AuthService {
         user['city']['_id'] = body.cityId;
         user['grade']['_id'] = body.gradeId;
         user['stage']['_id'] = body.stageId;
-        let savedUser = await this.userService.save(user).catch(reason => {
-            throw new BadRequestException('can not create user  ', reason);
-        });
+        user.tempCode = '12345';
+        await this.sendOTPSMS(user.phone,user.tempCode);
+
+        let savedUser = await this.userService.save(user);
         //signed token
+
+
         return {
             ...savedUser['_doc'],
             token: this.sign(savedUser),

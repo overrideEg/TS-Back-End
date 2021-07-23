@@ -14,8 +14,23 @@ export class CheckoutDTO {
     @ApiProperty({ type: () => Course, isArray: true, required: true })
     courses: Course[];
 
-    @ApiProperty({ description: 'PaymentMethod', default: PaymentMethod.creditCard, required: true })
+    @ApiProperty({  enum: [PaymentMethod.VISA,PaymentMethod.MADA,PaymentMethod.MASTER], required: true })
     paymentMethod?: PaymentMethod;
+
+    @ApiProperty({ required: true })
+    cardNumber?: string;
+
+    @ApiProperty({required: true })
+    expireMonth?: string;
+
+    @ApiProperty({required: true })
+    expireYear?: string;
+    
+    @ApiProperty({required: true })
+    holder?: string;
+
+    @ApiProperty({required: true })
+    cvv?: string;
 
 
 

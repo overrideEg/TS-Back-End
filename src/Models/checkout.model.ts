@@ -4,7 +4,7 @@ import * as mongoose from 'mongoose';
 import { OBaseEntity } from '../shared/base-entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Course } from './course.model';
-import { PaymentMethod } from '../enums/payment-method.enum';
+import { PaymentMethod, PaymentStatus } from '../enums/payment-method.enum';
 import { User } from './user.model';
 
 
@@ -23,7 +23,6 @@ export class Checkout extends OBaseEntity {
     @Prop()
     promoCode?: string;
 
-
     @ApiProperty({ type: () => Course, isArray: false, required: true })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate: true })
     course: Course;
@@ -32,9 +31,22 @@ export class Checkout extends OBaseEntity {
     @Prop({ default: 0 })
     price?: number;
 
-    @ApiProperty({ description: 'PaymentMethod', default: PaymentMethod.creditCard, required: true })
-    @Prop({ enum: [PaymentMethod.creditCard], default: PaymentMethod.creditCard })
+    @ApiProperty({ description: 'PaymentMethod', required: true })
+    @Prop({ enum: [PaymentMethod.VISA, PaymentMethod.MADA, PaymentMethod.MASTER] })
     paymentMethod?: PaymentMethod;
+
+    @ApiProperty({ enum: [PaymentStatus.Paid, PaymentStatus.Wait], required: true })
+    @Prop({ enum: [PaymentStatus.Paid, PaymentStatus.Wait], default: PaymentStatus.Wait })
+    paymentStatus?: PaymentStatus
+
+
+    @ApiProperty({ description: 'redirect', required: true })
+    @Prop({ type: mongoose.Schema.Types.Mixed })
+    paymentResult?: any;
+
+    @ApiProperty({ description: 'paymentCode', required: true })
+    @Prop()
+    paymentCode?: string;
 
     @ApiProperty({ description: 'price Before Discount' })
     @Prop()
