@@ -125,15 +125,15 @@ export class CourseService {
 
         let reservations = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(id) });
 
-        course.inCart = await this.userService.UserModel.exists({
+        course.inCart = req.user.id != null ? await this.userService.UserModel.exists({
             $and: [
                 { _id: new ObjectId(req.user.id) },
                 { cart: new ObjectId(id) },
             ]
-        })
+        }): false;
         console.log('inCart', course.inCart);
 
-        course.purchased = await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user.id) }] });
+        course.purchased = req.user.id != null ? await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user.id) }] }) : false;
         let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
         course.teacher['cRating'] = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
         course.related = await this.CourseModel.find({
