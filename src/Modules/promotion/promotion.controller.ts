@@ -26,6 +26,14 @@ export class PromotionController {
     return this.service.findAll();
   }
 
+    /* GET One Promotion End Point */
+    @UseGuards(JwtAuthGuard)
+    @Get('/byCode/:code')
+    getPromotionByCode(@Param('code') code: string): Promise<Promotion> {
+      return this.service.getPromotionByCode(code);
+    }
+  
+
 
   /* GET One Promotion End Point */
   @UseGuards(JwtAuthGuard)

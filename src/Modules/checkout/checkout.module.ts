@@ -24,7 +24,8 @@ import { NoticeModule } from '../notice/notice.module';
     ]),
     forwardRef(()=>CourseModule),
     forwardRef(()=>UserModule),
-    PromotionModule,
+    forwardRef(()=>PromotionModule),
+    
     NoticeModule,
     HttpModule
     

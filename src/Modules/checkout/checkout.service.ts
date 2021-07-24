@@ -27,6 +27,7 @@ export class CheckoutService {
         private courseService: CourseService,
         @Inject(forwardRef(() => UserService))
         private userService: UserService,
+        @Inject(forwardRef(() => PromotionService))
         private promotionService: PromotionService,
         private noticeService: NoticeService,
         private httpService: HttpService
