@@ -17,6 +17,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    if (payload.macAddress != null)
+    return payload;
     const user = await this.userService.validate(payload);
     if (user)
       return payload;
