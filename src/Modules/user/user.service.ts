@@ -119,7 +119,7 @@ export class UserService {
 
     async getTeacherProfile(id: string): Promise<TeacherProfile> {
         let user = await this.findOne(id);
-        let courses = await this.courseService.CourseModel.find({ teacher: user }).sort({ createdAt: 'desc' }).exec();
+        let courses = await this.courseService.CourseModel.find({ teacher: new ObjectId(id) }).sort({ createdAt: 'desc' }).exec();
         for await (const course of courses) {
             course.related = [];
             course.related = course.related.slice(0, 6);
@@ -136,7 +136,7 @@ export class UserService {
             });
             course.progress = progress / videos * 100;
             for await (let review of course.reviews) {
-                review.user = await this.UserModel.findOne(review.user).exec()
+                review.user = await this.UserModel.findOne(review.user['_id'].toString()).exec()
             }
             course['cRating'] = course.reviews.length == 0 ? 5 : course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length;
         }
