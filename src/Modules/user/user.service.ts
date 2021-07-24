@@ -136,9 +136,8 @@ export class UserService {
             });
             course.progress = progress / videos * 100;
             for await (let review of course.reviews) {
-                console.log(review.user);
                 
-                review.user = await this.UserModel.findOne(review.user).exec()
+                review.user = await this.UserModel.findById(review.user).exec()
             }
             course['cRating'] = course.reviews.length == 0 ? 5 : course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length;
         }
