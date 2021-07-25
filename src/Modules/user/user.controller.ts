@@ -90,9 +90,9 @@ export class UserController {
 
    /* PUT  User End Point */
    @UseGuards(JwtAuthGuard)
-   @Put('approveTeacher/:id')
+   @Put('teacherStatus/:id')
    approveTeacher(@Param('id') id: string): Promise<any> {
-     return this.service.approveTeacher(id);
+     return this.service.teacherStatus(id);
    }
   /* PUT  User End Point */
   @UseGuards(JwtAuthGuard)

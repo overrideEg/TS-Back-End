@@ -22,7 +22,7 @@ import { NoticeService } from '../notice/notice.service';
 
 @Injectable()
 export class UserService {
-   
+
 
     private readonly logger = new Logger(UserService.name);
 
@@ -110,12 +110,32 @@ export class UserService {
         await this.UserModel.findByIdAndUpdate(id, req);
         return this.findOne(id);
     }
-    async approveTeacher(id: string): Promise<any> {
+    async teacherStatus(id: string): Promise<any> {
         let teacher = await this.findOne(id);
-        teacher.teacherApproved = true;
-        return await this.update(id,teacher)
-      }
-  
+        if (!teacher.teacherApproved) {
+
+            teacher.teacherApproved = true;
+            this.noticeService.sendSpecificNotification({
+                userId: id,
+                notification: {
+                    body: `مرحباً ${teacher.name} تم تنشيط حسابك بنجاح`,
+                    title: 'تم تنشيط الحساب',
+                }
+            })
+        } else {
+            teacher.teacherApproved = false;
+            this.noticeService.sendSpecificNotification({
+                userId: id,
+                notification: {
+                    body: `مرحباً ${teacher.name} - تم تعطيل حسابك ٫  برجاء التواصل مع الادارة لمعرفة السبب`,
+                    title: 'تم تعطيب الحساب',
+                }
+            })
+        }
+        return await this.update(id, teacher)
+    }
+ 
+
     async remove(id: string): Promise<User> {
         return await this.UserModel.findByIdAndRemove(id);
     }
@@ -140,7 +160,7 @@ export class UserService {
             });
             course.progress = progress / videos * 100;
             for await (let review of course.reviews) {
-                
+
                 review.user = await this.UserModel.findById(review.user).exec()
             }
             course['cRating'] = course.reviews.length == 0 ? 5 : course.reviews.reduce((acc, review) => acc + review.stars, 0) / course.reviews.length;
@@ -206,14 +226,14 @@ export class UserService {
                     body: teacher.defaultLang === Lang.en ? `your request to withdraw cach with amount (${amount}) has been recorded and its status ${wallet.status.toString()}` :
                         `طلبك لسحب مبلغ ${amount} قيد التنفيذ`
                 },
-                data:{
+                data: {
                     entityType: 'Wallet',
                     entityId: wallet['_id'].toString()
                 }
             }
         )
 
-        let admins = await this.UserModel.find({userType: UserType.admin}).exec();
+        let admins = await this.UserModel.find({ userType: UserType.admin }).exec();
         for await (const admin of admins) {
             this.noticeService.sendSpecificNotification(
                 {
@@ -223,7 +243,7 @@ export class UserService {
                         body: admin.defaultLang === Lang.en ? `you have request to withdraw (${amount}) from ${teacher.name} with status ${wallet.status.toString()}` :
                             `لديك طلب سحب مبلغ ${amount} من ${teacher.name} وحالته ${wallet.status.toString()}`
                     },
-                    data:{
+                    data: {
                         entityType: 'Wallet',
                         entityId: wallet['_id'].toString()
                     }
@@ -249,16 +269,16 @@ export class UserService {
                 notification: {
                     title: teacher.defaultLang === Lang.en ? `your request has been approved` : 'تمت الموافقة على طلبك',
                     body: teacher.defaultLang === Lang.en ? `your request to withdraw ${wallet.value} has been approved` :
-                       `طلبك لسحب ${wallet.value} تمت الموافقة عليه`
+                        `طلبك لسحب ${wallet.value} تمت الموافقة عليه`
                 },
-                data:{
+                data: {
                     entityType: 'Wallet',
                     entityId: wallet['_id'].toString()
                 }
             }
         )
 
-       
+
         return wallet;
     }
 
