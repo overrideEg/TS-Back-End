@@ -49,11 +49,11 @@ export class FileService {
             file.pipe(uploadStream)
           },
           err => {
-            reject(new ServiceUnavailableException())
+            reject(new BadRequestException('error while uploading'))
           },
         )
       } catch (e) {
-        reject(new ServiceUnavailableException())
+        reject(new BadRequestException('error while uploading'))
       }
     })
   }
