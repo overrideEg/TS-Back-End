@@ -47,6 +47,7 @@ export class UserController {
   getTeacherProfile(@Param('id') id: string): Promise<TeacherProfile> {
     return this.service.getTeacherProfile(id);
   }
+
   @UseGuards(JwtAuthGuard)
   @Get('account')
   getBankAccounts(@Req() req) {
@@ -86,6 +87,13 @@ export class UserController {
   }
 
 
+
+   /* PUT  User End Point */
+   @UseGuards(JwtAuthGuard)
+   @Put('approveTeacher/:id')
+   approveTeacher(@Param('id') id: string): Promise<any> {
+     return this.service.approveTeacher(id);
+   }
   /* PUT  User End Point */
   @UseGuards(JwtAuthGuard)
   @Put(':id')

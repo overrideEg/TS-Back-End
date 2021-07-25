@@ -208,8 +208,9 @@ export class LearningClassService {
             course: new ObjectId(body.courseId),
             lesson: lesson
         }).exec();
+        
 
-        existsClass.endTime = Date.now();
+        existsClass['endTime'] = Date.now();
         lesson.isDone = true;
         await this.courseService.CourseModel.updateOne({ _id: body.courseId }, course);
         await this.model.updateOne({ _id: existsClass['_id'] }, existsClass);

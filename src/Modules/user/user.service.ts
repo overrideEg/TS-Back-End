@@ -22,7 +22,7 @@ import { NoticeService } from '../notice/notice.service';
 
 @Injectable()
 export class UserService {
-
+   
 
     private readonly logger = new Logger(UserService.name);
 
@@ -104,14 +104,18 @@ export class UserService {
         return userType ? this.UserModel.find({ userType: userType }).exec() : this.UserModel.find().exec();
     }
     async findOne(id: string): Promise<User> {
-        let user = await this.UserModel.findById(id).exec();
-
-        return user;
+        return await this.UserModel.findById(id).exec();
     }
     async update(id: string, req: User): Promise<User> {
         await this.UserModel.findByIdAndUpdate(id, req);
         return this.findOne(id);
     }
+    async approveTeacher(id: string): Promise<any> {
+        let teacher = await this.findOne(id);
+        teacher.teacherApproved = true;
+        return await this.update(id,teacher)
+      }
+  
     async remove(id: string): Promise<User> {
         return await this.UserModel.findByIdAndRemove(id);
     }

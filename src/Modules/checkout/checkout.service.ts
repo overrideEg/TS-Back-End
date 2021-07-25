@@ -161,6 +161,7 @@ export class CheckoutService {
                 paymentResult = res.data
             else throw new BadRequestException(res.data['result']['description']);
         }).catch(err=>{
+            console.log(err.response.data.result)
             throw new BadRequestException(err.response.data.result.description)
         })
 

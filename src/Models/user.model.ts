@@ -34,6 +34,9 @@ export class User extends OBaseEntity {
 
     @Prop({ default: false })
     isActive?: boolean;
+    
+    @Prop({ default: false })
+    teacherApproved?: boolean;
 
     @Prop({ unique: true })
     phone?: string;
