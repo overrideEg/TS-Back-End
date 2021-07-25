@@ -93,40 +93,40 @@ export class CheckoutService {
 
             checkout.course['enrolled'] = await this.CheckoutModel.count({ course: new ObjectId(checkout.course['_id'].toString()) }).exec()
             await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
-            //     await this.userService.createWalletForCheckout(checkoutSaved);
+                await this.userService.createWalletForCheckout(checkoutSaved);
 
 
 
-            //     this.noticeService.sendSpecificNotification(
-            //         {
-            //             userId: req.user.id,
-            //             notification: {
-            //                 title: req.user.defaultLang === Lang.en ? `Successfull Subscription` : `تم الاشتراك بنجاح`,
-            //                 body: req.user.defaultLang === Lang.en ? `your subscription is successfull to coursse ${course.name} with teacher ${course.teacher.name} with amount ${checkout.priceAfterDiscount}` :
-            //                     `تم الاشتراك بنجاح في دورة ${course.name} مع المدرس ${course.teacher.name} بمبلغ ${checkout.priceAfterDiscount}`
-            //             },
-            //             data: {
-            //                 entityType: 'Course',
-            //                 entityId: course['_id'].toString()
-            //             }
-            //         }
-            //     )
+                this.noticeService.sendSpecificNotification(
+                    {
+                        userId: req.user.id,
+                        notification: {
+                            title: req.user.defaultLang === Lang.en ? `Successfull Subscription` : `تم الاشتراك بنجاح`,
+                            body: req.user.defaultLang === Lang.en ? `your subscription is successfull to coursse ${course.name} with teacher ${course.teacher.name} with amount ${checkout.priceAfterDiscount}` :
+                                `تم الاشتراك بنجاح في دورة ${course.name} مع المدرس ${course.teacher.name} بمبلغ ${checkout.priceAfterDiscount}`
+                        },
+                        data: {
+                            entityType: 'Course',
+                            entityId: course['_id'].toString()
+                        }
+                    }
+                )
 
 
-            //     this.noticeService.sendSpecificNotification(
-            //         {
-            //             userId: course.teacher['_id'].toString(),
-            //             notification: {
-            //                 title: course.teacher.defaultLang === Lang.en ? `new Subscription` : `لديــك اشتــراك جديــد`,
-            //                 body: course.teacher.defaultLang === Lang.en ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}` :
-            //                     `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`
-            //             },
-            //             data: {
-            //                 entityType: 'Course',
-            //                 entityId: course['_id'].toString()
-            //             }
-            //         }
-            //     )
+                this.noticeService.sendSpecificNotification(
+                    {
+                        userId: course.teacher['_id'].toString(),
+                        notification: {
+                            title: course.teacher.defaultLang === Lang.en ? `new Subscription` : `لديــك اشتــراك جديــد`,
+                            body: course.teacher.defaultLang === Lang.en ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}` :
+                                `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`
+                        },
+                        data: {
+                            entityType: 'Course',
+                            entityId: course['_id'].toString()
+                        }
+                    }
+                )
             checkouts.push(checkoutSaved)
         }
 
@@ -142,7 +142,7 @@ export class CheckoutService {
             },
             params: {
                 'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
-                'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0),
+                'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
                 'merchantTransactionId':checkouts.reduce((acc, check) => acc + '-'+check['_id'].toString(), ''),
                 'testMode':'EXTERNAL',
                 'customer.email':req.user.email,
@@ -160,8 +160,11 @@ export class CheckoutService {
             if (res.data['result']['code'] === '000.200.000' || res.data['result']['code'] === '000.000.000')
                 paymentResult = res.data
             else throw new BadRequestException(res.data['result']['description']);
-        }).catch(err=>{
+        }).catch(async err=>{
             console.log(err.response.data.result)
+         
+            await this.CheckoutModel.deleteMany(checkouts);
+
             throw new BadRequestException(err.response.data.result.description)
         })
 
