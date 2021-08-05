@@ -91,42 +91,37 @@ export class CheckoutService {
 
             let checkoutSaved = await this.CheckoutModel.create(checkout);
 
-            checkout.course['enrolled'] = await this.CheckoutModel.count({ course: new ObjectId(checkout.course['_id'].toString()) }).exec()
-            await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
-                await this.userService.createWalletForCheckout(checkoutSaved);
-
-
-
-                this.noticeService.sendSpecificNotification(
-                    {
-                        userId: req.user.id,
-                        notification: {
-                            title: req.user.defaultLang === Lang.en ? `Successfull Subscription` : `تم الاشتراك بنجاح`,
-                            body: req.user.defaultLang === Lang.en ? `your subscription is successfull to coursse ${course.name} with teacher ${course.teacher.name} with amount ${checkout.priceAfterDiscount}` :
-                                `تم الاشتراك بنجاح في دورة ${course.name} مع المدرس ${course.teacher.name} بمبلغ ${checkout.priceAfterDiscount}`
-                        },
-                        data: {
-                            entityType: 'Course',
-                            entityId: course['_id'].toString()
-                        }
-                    }
-                )
-
-
-                this.noticeService.sendSpecificNotification(
-                    {
-                        userId: course.teacher['_id'].toString(),
-                        notification: {
-                            title: course.teacher.defaultLang === Lang.en ? `new Subscription` : `لديــك اشتــراك جديــد`,
-                            body: course.teacher.defaultLang === Lang.en ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}` :
-                                `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`
-                        },
-                        data: {
-                            entityType: 'Course',
-                            entityId: course['_id'].toString()
-                        }
-                    }
-                )
+            // checkout.course['enrolled'] = await this.CheckoutModel.count({ course: new ObjectId(checkout.course['_id'].toString()) }).exec()
+            // await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
+            //    await this.userService.createWalletForCheckout(checkoutSaved);
+            //     this.noticeService.sendSpecificNotification(
+            //         {
+            //             userId: req.user.id,
+            //             notification: {
+            //                 title: req.user.defaultLang === Lang.en ? `Successfull Subscription` : `تم الاشتراك بنجاح`,
+            //                 body: req.user.defaultLang === Lang.en ? `your subscription is successfull to coursse ${course.name} with teacher ${course.teacher.name} with amount ${checkout.priceAfterDiscount}` :
+            //                     `تم الاشتراك بنجاح في دورة ${course.name} مع المدرس ${course.teacher.name} بمبلغ ${checkout.priceAfterDiscount}`
+            //             },
+            //             data: {
+            //                 entityType: 'Course',
+            //                 entityId: course['_id'].toString()
+            //             }
+            //         }
+            //     )
+            //     this.noticeService.sendSpecificNotification(
+            //         {
+            //             userId: course.teacher['_id'].toString(),
+            //             notification: {
+            //                 title: course.teacher.defaultLang === Lang.en ? `new Subscription` : `لديــك اشتــراك جديــد`,
+            //                 body: course.teacher.defaultLang === Lang.en ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}` :
+            //                     `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`
+            //             },
+            //             data: {
+            //                 entityType: 'Course',
+            //                 entityId: course['_id'].toString()
+            //             }
+            //         }
+            //     )
             checkouts.push(checkoutSaved)
         }
 
@@ -136,16 +131,16 @@ export class CheckoutService {
         await this.userService.update(req.user.id, user)
 
         let paymentResult: any;
-        await this.httpService.post('https://test.oppwa.com/v1/payments', null, {
+        await this.httpService.post('https://test.oppwa.com/v1/checkouts', null, {
             headers: {
                 'Authorization': Payment.token
             },
             params: {
                 'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
                 'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
-                'merchantTransactionId':checkouts.reduce((acc, check) => acc + '-'+check['_id'].toString(), ''),
-                'testMode':'EXTERNAL',
-                'customer.email':req.user.email,
+                'merchantTransactionId': checkouts.reduce((acc, check) => acc + '-' + check['_id'].toString(), ''),
+                'testMode': 'EXTERNAL',
+                'customer.email': req.user.email,
                 'currency': Payment.Currency,
                 'paymentBrand': body.paymentMethod,
                 'paymentType': Payment.paymentType,
@@ -154,15 +149,14 @@ export class CheckoutService {
                 'card.expiryMonth': body.expireMonth,
                 'card.expiryYear': body.expireYear,
                 'card.cvv': body.cvv,
-                'shopperResultUrl': 'http://localhost:3093/Checkout/authorize',
             }
         }).toPromise().then(res => {
-            if (res.data['result']['code'] === '000.200.000' || res.data['result']['code'] === '000.000.000')
+            if (res.data['result']['code'] === '000.200.100' || res.data['result']['code'] === '000.000.000')
                 paymentResult = res.data
             else throw new BadRequestException(res.data['result']['description']);
-        }).catch(async err=>{
+        }).catch(async err => {
             console.log(err.response.data.result)
-         
+
             await this.CheckoutModel.deleteMany(checkouts);
 
             throw new BadRequestException(err.response.data.result.description)
@@ -170,14 +164,51 @@ export class CheckoutService {
 
 
         for await (const checkout of checkouts) {
-            checkout.paymentResult = paymentResult;
-            await this.CheckoutModel.updateOne({ _id: checkout['_id'] }, checkout);
+            // checkout.paymentResult = paymentResult;
+            // checkout.paymentId = paymentResult.id;
+            await this.CheckoutModel.findByIdAndUpdate(checkout['_id'].toString(), {
+                paymentId: paymentResult.id
+            });
         }
 
 
 
 
-        return checkouts
+        return { ...paymentResult, resultUrl: `http://localhost:3093/v1/Checkout/authorize/${body.paymentMethod}/${paymentResult.id}` }
     }
+
+
+
+    async authorize(paymentMethod: string, id: string, resourcePath: string) {
+        let checkouts = await this.CheckoutModel.find({ paymentId: id });
+        console.log('id', id);
+        console.log('resourcePath', resourcePath);
+        let paymentResult;
+        let path = `https://test.oppwa.com/v1/checkouts/${id}/payment?entityId=${paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada}`;
+
+        await this.httpService.get(path, {
+
+            headers: {
+                'Authorization': Payment.token
+            },
+            params: {
+                'entityId': paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
+            },
+
+
+
+        }).toPromise().then(res => {
+            paymentResult = res.data
+        }).catch(async err => {
+            console.log(err.response.data.result)
+
+            // await this.CheckoutModel.deleteMany(checkouts);
+
+            throw new BadRequestException(err.response.data.result.description)
+        })
+
+        return paymentResult
+    }
+
 
 }

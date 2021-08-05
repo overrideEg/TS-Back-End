@@ -18,10 +18,10 @@ export const sms = {
 
 
 
-export const Payment ={
+export const Payment = {
   token: 'Bearer OGFjN2E0Yzc3YTMxM2E3ZDAxN2EzMzk2NWY0YTA5MWV8UW1nNkdqZmE0WA==',
   entityIdVisaMaster: '8ac7a4c77a313a7d017a3396b1b60922',
   entityIdMada: '8ac7a4c77a313a7d017a339726eb0926',
   paymentType: 'DB',
-  Currency : 'SAR'
+  Currency: 'SAR'
 }

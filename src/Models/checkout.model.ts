@@ -46,7 +46,7 @@ export class Checkout extends OBaseEntity {
 
     @ApiProperty({ description: 'paymentCode', required: true })
     @Prop()
-    paymentCode?: string;
+    paymentId?: string;
 
     @ApiProperty({ description: 'price Before Discount' })
     @Prop()
