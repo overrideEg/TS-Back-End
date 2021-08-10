@@ -151,10 +151,13 @@ export class CourseService {
             _id: { $ne: course['_id'] }
         }).exec();
 
-        related.forEach((rel: any) => {
-            rel = rel.toObject()
-            delete rel.content; delete rel.teacher.wallet;
-        })
+        for await (const rel of related) {
+            rel.teacher.wallet = []
+            rel.content = [];
+            rel.Days = [];
+            rel.students = [];
+        }
+       
 
 
         course.related = related;
