@@ -43,7 +43,7 @@ export class CourseService {
                 });
             })
         }
-        
+
         return this.CourseModel.create(body)
     }
     async update(req: any, id: string, body: Course): Promise<Course | PromiseLike<Course>> {
@@ -136,13 +136,13 @@ export class CourseService {
                 { cart: new ObjectId(id) },
             ]
         }) : false;
-        
+
 
         course.purchased = req.user.id != null ? await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user.id) }, { paymentStatus: PaymentStatus.Paid }] }) : false;
         let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
         course.teacher['cRating'] = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
         delete course.teacher.wallet;
-        course.related = await this.CourseModel.find({
+        let related = await this.CourseModel.find({
             $or: [
                 { subject: course.subject ? course.subject['_id'] : null },
                 { teacher: course.teacher['_id'] ?? '' },
@@ -151,16 +151,10 @@ export class CourseService {
             _id: { $ne: course['_id'] }
         }).exec();
 
-        
+        related.forEach((rel: any) => { rel = rel.toObject() })
 
-        course.related?.forEach(course => {
-            delete course.content;
-            delete course.teacher.wallet;
-            course.reviews.forEach(rev => {
-                delete rev.user;
-            })
-        })
 
+        course.related = related;
         let students = []
 
 
