@@ -24,6 +24,7 @@ export class CheckoutController {
   @Get('payment/:id')
   @Render('payment.hbs')
   payment(@Param('id') id: string, @Param('resultUrl') resultUrl: string) {
+    return {id:id,resultUrl:resultUrl};
   }
 
   @Get('authorize/:paymentMethod/:paymentId')
