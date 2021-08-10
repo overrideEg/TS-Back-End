@@ -181,8 +181,12 @@ export class CourseService {
         course.progress = this.calculateProgress(course);
         course.teacher.wallet = [];
         course.teacher.bankAccounts = [];
-        course.content.forEach((con) => con.lessons.forEach(les =>  les.exersices = []))
-        course.reviews.forEach((rev) => {rev.user.studentReviews = [];rev.user.fcmTokens = []})
+        course.content.forEach((con) => con.lessons.forEach(les => les.exersices = []))
+        course.reviews.forEach((rev) => {
+            if (rev.user != null) {
+                rev.user.studentReviews = []; rev.user.fcmTokens = []
+            }
+        })
 
         return course;
     }
