@@ -25,11 +25,11 @@ export class Wallet extends OBaseEntity {
     status: TransactionStatus
    
     @ApiProperty({ type: () => Checkout })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Checkout.name})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Checkout.name, autopopulate:true })
     checkout?: Checkout;
 
     @ApiProperty({ type: () => Course })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course'})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate:true })
     course?: Course;
 
     @ApiProperty({ type: () => BankAccount })

@@ -29,6 +29,8 @@ export class CourseService {
             throw new BadRequestException('only teacher can add courses');
         }
         let teacher = await this.userService.findOne(req.user.id);
+        delete teacher.wallet;
+
         body['teacher'] = teacher;
         body['createdAt'] = Date.now()
 
@@ -41,6 +43,7 @@ export class CourseService {
                 });
             })
         }
+        
         return this.CourseModel.create(body)
     }
     async update(req: any, id: string, body: Course): Promise<Course | PromiseLike<Course>> {
@@ -104,6 +107,7 @@ export class CourseService {
         })
         course.content = contents;
         await this.CourseModel.updateOne({ _id: course['_id'] }, course).exec();
+        delete course.teacher.wallet;
         return course.content;
     }
 
@@ -123,6 +127,7 @@ export class CourseService {
 
     async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
+        delete course.teacher.wallet;
 
         let reservations = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(id), paymentStatus: PaymentStatus.Paid });
 
@@ -132,7 +137,6 @@ export class CourseService {
                 { cart: new ObjectId(id) },
             ]
         }) : false;
-        console.log('inCart', course.inCart);
 
         course.purchased = req.user.id != null ? await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user.id) }, { paymentStatus: PaymentStatus.Paid }] }) : false;
         let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
@@ -155,7 +159,7 @@ export class CourseService {
 
         let students = []
 
-    
+
 
         for await (const res of reservations) {
             students.push({
@@ -178,6 +182,8 @@ export class CourseService {
 
     async findById(id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
+        delete course.teacher.wallet;
+
         course.related = await this.CourseModel.find({
             $or: [
                 { subject: course.subject ? course.subject['_id'] : null },
@@ -195,6 +201,7 @@ export class CourseService {
             throw new BadRequestException('only teacher can view this request');
         }
         let teacher = await this.userService.findOne(req.user.id);
+        delete teacher.wallet;
         let courses = [];
         if (teacher) {
             courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
@@ -202,6 +209,7 @@ export class CourseService {
                 course['progress'] = this.calculateProgress(course);
             })
         }
+
         return courses;
     }
 
@@ -246,6 +254,8 @@ export class CourseService {
 
         purchased.forEach(checkout => {
             checkout.course.progress = this.calculateProgress(checkout.course);
+            delete checkout.course.teacher.wallet;
+
         })
         return purchased.map((checkout) => checkout.course);
     }
@@ -257,6 +267,7 @@ export class CourseService {
         if (!checkout)
             throw new BadRequestException('you dont purchased this course')
         let course = checkout.course;
+        delete course.teacher.wallet;
         let content = course?.content?.find(content => content.lessons.find(less => less.OId === lessonId));
         let lesson = content?.lessons?.find(less => less.OId === lessonId);
         if (!course || !content || !lesson) {
@@ -278,6 +289,7 @@ export class CourseService {
 
     async getExcercices(req: any, courseId: string, lessonId: string): Promise<Excercice[] | PromiseLike<Excercice[]>> {
         let course = await this.CourseModel.findById(courseId);
+        delete course.teacher.wallet;
         let content = course?.content?.find(content => content.lessons.find(less => less.OId === lessonId));
         let lesson = content?.lessons?.find(less => less.OId === lessonId);
         if (!course || !content || !lesson) {
