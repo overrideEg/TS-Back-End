@@ -153,10 +153,9 @@ export class CourseService {
             })
         })
 
-        course.content.forEach((cont) => {
-            delete cont.lessons
-        })
         let students = []
+
+    
 
         for await (const res of reservations) {
             students.push({
