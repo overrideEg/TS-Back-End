@@ -141,7 +141,6 @@ export class CourseService {
         course.purchased = req.user.id != null ? await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user.id) }, { paymentStatus: PaymentStatus.Paid }] }) : false;
         let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
         course.teacher['cRating'] = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-        delete course.teacher.wallet;
         let related = await this.CourseModel.find({
             $or: [
                 { subject: course.subject ? course.subject['_id'] : null },
@@ -180,6 +179,8 @@ export class CourseService {
         course.related = course.related.slice(0, 3);
         course.enrolled = reservations.length;
         course.progress = this.calculateProgress(course);
+         course.teacher.wallet = [];
+         course.teacher.bankAccounts = [];
 
         return course;
     }
