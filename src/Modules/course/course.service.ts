@@ -127,7 +127,6 @@ export class CourseService {
 
     async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
-        delete course.teacher.wallet;
 
         let reservations = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(id), paymentStatus: PaymentStatus.Paid });
 
@@ -137,10 +136,12 @@ export class CourseService {
                 { cart: new ObjectId(id) },
             ]
         }) : false;
+        
 
         course.purchased = req.user.id != null ? await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user.id) }, { paymentStatus: PaymentStatus.Paid }] }) : false;
         let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
         course.teacher['cRating'] = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+        delete course.teacher.wallet;
         course.related = await this.CourseModel.find({
             $or: [
                 { subject: course.subject ? course.subject['_id'] : null },
@@ -148,10 +149,13 @@ export class CourseService {
                 { grade: course.grade['_id'] ?? '' },
                 { stage: course.stage['_id'] ?? '' }],
             _id: { $ne: course['_id'] }
-        });
+        }).exec();
+
+        
 
         course.related?.forEach(course => {
             delete course.content;
+            delete course.teacher.wallet;
             course.reviews.forEach(rev => {
                 delete rev.user;
             })
