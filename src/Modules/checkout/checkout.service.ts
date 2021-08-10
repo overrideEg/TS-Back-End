@@ -180,7 +180,7 @@ export class CheckoutService {
             if (checkout.paymentResult == null && checkout.paymentResult == PaymentStatus.Wait) {
                 checkout.paymentResult = paymentResult;
                 checkout.paymentStatus = paymentResult.result?.code === "000.100.110" ? PaymentStatus.Paid : PaymentStatus.Fail;
-                console.log('checkout',checkout);
+                console.log('checkout',checkout.paymentStatus);
                 
                 await this.CheckoutModel.findByIdAndUpdate(checkout['_id'], checkout)
             }
