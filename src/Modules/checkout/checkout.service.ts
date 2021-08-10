@@ -146,24 +146,17 @@ export class CheckoutService {
 
     async authorize(paymentMethod: string, id: string, path: string) {
         let checkouts = await this.CheckoutModel.find({ paymentId: id });
-
+        console.log('checkouts',checkouts);;
+        
         let paymentResult;
         path += `?entityId=${paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada}`
 
         await this.httpService.get(path, {
-
             baseURL: Payment.baseURL,
             method: 'GET',
-
             headers: {
                 'Authorization': Payment.token
             },
-            // params: {
-            //     'entityId': paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
-            // },
-
-
-
         }).toPromise().then(res => {
             paymentResult = res.data
             console.log(res.data.result)
