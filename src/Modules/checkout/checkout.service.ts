@@ -165,11 +165,11 @@ export class CheckoutService {
 
 
         }).toPromise().then(res => {
-
             paymentResult = res.data
+            console.log(res.data.result)
+
         }).catch(async err => {
             paymentResult = err.response.data;
-            console.log(err.response.data)
 
             // await this.CheckoutModel.deleteMany(checkouts);
 
