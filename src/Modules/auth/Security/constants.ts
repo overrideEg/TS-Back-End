@@ -23,5 +23,6 @@ export const Payment = {
   entityIdVisaMaster: '8ac7a4c77a313a7d017a3396b1b60922',
   entityIdMada: '8ac7a4c77a313a7d017a339726eb0926',
   paymentType: 'DB',
-  Currency: 'SAR'
+  Currency: 'SAR',
+  baseURL :'https://test.oppwa.com'
 }

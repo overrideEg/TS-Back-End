@@ -5,5 +5,6 @@ export enum PaymentMethod {
 }
 export enum PaymentStatus {
     Paid = 'Paid',
-    Wait = 'Wait'
+    Wait = 'Wait',
+    Fail = 'Fail'
 }

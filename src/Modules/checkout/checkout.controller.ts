@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Render, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Render, Req, UseGuards ,Request} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
 import { Checkout } from '../../Models/checkout.model';
@@ -25,7 +25,7 @@ export class CheckoutController {
 
 
   @Get('authorize/:paymentMethod/:paymentId')
-  authorize(@Param('paymentMethod') paymentMethod : string,@Query('paymentId') id: string, @Query('resourcePath') resourcePath: string) {
+  authorize(@Param('paymentMethod') paymentMethod : string,@Param('paymentId') id: string, @Query('resourcePath') resourcePath: string) {
     return this.service.authorize(paymentMethod,id,resourcePath)
   }
 

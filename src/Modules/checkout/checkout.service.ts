@@ -3,7 +3,7 @@ import { BadRequestException, forwardRef, HttpService, Inject, Injectable, Logge
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
-import { PaymentMethod } from '../../enums/payment-method.enum';
+import { PaymentMethod, PaymentStatus } from '../../enums/payment-method.enum';
 import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
 import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
 import { Promotion } from '../../Models/promotion.model';
@@ -91,37 +91,7 @@ export class CheckoutService {
 
             let checkoutSaved = await this.CheckoutModel.create(checkout);
 
-            // checkout.course['enrolled'] = await this.CheckoutModel.count({ course: new ObjectId(checkout.course['_id'].toString()) }).exec()
-            // await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
-            //    await this.userService.createWalletForCheckout(checkoutSaved);
-            //     this.noticeService.sendSpecificNotification(
-            //         {
-            //             userId: req.user.id,
-            //             notification: {
-            //                 title: req.user.defaultLang === Lang.en ? `Successfull Subscription` : `تم الاشتراك بنجاح`,
-            //                 body: req.user.defaultLang === Lang.en ? `your subscription is successfull to coursse ${course.name} with teacher ${course.teacher.name} with amount ${checkout.priceAfterDiscount}` :
-            //                     `تم الاشتراك بنجاح في دورة ${course.name} مع المدرس ${course.teacher.name} بمبلغ ${checkout.priceAfterDiscount}`
-            //             },
-            //             data: {
-            //                 entityType: 'Course',
-            //                 entityId: course['_id'].toString()
-            //             }
-            //         }
-            //     )
-            //     this.noticeService.sendSpecificNotification(
-            //         {
-            //             userId: course.teacher['_id'].toString(),
-            //             notification: {
-            //                 title: course.teacher.defaultLang === Lang.en ? `new Subscription` : `لديــك اشتــراك جديــد`,
-            //                 body: course.teacher.defaultLang === Lang.en ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}` :
-            //                     `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`
-            //             },
-            //             data: {
-            //                 entityType: 'Course',
-            //                 entityId: course['_id'].toString()
-            //             }
-            //         }
-            //     )
+
             checkouts.push(checkoutSaved)
         }
 
@@ -131,7 +101,10 @@ export class CheckoutService {
         await this.userService.update(req.user.id, user)
 
         let paymentResult: any;
-        await this.httpService.post('https://test.oppwa.com/v1/checkouts', null, {
+        await this.httpService.post('/v1/checkouts', null, {
+
+            baseURL: Payment.baseURL,
+            method: 'POST',
             headers: {
                 'Authorization': Payment.token
             },
@@ -139,16 +112,9 @@ export class CheckoutService {
                 'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
                 'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
                 'merchantTransactionId': checkouts.reduce((acc, check) => acc + '-' + check['_id'].toString(), ''),
-                'testMode': 'EXTERNAL',
                 'customer.email': req.user.email,
                 'currency': Payment.Currency,
-                'paymentBrand': body.paymentMethod,
                 'paymentType': Payment.paymentType,
-                'card.number': body.cardNumber,
-                'card.holder': body.holder,
-                'card.expiryMonth': body.expireMonth,
-                'card.expiryYear': body.expireYear,
-                'card.cvv': body.cvv,
             }
         }).toPromise().then(res => {
             if (res.data['result']['code'] === '000.200.100' || res.data['result']['code'] === '000.000.000')
@@ -172,42 +138,94 @@ export class CheckoutService {
         }
 
 
+        const fullUrl = 'http://' + req.hostname + '/v1';
 
-
-        return { ...paymentResult, resultUrl: `http://localhost:3093/v1/Checkout/authorize/${body.paymentMethod}/${paymentResult.id}` }
+        return { ...paymentResult, resultUrl: fullUrl + `/Checkout/authorize/${body.paymentMethod}/${paymentResult.id}` }
     }
 
 
 
-    async authorize(paymentMethod: string, id: string, resourcePath: string) {
+    async authorize(paymentMethod: string, id: string, path: string) {
         let checkouts = await this.CheckoutModel.find({ paymentId: id });
-        console.log('id', id);
-        console.log('resourcePath', resourcePath);
+
         let paymentResult;
-        let path = `https://test.oppwa.com/v1/checkouts/${id}/payment?entityId=${paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada}`;
+        path += `?entityId=${paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada}`
 
         await this.httpService.get(path, {
+
+            baseURL: Payment.baseURL,
+            method: 'GET',
 
             headers: {
                 'Authorization': Payment.token
             },
-            params: {
-                'entityId': paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
-            },
+            // params: {
+            //     'entityId': paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
+            // },
 
 
 
         }).toPromise().then(res => {
+
             paymentResult = res.data
         }).catch(async err => {
-            console.log(err.response.data.result)
+            paymentResult = err.response.data;
+            console.log(err.response.data)
 
             // await this.CheckoutModel.deleteMany(checkouts);
 
-            throw new BadRequestException(err.response.data.result.description)
+            // throw new BadRequestException(err.response.data.result.description)
         })
 
-        return paymentResult
+        for await (const checkout of checkouts) {
+            if (checkout.paymentResult == null && checkout.paymentResult == PaymentStatus.Wait){
+
+                checkout.paymentResult = paymentResult;
+                checkout.paymentStatus = paymentResult.result?.code === "000.100.110" ? PaymentStatus.Paid : PaymentStatus.Fail;
+        
+                await this.CheckoutModel.findByIdAndUpdate(checkout['_id'], checkout)
+            }
+            try {
+                let course = checkout['course']
+                course.enrolled = await this.CheckoutModel.count({ paymentStatus: PaymentStatus.Paid,course:course });
+                await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
+                this.noticeService.sendSpecificNotification(
+                    {
+                        userId: checkout.user['_id'].toString(),
+                        notification: {
+                            title: checkout.user.defaultLang === Lang.en ? `Successfull Subscription` : `تم الاشتراك بنجاح`,
+                            body: checkout.user.defaultLang === Lang.en ? `your subscription is successfull to coursse ${course.name} with teacher ${course.teacher?.name} with amount ${checkout.priceAfterDiscount}` :
+                                `تم الاشتراك بنجاح في دورة ${course.name} مع المدرس ${course.teacher?.name} بمبلغ ${checkout.priceAfterDiscount}`
+                        },
+                        data: {
+                            entityType: 'Course',
+                            entityId: course['_id'].toString()
+                        }
+                    }
+                )
+                this.noticeService.sendSpecificNotification(
+                    {
+                        userId: course.teacher['_id'].toString(),
+                        notification: {
+                            title: course.teacher.defaultLang === Lang.en ? `new Subscription` : `لديــك اشتــراك جديــد`,
+                            body: course.teacher.defaultLang === Lang.en ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}` :
+                                `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`
+                        },
+                        data: {
+                            entityType: 'Course',
+                            entityId: course['_id'].toString()
+                        }
+                    }
+                )
+                this.userService.createWalletForCheckout(checkout);
+
+            } catch (e) {
+
+            }
+        }
+
+
+        return paymentResult.result
     }
 
 
