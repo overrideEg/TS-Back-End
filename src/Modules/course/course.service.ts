@@ -146,7 +146,7 @@ export class CourseService {
             _id: { $ne: course['_id'] }
         });
 
-        course.related.forEach(course => {
+        course.related?.forEach(course => {
             delete course.content;
             course.reviews.forEach(rev => {
                 delete rev.user;
