@@ -152,6 +152,10 @@ export class CourseService {
                 delete rev.user;
             })
         })
+
+        course.content.forEach((cont) => {
+            delete cont.lessons
+        })
         let students = []
 
         for await (const res of reservations) {
