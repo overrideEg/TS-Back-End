@@ -40,7 +40,7 @@ export class CheckoutService {
         return saved;
     }
 
-    async checkAndPay(req, body: CheckoutDTO): Promise<Checkout[] | PromiseLike<Checkout[]>> {
+    async checkAndPay(req, body: CheckoutDTO): Promise<Checkout[] | PromiseLike<any>> {
 
 
         let promotion: Promotion;
@@ -140,7 +140,7 @@ export class CheckoutService {
 
         const fullUrl = 'http://' + req.hostname + '/v1';
 
-        return { ...paymentResult, resultUrl: fullUrl + `/Checkout/authorize/${body.paymentMethod}/${paymentResult.id}` }
+        return { id: paymentResult.id, resultUrl: fullUrl + `/Checkout/authorize/${body.paymentMethod}/${paymentResult.id}` }
     }
 
 
