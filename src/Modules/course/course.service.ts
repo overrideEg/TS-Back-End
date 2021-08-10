@@ -2,6 +2,7 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { PaymentStatus } from '../../enums/payment-method.enum';
 import { Course, CourseContent, CourseDocument, CourseReview, Excercice, LessonType, random } from '../../Models/course.model';
 import { UserType } from '../../Models/user.model';
 import { Lang } from '../../shared/enums/lang.enum';
@@ -60,7 +61,7 @@ export class CourseService {
             })
         }
         await this.CourseModel.updateOne({ _id: id }, body).exec();
-        return await this.findOne(req,id);
+        return await this.findOne(req, id);
     }
 
     async delete(req: any, id: string): Promise<Course | PromiseLike<Course>> {
@@ -75,7 +76,7 @@ export class CourseService {
         if (course.startDate < Date.now()) {
             throw new BadRequestException('you can not delete started course');
         }
-        let orders = await this.checkoutService.CheckoutModel.exists({ course: new ObjectId(id) });
+        let orders = await this.checkoutService.CheckoutModel.exists({ course: new ObjectId(id), paymentStatus: PaymentStatus.Paid });
         if (orders) {
             throw new BadRequestException(req.user.defaultLang === Lang.en ? 'you can not delete course because you have reservations' : 'لا يمكن حذف الدورة لوجود حجوزات بها');
         }
@@ -123,17 +124,17 @@ export class CourseService {
     async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
         let course = await this.CourseModel.findById(id).exec();
 
-        let reservations = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(id) });
+        let reservations = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(id), paymentStatus: PaymentStatus.Paid });
 
         course.inCart = req.user.id != null ? await this.userService.UserModel.exists({
             $and: [
                 { _id: new ObjectId(req.user.id) },
                 { cart: new ObjectId(id) },
             ]
-        }): false;
+        }) : false;
         console.log('inCart', course.inCart);
 
-        course.purchased = req.user.id != null ? await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user.id) }] }) : false;
+        course.purchased = req.user.id != null ? await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user.id) }, { paymentStatus: PaymentStatus.Paid }] }) : false;
         let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
         course.teacher['cRating'] = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
         course.related = await this.CourseModel.find({
@@ -222,16 +223,16 @@ export class CourseService {
     }
 
     async getStudentCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
-        let purchased  = [];
-        if (req.user.userType === UserType.parent){
+        let purchased = [];
+        if (req.user.userType === UserType.parent) {
 
             let parent = await this.userService.findOne(req.user.id);
-            for await (const student of parent.students ) {
-                purchased.push(  await this.checkoutService.CheckoutModel.find({ user: student }).sort({ 'valueDate': 'desc' }).exec());
+            for await (const student of parent.students) {
+                purchased.push(await this.checkoutService.CheckoutModel.find({ user: student, paymentStatus: PaymentStatus.Paid }).sort({ 'valueDate': 'desc' }).exec());
 
             }
         }
-         purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
+        purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id),paymentStatus: PaymentStatus.Paid }).sort({ 'valueDate': 'desc' }).exec();
 
         purchased.forEach(checkout => {
             checkout.course.progress = this.calculateProgress(checkout.course);
@@ -242,7 +243,7 @@ export class CourseService {
 
 
     async applyExcercice(req: any, courseId: string, lessonId: string, body: string[]): Promise<Excercice[] | PromiseLike<Excercice[]>> {
-        let checkout = await this.checkoutService.CheckoutModel.findOne({ course: new ObjectId(courseId), user: new ObjectId(req.user.id) })
+        let checkout = await this.checkoutService.CheckoutModel.findOne({ course: new ObjectId(courseId), user: new ObjectId(req.user.id), paymentStatus: PaymentStatus.Paid })
         if (!checkout)
             throw new BadRequestException('you dont purchased this course')
         let course = checkout.course;

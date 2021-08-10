@@ -19,6 +19,7 @@ import { CourseService } from '../course/course.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 import * as moment from 'moment'
 import { NoticeService } from '../notice/notice.service';
+import { PaymentStatus } from '../../enums/payment-method.enum';
 
 @Injectable()
 export class UserService {
@@ -134,7 +135,7 @@ export class UserService {
         }
         return await this.update(id, teacher)
     }
- 
+
 
     async remove(id: string): Promise<User> {
         return await this.UserModel.findByIdAndRemove(id);
@@ -174,7 +175,7 @@ export class UserService {
         profile.avatar = user['avatar'] ?? '';
         profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
 
-        profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
+        profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments({ paymentStatus: PaymentStatus.Paid }).populate({
             "path": "course",
             'model': Course.name
         }).populate({
