@@ -145,9 +145,7 @@ export class CheckoutService {
 
 
     async authorize(paymentMethod: string, id: string, path: string) {
-        let checkouts = await this.CheckoutModel.find({ paymentId: id });
-        console.log('checkouts',checkouts);;
-        
+        let checkouts = await this.CheckoutModel.find({ paymentId: id });        
         let paymentResult;
         path += `?entityId=${paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada}`
 
@@ -170,13 +168,12 @@ export class CheckoutService {
         })
 
         for await (const checkout of checkouts) {
-            if (checkout.paymentResult == null && checkout.paymentResult == PaymentStatus.Wait) {
                 checkout.paymentResult = paymentResult;
                 checkout.paymentStatus = paymentResult.result?.code === "000.100.110" ? PaymentStatus.Paid : PaymentStatus.Fail;
                 console.log('checkout',checkout.paymentStatus);
                 
                 await this.CheckoutModel.findByIdAndUpdate(checkout['_id'], checkout)
-            }
+            
             try {
                 let course = checkout['course']
                 course.enrolled = await this.CheckoutModel.count({ paymentStatus: PaymentStatus.Paid, course: course });
