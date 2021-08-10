@@ -242,7 +242,7 @@ export class CourseService {
 
             }
         }
-        purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id) }).sort({ 'valueDate': 'desc' }).exec();
+        purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id), paymentStatus: PaymentStatus.Paid }).sort({ 'valueDate': 'desc' }).exec();
 
         purchased.forEach(checkout => {
             checkout.course.progress = this.calculateProgress(checkout.course);
