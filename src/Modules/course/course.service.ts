@@ -160,7 +160,7 @@ export class CourseService {
        
 
 
-        course.related = related;
+        course.related = [];
         let students = []
 
 
