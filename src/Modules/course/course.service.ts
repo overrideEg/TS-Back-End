@@ -145,6 +145,13 @@ export class CourseService {
                 { stage: course.stage['_id'] ?? '' }],
             _id: { $ne: course['_id'] }
         });
+
+        course.related.forEach(course => {
+            delete course.content;
+            course.reviews.forEach(rev => {
+                delete rev.user;
+            })
+        })
         let students = []
 
         for await (const res of reservations) {
@@ -159,10 +166,10 @@ export class CourseService {
             rev.user = await this.userService.findOne(rev.user['_id'])
         }
         course.students = students
+        course.related = course.related.slice(0, 3);
         course.enrolled = reservations.length;
         course.progress = this.calculateProgress(course);
 
-        course.related = course.related.slice(0, 6);
         return course;
     }
 
@@ -232,7 +239,7 @@ export class CourseService {
 
             }
         }
-        purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id),paymentStatus: PaymentStatus.Paid }).sort({ 'valueDate': 'desc' }).exec();
+        purchased = await this.checkoutService.CheckoutModel.find({ user: new ObjectId(req.user.id), paymentStatus: PaymentStatus.Paid }).sort({ 'valueDate': 'desc' }).exec();
 
         purchased.forEach(checkout => {
             checkout.course.progress = this.calculateProgress(checkout.course);
