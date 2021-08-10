@@ -151,7 +151,10 @@ export class CourseService {
             _id: { $ne: course['_id'] }
         }).exec();
 
-        related.forEach((rel: any) => { rel = rel.toObject() })
+        related.forEach((rel: any) => {
+            rel = rel.toObject()
+            delete rel.content; delete rel.teacher.wallet;
+        })
 
 
         course.related = related;
