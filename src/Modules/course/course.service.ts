@@ -182,6 +182,7 @@ export class CourseService {
         course.teacher.wallet = [];
         course.teacher.bankAccounts = [];
         course.content.forEach((con) => con.lessons.forEach(les =>  les.exersices = []))
+        course.reviews.forEach((rev) => {rev.user.studentReviews = [];rev.user.fcmTokens = []})
 
         return course;
     }
