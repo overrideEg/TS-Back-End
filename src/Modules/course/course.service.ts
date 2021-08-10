@@ -156,7 +156,7 @@ export class CourseService {
             rel.Days = [];
             rel.students = [];
         }
-       
+
 
 
         course.related = [];
@@ -179,8 +179,9 @@ export class CourseService {
         course.related = course.related.slice(0, 3);
         course.enrolled = reservations.length;
         course.progress = this.calculateProgress(course);
-         course.teacher.wallet = [];
-         course.teacher.bankAccounts = [];
+        course.teacher.wallet = [];
+        course.teacher.bankAccounts = [];
+        course.content.forEach((con) => con.lessons.forEach(les =>  les.exersices = []))
 
         return course;
     }
