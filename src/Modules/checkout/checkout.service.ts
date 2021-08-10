@@ -138,9 +138,8 @@ export class CheckoutService {
         }
 
 
-        const fullUrl = 'http://' + req.hostname + '/v1';
 
-        return { id: paymentResult.id, resultUrl: fullUrl + `/Checkout/authorize/${body.paymentMethod}/${paymentResult.id}` }
+        return { id: paymentResult.id, paymentMethod: body.paymentMethod }
     }
 
 
@@ -178,16 +177,16 @@ export class CheckoutService {
         })
 
         for await (const checkout of checkouts) {
-            if (checkout.paymentResult == null && checkout.paymentResult == PaymentStatus.Wait){
+            if (checkout.paymentResult == null && checkout.paymentResult == PaymentStatus.Wait) {
 
                 checkout.paymentResult = paymentResult;
                 checkout.paymentStatus = paymentResult.result?.code === "000.100.110" ? PaymentStatus.Paid : PaymentStatus.Fail;
-        
+
                 await this.CheckoutModel.findByIdAndUpdate(checkout['_id'], checkout)
             }
             try {
                 let course = checkout['course']
-                course.enrolled = await this.CheckoutModel.count({ paymentStatus: PaymentStatus.Paid,course:course });
+                course.enrolled = await this.CheckoutModel.count({ paymentStatus: PaymentStatus.Paid, course: course });
                 await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
                 this.noticeService.sendSpecificNotification(
                     {
