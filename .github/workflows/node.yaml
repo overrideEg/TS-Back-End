@@ -29,10 +29,10 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           SRC_FOLDER: dist
           DEST_OWNER: overrideEg
-          DEST_REPO: magic-ball-back-end
+          DEST_REPO:  TS-Back-End
           DEST_BRANCH: main
           DEST_FOLDER: dist
-          DEST_PREDEPLOY_CLEANUP: "rm -rf magic-ball-back-end/dist "
+          DEST_PREDEPLOY_CLEANUP: "rm -rf TS-Back-End/dist"
       - name: Deploy to Hawzen server
         uses: easingthemes/ssh-deploy@main
         env:
@@ -41,7 +41,7 @@ jobs:
           SOURCE: "/dist/"
           REMOTE_HOST:  ${{ secrets.HOST }}
           REMOTE_USER: ${{ secrets.USERNAME }}
-          TARGET: /usr/projects/magic-ball-cd
+          TARGET: /usr/projects/ts-academy-cd
           EXCLUDE: "/dist/, /node_modules/"
       - name: deploy to live
         uses: appleboy/ssh-action@master
@@ -50,7 +50,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          script: cd /usr/projects/magic-ball-cd && npm install && pm2 delete magic-ball && pm2 start -i max main.js --name magic-ball
+          script: cd /usr/projects/ts-academy-cd && npm install && pm2 delete ts-academy && pm2 start -i max main.js --name ts-academy
 
 
           # ssh-keygen -m PEM -t rsa -b 4096
