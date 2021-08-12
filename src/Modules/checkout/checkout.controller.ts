@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Render, Req, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Render, Req, UseGuards, Request,Redirect } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
 import { Checkout } from '../../Models/checkout.model';
@@ -28,9 +28,10 @@ export class CheckoutController {
     return { id: id, resultUrl: fullUrl + `/Checkout/authorize/${paymentMethod}/${id}` };
   }
 
+  @Redirect('https://tsacademy.info/homePage', 301)
   @Get('authorize/:paymentMethod/:paymentId')
   authorize(@Param('paymentMethod') paymentMethod: string, @Param('paymentId') id: string, @Query('resourcePath') resourcePath: string) {
-    return this.service.authorize(paymentMethod, id, resourcePath)
+     this.service.authorize(paymentMethod, id, resourcePath)
   }
 
 }
