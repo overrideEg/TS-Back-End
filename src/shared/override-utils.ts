@@ -167,27 +167,7 @@ export class OverrideUtils {
     }
 
 
-    /**
-      * Build URL With Query PArams
-      *
-      * @param req express request to get server url 
-      * @param attributes object contain map<key,value> to put it on url
-      * @returns {string} url
-      */
-    public static buildUrl({ req, attributes }: { req: any, attributes: GenericObject }) {
-        let url =  'https://server.edu-promise.com' + req.originalUrl;
-        // let url = req.protocol + '://' + req.hostname + ':3050' + req.originalUrl;
-
-        for (const key in attributes) {
-            if (Object.prototype.hasOwnProperty.call(attributes, key)) {
-                const element = attributes[key];
-
-                url = urlGenerator(url, key, element)
-
-            }
-        }
-        return url
-    }
+ 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //:::                                                                         :::
 //:::  This routine calculates the distance between two points (given the     :::
