@@ -100,6 +100,18 @@ export class CheckoutService {
         user.cart = [];
         await this.userService.update(req.user.id, user)
 
+        if (checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0) == 0) {
+            let ids = OverrideUtils.generateGUID();
+            for await (const checkout of checkouts) {
+                // checkout.paymentResult = paymentResult;
+                // checkout.paymentId = paymentResult.id;
+                await this.CheckoutModel.findByIdAndUpdate(checkout['_id'].toString(), {
+                    paymentId: ids
+                });
+            }
+
+            return { id: ids, paymentMethod: body.paymentMethod }
+        }
         let paymentResult: any;
         await this.httpService.post('/v1/checkouts', null, {
 
@@ -145,10 +157,13 @@ export class CheckoutService {
 
 
     async authorize(paymentMethod: string, id: string, path: string) {
-        let checkouts = await this.CheckoutModel.find({ paymentId: id });        
+
+        let checkouts = await this.CheckoutModel.find({ paymentId: id });
         let paymentResult;
         path += `?entityId=${paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada}`
 
+        if (checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0)> 0) {
+        
         await this.httpService.get(path, {
             baseURL: Payment.baseURL,
             method: 'GET',
@@ -167,52 +182,53 @@ export class CheckoutService {
             // throw new BadRequestException(err.response.data.result.description)
         })
 
-        for await (const checkout of checkouts) {
-                checkout.paymentResult = paymentResult;
-                checkout.paymentStatus = paymentResult.result?.code === "000.100.110" ? PaymentStatus.Paid : PaymentStatus.Fail;
-                console.log('checkout',checkout.paymentStatus);
-                
-                await this.CheckoutModel.findByIdAndUpdate(checkout['_id'], checkout)
-            
-            try {
-                let course = checkout['course']
-                course.enrolled = await this.CheckoutModel.count({ paymentStatus: PaymentStatus.Paid, course: course });
-                await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
-                this.noticeService.sendSpecificNotification(
-                    {
-                        userId: checkout.user['_id'].toString(),
-                        notification: {
-                            title: checkout.user.defaultLang === Lang.en ? `Successfull Subscription` : `تم الاشتراك بنجاح`,
-                            body: checkout.user.defaultLang === Lang.en ? `your subscription is successfull to coursse ${course.name} with teacher ${course.teacher?.name} with amount ${checkout.priceAfterDiscount}` :
-                                `تم الاشتراك بنجاح في دورة ${course.name} مع المدرس ${course.teacher?.name} بمبلغ ${checkout.priceAfterDiscount}`
-                        },
-                        data: {
-                            entityType: 'Course',
-                            entityId: course['_id'].toString()
-                        }
-                    }
-                )
-                this.noticeService.sendSpecificNotification(
-                    {
-                        userId: course.teacher['_id'].toString(),
-                        notification: {
-                            title: course.teacher.defaultLang === Lang.en ? `new Subscription` : `لديــك اشتــراك جديــد`,
-                            body: course.teacher.defaultLang === Lang.en ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}` :
-                                `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`
-                        },
-                        data: {
-                            entityType: 'Course',
-                            entityId: course['_id'].toString()
-                        }
-                    }
-                )
-                this.userService.createWalletForCheckout(checkout);
+        
+    }
+    for await (const checkout of checkouts) {
+        checkout.paymentResult = paymentResult;
+        checkout.paymentStatus =checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0) == 0 ?PaymentStatus.Paid  : paymentResult.result?.code === "000.100.110" ? PaymentStatus.Paid : PaymentStatus.Fail;
+        console.log('checkout', checkout.paymentStatus);
 
-            } catch (e) {
+        await this.CheckoutModel.findByIdAndUpdate(checkout['_id'], checkout)
 
-            }
+        try {
+            let course = checkout['course']
+            course.enrolled = await this.CheckoutModel.count({ paymentStatus: PaymentStatus.Paid, course: course });
+            await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
+            this.noticeService.sendSpecificNotification(
+                {
+                    userId: checkout.user['_id'].toString(),
+                    notification: {
+                        title: checkout.user.defaultLang === Lang.en ? `Successfull Subscription` : `تم الاشتراك بنجاح`,
+                        body: checkout.user.defaultLang === Lang.en ? `your subscription is successfull to coursse ${course.name} with teacher ${course.teacher?.name} with amount ${checkout.priceAfterDiscount}` :
+                            `تم الاشتراك بنجاح في دورة ${course.name} مع المدرس ${course.teacher?.name} بمبلغ ${checkout.priceAfterDiscount}`
+                    },
+                    data: {
+                        entityType: 'Course',
+                        entityId: course['_id'].toString()
+                    }
+                }
+            )
+            this.noticeService.sendSpecificNotification(
+                {
+                    userId: course.teacher['_id'].toString(),
+                    notification: {
+                        title: course.teacher.defaultLang === Lang.en ? `new Subscription` : `لديــك اشتــراك جديــد`,
+                        body: course.teacher.defaultLang === Lang.en ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}` :
+                            `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`
+                    },
+                    data: {
+                        entityType: 'Course',
+                        entityId: course['_id'].toString()
+                    }
+                }
+            )
+            this.userService.createWalletForCheckout(checkout);
+
+        } catch (e) {
+
         }
-
+    }
 
         return paymentResult.result
     }
