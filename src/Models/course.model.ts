@@ -205,11 +205,5 @@ export class Course extends OBaseEntity {
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);
 CourseSchema.index({
-    'name.ar': 'text',
-    'name.en': 'text',
-    'info.en': 'text',
-    'description.en': 'text',
-    'description.ar': 'text',
-    'content.chapter': 'text',
-    'content.chapter.lessons.name': 'text',
+    '$**': 'text',
 });

@@ -23,9 +23,9 @@ export class SearchService {
         let globalSearch = new GlobalSearch()
         let courses = await this.courseService.CourseModel.find(
             {
-                $and: [
-                    { $text: { $search: search } },
-                    {
+                // $and: [
+                //     // { $text: { $search: search } },
+                //     {
                         $or: [
 
                             { "name.en": { $regex: '^' + search, $options: 'i' } },
@@ -37,8 +37,8 @@ export class SearchService {
                             { 'content.chapter': { $regex: '^' + search, $options: 'i' } },
                             { 'content.chapter.lessons.name': { $regex: '^' + search, $options: 'i' } }
                         ]
-                    }
-                ]
+                //     }
+                // ]
 
             }
         ).sort({
