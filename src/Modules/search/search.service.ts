@@ -24,16 +24,16 @@ export class SearchService {
         let courses = await this.courseService.CourseModel.find(
             {
                 $or: [
-                    { $text: { $search: "super" } },
+                    { $text: { $search:search} },
                    
-                    { "name.en": { $regex: '^' + search, $options: 'i' } },
-                    { "name.ar": { $regex: '^' + search, $options: 'i' } },
-                    { "info.en": { $regex: '^' + search, $options: 'i' } },
-                    { "info.ar": { $regex: '^' + search, $options: 'i' } },
-                    { "description.en": { $regex: '^' + search, $options: 'i' } },
-                    { "description.ar": { $regex: '^' + search, $options: 'i' } },
-                    { 'content.chapter': { $regex: '^' + search, $options: 'i' } },
-                    { 'content.chapter.lessons.name': { $regex: '^' + search, $options: 'i' } }
+                    { "name.en": { $regex: '^' + search, $options: 'i' }  },
+                    { "name.ar": { $regex: '^' + search, $options: 'i' }  },
+                    { "info.en": { $regex: '^' + search, $options: 'i' }  },
+                    { "info.ar": { $regex: '^' + search, $options: 'i' }  },
+                    { "description.en": { $regex: '^' + search, $options: 'i' }  },
+                    { "description.ar": { $regex: '^' + search, $options: 'i' }  },
+                    { 'content.chapter': { $regex: '^' + search, $options: 'i' }  },
+                    { 'content.chapter.lessons.name': { $regex: '^' + search, $options: 'i' }  }
                 ]
 
             }
@@ -53,8 +53,8 @@ export class SearchService {
         let userTeachers = await this.userService.UserModel.find(
             {
                 $or: [
-                    { $text: { $search: "super" } },
-                    { "name": { $regex: '^' + search, $options: 'i' }, }
+                    { $text: { $search: search } },
+                    { "name": { $regex: '^' + search, $options: 'i' } , }
                 ],
 
                 userType: UserType.teacher
