@@ -23,13 +23,13 @@ export class SearchService {
         let globalSearch = new GlobalSearch()
         let courses = await this.courseService.CourseModel.find(
             {
-                // $and: [
-                //     // { $text: { $search: search } },
-                //     {
+                $and: [
+                    { $text: { $search: search ,$language:'arabic',$caseSensitive:false,$diacriticSensitive:false} },
+                    {
                         $or: [
 
-                            { "name.en": /${search}/ },
-                            { "name.ar": /${search}/ },
+                            // { "name.en": / },
+                            // { "name.ar": /${search}/ },
                             // { "name.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
                             // { "info.en": { $regex: /.*${search}.*/i, $options: 'i' } },
                             // { "info.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
@@ -38,8 +38,8 @@ export class SearchService {
                             // { 'content.chapter': { $regex: /.*${search}.*/i, $options: 'i' } },
                             // { 'content.chapter.lessons.name': { $regex: /.*${search}.*/i, $options: 'i' } }
                         ]
-                //     }
-                // ]
+                    }
+                ]
 
             }
         ).sort({
