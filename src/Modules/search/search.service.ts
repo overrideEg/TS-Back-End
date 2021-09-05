@@ -28,14 +28,15 @@ export class SearchService {
                 //     {
                         $or: [
 
-                            { "name.en": { $regex: /.*${search}.*/i , $options: 'i' } },
-                            { "name.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            { "info.en": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            { "info.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            { "description.en": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            { "description.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            { 'content.chapter': { $regex: /.*${search}.*/i, $options: 'i' } },
-                            { 'content.chapter.lessons.name': { $regex: /.*${search}.*/i, $options: 'i' } }
+                            { "name.en": /${search}/ },
+                            { "name.ar": /${search}/ },
+                            // { "name.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
+                            // { "info.en": { $regex: /.*${search}.*/i, $options: 'i' } },
+                            // { "info.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
+                            // { "description.en": { $regex: /.*${search}.*/i, $options: 'i' } },
+                            // { "description.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
+                            // { 'content.chapter': { $regex: /.*${search}.*/i, $options: 'i' } },
+                            // { 'content.chapter.lessons.name': { $regex: /.*${search}.*/i, $options: 'i' } }
                         ]
                 //     }
                 // ]
