@@ -24,7 +24,7 @@ export class SearchService {
         let courses = await this.courseService.CourseModel.find(
             {
                 $and: [
-                    { $text: { $search: search ,$language:'arabic',$caseSensitive:false,$diacriticSensitive:false} },
+                    { $text: { $search: search ,$caseSensitive:false,$diacriticSensitive:false} },
                     {
                         $or: [
 
