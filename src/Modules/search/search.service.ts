@@ -57,7 +57,6 @@ export class SearchService {
         let userTeachers = await this.userService.UserModel.find(
             {
                 $and: [
-                    { $text: { $search: search } },
                     {
                         $or: [
                             { "name": { $regex: '^' + search, $options: 'i' }, }
