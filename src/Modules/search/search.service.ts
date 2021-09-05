@@ -13,8 +13,8 @@ const ObjectId = require('mongoose').Types.ObjectId;
 export class SearchService {
 
     constructor(
-        private courseService : CourseService,
-        private checkoutService : CheckoutService,
+        private courseService: CourseService,
+        private checkoutService: CheckoutService,
         private userService: UserService
     ) { }
 
@@ -24,11 +24,15 @@ export class SearchService {
         let courses = await this.courseService.CourseModel.find(
             {
                 $or: [
-                    { "name": { $regex: '^' + search, $options: 'i' } },
-                    { "info": { $regex: '^' + search, $options: 'i' } },
-                    { "description": { $regex: '^' + search, $options: 'i' } },
-                    { 'content.chapter': { $regex: '^' + search, $options: 'i' } },
-                    { 'content.chapter.lessons.name': { $regex: '^' + search, $options: 'i' } }
+                    { $text: { $search: "super" } },
+                    { "name.en": { $regex: search, $options: 'i' } },
+                    { "name.ar": { $regex: search, $options: 'i' } },
+                    { "info.en": { $regex: search, $options: 'i' } },
+                    { "info.ar": { $regex: search, $options: 'i' } },
+                    { "description.en": { $regex: search, $options: 'i' } },
+                    { "description.ar": { $regex: search, $options: 'i' } },
+                    { 'content.chapter': { $regex: search, $options: 'i' } },
+                    { 'content.chapter.lessons.name': { $regex: search, $options: 'i' } }
                 ]
 
             }
@@ -47,8 +51,11 @@ export class SearchService {
         globalSearch.courses = courses;
         let userTeachers = await this.userService.UserModel.find(
             {
-
-                "name": { $regex: '^' + search, $options: 'i' },
+                $or: [
+                    { $text: { $search: "super" } },
+                    { "name": { $regex: search, $options: 'i' }, }
+                ],
+               
                 userType: UserType.teacher
 
 
@@ -89,13 +96,14 @@ export class SearchService {
         let globalFilter = new GlobalFilter();
 
         let featuresCourses = await this.courseService.CourseModel.find({
-            subject: new ObjectId(subjectId),
-
+            $and: [
+                subjectId ? { subject: new ObjectId(subjectId) } : {}
+            ]
         }).sort({ 'cRating': 'desc' }).exec();
 
 
         for await (const course of featuresCourses) {
-            course.inCart =  await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id) , cart: new ObjectId(course['_id'].toString())})
+            course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
         }
         globalFilter.topInstructors = []
 
@@ -124,19 +132,15 @@ export class SearchService {
         let allCourses = await this.courseService.CourseModel.find({
 
             $and: [
-                { subject: new ObjectId(subjectId) },
-                {
-                    $or: [
-                        gradeId ? { grade: new ObjectId(gradeId) } : {},
-                        stageId ? { grade: new ObjectId(stageId) } : {},
-                    ]
-                }
+                subjectId ? { subject: new ObjectId(subjectId) } : {},
+                gradeId ? { grade: new ObjectId(gradeId) } : {},
+                stageId ? { grade: new ObjectId(stageId) } : {},
             ]
-        }).sort({ 'cRating': rate === Sort.HTL ? 'desc' : 'asc' }) .limit(limit)
-        .skip(limit * page).exec();
+        }).sort({ 'cRating': rate === Sort.HTL ? 'desc' : 'asc' }).limit(limit)
+            .skip(limit * page).exec();
 
         for await (const course of allCourses) {
-            course.inCart =  await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id) , cart: new ObjectId(course['_id'].toString())})
+            course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
 
         }
         if (cityId) {

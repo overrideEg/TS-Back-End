@@ -10,6 +10,7 @@ import { Subject } from './subject.model';
 import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from './user.model';
+import { Localized } from '../shared/localized';
 
 export const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
@@ -131,25 +132,20 @@ export class Course extends OBaseEntity {
     @IsString()
     cover?: string
 
+    @ApiProperty({ type: () => Localized })
+    @Prop({ type: () => Localized })
+    name?: Localized;
     @ApiProperty()
     @Prop()
-    @IsString()
-    name?: string;
-    @ApiProperty()
-    @Prop()
-    @IsNumber()
     price?: number;
-    @ApiProperty()
-    @Prop()
-    @IsString()
+    @ApiProperty({ type: () => Localized })
+    @Prop({ type: () => Localized })
     info?: string;
     @ApiProperty()
     @Prop()
-    @IsNumber()
     startDate?: number;
-    @ApiProperty()
-    @Prop()
-    @IsString()
+    @ApiProperty({ type: () => Localized })
+    @Prop({ type: () => Localized })
     description?: string
     @ApiProperty({ type: () => Stage })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name, autopopulate: true })
@@ -208,3 +204,6 @@ export class Course extends OBaseEntity {
     students: any[]
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);
+CourseSchema.index({
+    '$**': 'text',
+});
