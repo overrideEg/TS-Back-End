@@ -104,6 +104,8 @@ export class SearchService {
     async filter(req: any, subjectId: string, gradeId: string, stageId: string, cityId: string, rate: Sort, page: number, limit: number): Promise<GlobalFilter | PromiseLike<GlobalFilter>> {
         let globalFilter = new GlobalFilter();
 
+        console.log(subjectId,gradeId,stageId);
+        
         let featuresCourses = await this.courseService.CourseModel.find({
             $and: [
                 subjectId ? { subject: new ObjectId(subjectId) } : {},
