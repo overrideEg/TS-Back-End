@@ -28,10 +28,10 @@ export class SearchController {
   @ApiQuery({ name: 'gradeId', description: 'gradeId', required: false })
   @ApiQuery({ name: 'stageId', description: 'stageId', required: false })
   @ApiQuery({ name: 'cityId', description: 'cityId', required: false })
-  @ApiParam({ name: 'subjectId', description: 'subjectId', required: true })
+  @ApiQuery({ name: 'subjectId', description: 'subjectId', required: true })
   async filter(
     @Req() req,
-    @Param('subjectId') subjectId: string,
+    @Query('subjectId') subjectId: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('gradeId') gradeId: string,
