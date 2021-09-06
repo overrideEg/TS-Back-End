@@ -21,7 +21,7 @@ export class SearchController {
   }
   
   @UseGuards(JwtAuthGuard)
-  @Get(':subjectId')
+  @Get('filter')
   @ApiQuery({ name: 'rate', description: 'rate sorting', enum: [Sort.HTL, Sort.LTH] })
   @ApiQuery({ name: 'page', description: 'page', required: true })
   @ApiQuery({ name: 'limit', description: 'number of pages', required: false })
