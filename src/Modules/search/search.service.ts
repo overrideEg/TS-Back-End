@@ -60,7 +60,7 @@ export class SearchService {
                 $and: [
                     {
                         $or: [
-                            { "name": new RegExp(search, "i") }
+                            { "name": new RegExp(search, "i") },
                             { "email": new RegExp(search, "i") }
                         ],
                     },
