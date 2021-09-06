@@ -89,8 +89,8 @@ export class Lesson {
 
     @ApiProperty({ type: () => Attachement })
     @Prop({ required: false })
-    @ValidateNested()
-    @Type(() => Attachement)
+    // @ValidateNested()
+    // @Type(() => Attachement)
     attachement: Attachement;
 
 
