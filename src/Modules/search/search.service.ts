@@ -24,19 +24,17 @@ export class SearchService {
         let courses = await this.courseService.CourseModel.find(
             {
                 $and: [
-                    { $text: { $search: search ,$caseSensitive:false,$diacriticSensitive:false} },
+                    { $text: { $search: search, $caseSensitive: false, $diacriticSensitive: false } },
                     {
                         $or: [
 
                             // { "name.en": / },
                             // { "name.ar": /${search}/ },
-                            // { "name.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            // { "info.en": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            // { "info.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            // { "description.en": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            // { "description.ar": { $regex: /.*${search}.*/i, $options: 'i' } },
-                            // { 'content.chapter': { $regex: /.*${search}.*/i, $options: 'i' } },
-                            // { 'content.chapter.lessons.name': { $regex: /.*${search}.*/i, $options: 'i' } }
+                            { "name.ar": new RegExp(search, "i") },
+                            { "info.ar": new RegExp(search, "i") },
+                            { "description.ar": new RegExp(search, "i") },
+                            { 'content.chapter': new RegExp(search, "i") },
+                            { 'content.chapter.lessons.name': new RegExp(search, "i") }
                         ]
                     }
                 ]
