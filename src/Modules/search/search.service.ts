@@ -137,7 +137,9 @@ export class SearchService {
             profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
             profile.bio = course.teacher?.bio ?? course.teacher.name;
             profile.userId = course.teacher['_id']
+            if (!cityId)
             globalFilter.topInstructors.push(profile);
+           
         }
 
         globalFilter.featuresCourses = featuresCourses.slice(0, 10);
@@ -158,8 +160,10 @@ export class SearchService {
         }
         if (cityId) {
             allCourses = allCourses.filter(course => course?.teacher?.city['_id'] === cityId);
+            featuresCourses = featuresCourses.filter(course => course?.teacher?.city['_id'] === cityId);
         }
         globalFilter.allCourses = allCourses;
+        globalFilter.featuresCourses = featuresCourses;
         return globalFilter;
 
     }
