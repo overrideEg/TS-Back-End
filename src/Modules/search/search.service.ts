@@ -106,7 +106,9 @@ export class SearchService {
 
         let featuresCourses = await this.courseService.CourseModel.find({
             $and: [
-                subjectId ? { subject: new ObjectId(subjectId) } : {}
+                subjectId ? { subject: new ObjectId(subjectId) } : {},
+                gradeId ? { grade: new ObjectId(gradeId) } : {},
+                stageId ? { grade: new ObjectId(stageId) } : {},
             ]
         }).sort({ 'cRating': 'desc' }).exec();
 
