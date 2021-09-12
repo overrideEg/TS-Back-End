@@ -18,7 +18,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class LearningClassService {
-  
+
 
 
 
@@ -89,9 +89,13 @@ export class LearningClassService {
         var checkouts = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(body.courseId) }).exec()
         for await (const checkout of checkouts) {
 
-            this.noticeService.sendSpecificNotification({ userId: checkout.user['_id'].toString(),
-             notification: { title: checkout.user.defaultLang == Lang.en ? 'Live Lesson Stated':'بدأ البث المباشر للدرس',
-              body: checkout.user.defaultLang == Lang.en ? `${course.teacher.name} started live session on lesson ${lesson.name}, join now` : `${course.teacher.name} بدأ بث مباشر لدرس ${lesson.name}` },data:{entityType:'Course',entityId:course['_id'].toString()},imageURL : course.cover })
+            this.noticeService.sendSpecificNotification({
+                userId: checkout.user['_id'].toString(),
+                notification: {
+                    title: checkout.user.defaultLang == Lang.en ? 'Live Lesson Stated' : 'بدأ البث المباشر للدرس',
+                    body: checkout.user.defaultLang == Lang.en ? `${course.teacher.name} started live session on lesson ${lesson.name}, join now` : `${course.teacher.name} بدأ بث مباشر لدرس ${lesson.name}`
+                }, data: { entityType: 'Course', entityId: course['_id'].toString() }, imageURL: course.cover
+            })
 
         }
 
@@ -173,8 +177,8 @@ export class LearningClassService {
             throw new WsException(`this course not started yet`)
 
         }
-        if (existsClass.attenders>0)
-        existsClass.attenders -= 1;
+        if (existsClass.attenders > 0)
+            existsClass.attenders -= 1;
         const leaveMessage = new ChatMessage();
         leaveMessage.time = Date.now();
         leaveMessage.user = user;
@@ -186,8 +190,8 @@ export class LearningClassService {
             course: new ObjectId(body.courseId),
             lesson: lesson
         }).exec();;
-      }
-  
+    }
+
 
     async endLive(user: User, body: StartLiveDTO) {
         let course = await this.courseService.findById(body.courseId);
@@ -208,12 +212,14 @@ export class LearningClassService {
             course: new ObjectId(body.courseId),
             lesson: lesson
         }).exec();
-        
 
-        existsClass['endTime'] = Date.now();
+
+        if (existsClass) {
+            existsClass['endTime'] = Date.now();
+            await this.model.updateOne({ _id: existsClass['_id'] }, existsClass);
+        }
         lesson.isDone = true;
         await this.courseService.CourseModel.updateOne({ _id: body.courseId }, course);
-        await this.model.updateOne({ _id: existsClass['_id'] }, existsClass);
         return existsClass;
     }
 
