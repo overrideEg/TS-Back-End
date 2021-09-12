@@ -1,58 +1,58 @@
-name: Node.js CI
+# name: Node.js CI
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
 
-jobs:
-  build:
+# jobs:
+#   build:
 
-    runs-on: ubuntu-latest
+#     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
+#     strategy:
+#       matrix:
+#         node-version: [14.x]
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm run build --if-present
-      - name: Release build
-        uses: hpcodecraft/action-deploy-workspace-to-repo@v2.2
-        env:
-          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-          SRC_FOLDER: dist
-          DEST_OWNER: overrideEg
-          DEST_REPO:  TS-Back-End
-          DEST_BRANCH: main
-          DEST_FOLDER: dist
-          DEST_PREDEPLOY_CLEANUP: "rm -rf TS-Back-End/dist"
-      - name: Deploy to Hawzen server
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO"
-          SOURCE: "/dist/"
-          REMOTE_HOST:  ${{ secrets.HOST }}
-          REMOTE_USER: ${{ secrets.USERNAME }}
-          TARGET: /usr/projects/ts-academy-cd
-          EXCLUDE: "/dist/, /node_modules/"
-      - name: deploy to live
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          script: cd /usr/projects/ts-academy-cd && npm install && pm2 delete ts-academy && pm2 start -i max main.js --name ts-academy
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Use Node.js ${{ matrix.node-version }}
+#         uses: actions/setup-node@v1
+#         with:
+#           node-version: ${{ matrix.node-version }}
+#       - run: npm install
+#       - run: npm run build --if-present
+#       - name: Release build
+#         uses: hpcodecraft/action-deploy-workspace-to-repo@v2.2
+#         env:
+#           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+#           SRC_FOLDER: dist
+#           DEST_OWNER: overrideEg
+#           DEST_REPO:  TS-Back-End
+#           DEST_BRANCH: main
+#           DEST_FOLDER: dist
+#           DEST_PREDEPLOY_CLEANUP: "rm -rf TS-Back-End/dist"
+#       - name: Deploy to Hawzen server
+#         uses: easingthemes/ssh-deploy@main
+#         env:
+#           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+#           ARGS: "-rltgoDzvO"
+#           SOURCE: "/dist/"
+#           REMOTE_HOST:  ${{ secrets.HOST }}
+#           REMOTE_USER: ${{ secrets.USERNAME }}
+#           TARGET: /usr/projects/ts-academy-cd
+#           EXCLUDE: "/dist/, /node_modules/"
+#       - name: deploy to live
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.HOST }}
+#           username: ${{ secrets.USERNAME }}
+#           password: ${{ secrets.PASSWORD }}
+#           port: ${{ secrets.PORT }}
+#           script: cd /usr/projects/ts-academy-cd && npm install && pm2 delete ts-academy && pm2 start -i max main.js --name ts-academy
 
 
-          # ssh-keygen -m PEM -t rsa -b 4096
-          # cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+#           # ssh-keygen -m PEM -t rsa -b 4096
+#           # cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
