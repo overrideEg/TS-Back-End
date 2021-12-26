@@ -1,4 +1,4 @@
-import { BadRequestException, HttpService, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { Login } from './DTOs/login.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -12,6 +12,7 @@ import { refreshToken } from './DTOs/refreshToken.dto';
 import { Lang } from '../../shared/enums/lang.enum';
 import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
 import { jwtConstants, sms } from './security/constants';
+import { HttpService } from '@nestjs/axios';
 
 
 @Injectable()
@@ -90,7 +91,7 @@ export class AuthService {
         if (!user)
             throw new UnauthorizedException('check your credintials');
         user.tempCode = "00000";
-        await this.sendOTPSMS(user.phone,user.tempCode)
+        await this.sendOTPSMS(user.phone, user.tempCode)
         user.isActive = false;
         user = await this.userService.update(user['_id'], user);
 
@@ -119,7 +120,7 @@ export class AuthService {
         if (!user)
             throw new UnauthorizedException('check your credintials');
         user.tempCode = '54321';
-       await  this.sendOTPSMS(user.phone,user.tempCode)
+        await this.sendOTPSMS(user.phone, user.tempCode)
         user.isActive = false;
         user = await this.userService.update(user['_id'], user);
         return {
@@ -132,7 +133,7 @@ export class AuthService {
     async sendOTPSMS(number: string, tempCode: string) {
         const msg = `${tempCode} is your verification code for TS-Academy App`;
         const baseURL = `https://apps.gateway.sa/vendorsms/pushsms.aspx?user=${sms.user}&password=${sms.password}&msisdn=${number}&sid=${sms.sid}&fl=${sms.fl}&msg=${msg}`;
-       await this.httpService.get(baseURL).toPromise();
+        await this.httpService.get(baseURL).toPromise();
     }
     async activate(req: any, code: string) {
         let user = await this.userService.findOne(req.user._id);
@@ -171,7 +172,7 @@ export class AuthService {
             }
         }
 
-      
+
 
 
 
@@ -231,7 +232,7 @@ export class AuthService {
         user.coverletter = body.coverLetter;
         user.resume = body.resume;
         user.tempCode = '12345';
-        await this.sendOTPSMS(user.phone,user.tempCode);
+        await this.sendOTPSMS(user.phone, user.tempCode);
         let savedUser = await this.userService.save(user).catch(reason => {
             throw new BadRequestException('can not create user  ', reason)
         });
@@ -262,7 +263,7 @@ export class AuthService {
         user.phone = body.phone;
         user.students = [savedSudent];
         user.tempCode = '12345';
-        await this.sendOTPSMS(user.phone,user.tempCode);
+        await this.sendOTPSMS(user.phone, user.tempCode);
         let savedUser = await this.userService.save(user).catch(reason => {
             throw new BadRequestException('can not create user  ', reason);
         });
@@ -295,7 +296,7 @@ export class AuthService {
         user['grade']['_id'] = body.gradeId;
         user['stage']['_id'] = body.stageId;
         user.tempCode = '12345';
-        await this.sendOTPSMS(user.phone,user.tempCode);
+        await this.sendOTPSMS(user.phone, user.tempCode);
 
         let savedUser = await this.userService.save(user);
         //signed token

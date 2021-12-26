@@ -6,6 +6,7 @@ import { Course, CourseSchema } from '../../models/course/course.model';
 import { UserModule } from '../user/user.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 import * as mongoose from 'mongoose';
+import { CourseReview, CourseReviewSchema } from '../../models/course/sub-models/course-review.model';
 @Module({
   imports: [
     MongooseModule.forFeatureAsync([
@@ -13,6 +14,14 @@ import * as mongoose from 'mongoose';
         name: Course.name,
         useFactory: () => {
           const schema = CourseSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },      
+      {
+        name: CourseReview.name,
+        useFactory: () => {
+          const schema = CourseReviewSchema;
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },

@@ -1,4 +1,4 @@
-import { forwardRef, HttpModule, Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CheckoutService } from './checkout.service';
 import { CheckoutController } from './checkout.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,6 +8,8 @@ import { CourseModule } from '../course/course.module';
 import { UserModule } from '../user/user.module';
 import { PromotionModule } from '../promotion/promotion.module';
 import { NoticeModule } from '../notice/notice.module';
+import {HttpModule} from '@nestjs/axios';
+import { PricingModule } from '../pricing/pricing.module';
 
 @Module({
   imports: [
@@ -27,7 +29,8 @@ import { NoticeModule } from '../notice/notice.module';
     forwardRef(()=>PromotionModule),
     
     NoticeModule,
-    HttpModule
+    HttpModule,
+    PricingModule
     
   ],
   controllers: [CheckoutController],

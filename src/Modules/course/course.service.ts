@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { LessonType } from '../../enums/lesson-type.enum';
 import { PaymentStatus } from '../../enums/payment-method.enum';
+import { Status } from '../../enums/status.enum';
 import { Course, CourseDocument } from '../../models/course/course.model';
 import { CourseContent, CourseContentDocument } from '../../models/course/sub-models/course-content.model';
 import { CourseReview, CourseReviewDocument } from '../../models/course/sub-models/course-review.model';
@@ -25,7 +26,7 @@ export class CourseService {
     constructor(
         @InjectModel(Course.name) public CourseModel: Model<CourseDocument>,
         // @InjectModel(CourseContent.name) public CourseContentModel: Model<CourseContentDocument>,
-        // @InjectModel(CourseReview.name) public CourseReviewModel: Model<CourseReviewDocument>,
+        @InjectModel(CourseReview.name) public reviewModel: Model<CourseReviewDocument>,
         // @InjectModel(Excercice.name) public ExcerciceModel: Model<ExcerciceDocument>,
         // @InjectModel(Lesson.name) public LessonModel: Model<LessonDocument>,
         @Inject(forwardRef(() => UserService)) private userService: UserService,
@@ -38,9 +39,23 @@ export class CourseService {
             throw new BadRequestException('only teacher can add courses');
         }
         body.teacher = req.user;
-        // TODO: Send Notification To Adnmin And Teacher
+        // TODO: Send Notification To Admin And Teacher
         return this.CourseModel.create(body)
     }
+
+    async approveCourse(req: any, courseId: string): Promise<Course | PromiseLike<Course>> {
+        if (req.user.userType !== UserType.admin) {
+            throw new BadRequestException('only admin can approve  courses');
+        }
+        let course = await this.CourseModel.findByIdAndUpdate(courseId, { $set: { status: Status.approved } })
+        course.status = Status.approved;
+        // TODO: Send Notification To Admin And Teacher
+
+        return course;
+    }
+
+
+
     async update(req: any, id: string, body: Course): Promise<Course | PromiseLike<Course>> {
         if (req.user.userType !== UserType.teacher) {
             throw new BadRequestException('only teacher can update courses');
@@ -49,7 +64,7 @@ export class CourseService {
         if (teacher['_id'].toString() !== req.user._id) {
             throw new BadRequestException('only teacher can update his courses');
         }
-       
+
         await this.CourseModel.updateOne({ _id: id }, body).exec();
         return await this.findOne(req, id);
     }
@@ -77,91 +92,161 @@ export class CourseService {
 
 
     async reviewCourse(req: any, courseId: string, body: CourseReview): Promise<CourseReview[] | PromiseLike<CourseReview[]>> {
-        let course = await this.CourseModel.findById(courseId).exec()
         body.user = new ObjectId(req.user._id)
-        course.reviews === null ? course.reviews = [body] : course.reviews.push(body);
-        course['cRating'] = course['reviews'].length == 0 ? 5 : course['reviews'].reduce((acc, review) => acc + review.stars, 0) / course['reviews'].length;
-        await this.CourseModel.updateOne({ _id: course['_id'] }, course).exec();
-        return (await this.CourseModel.findById(courseId).exec()).reviews;
+        let review = await this.reviewModel.create(body);
+        let course = await this.CourseModel.findByIdAndUpdate(courseId, { $push: { reviews: review } }).exec();
+        course.reviews.push(review);
+        //TODO: Send Notification To Teacher
+        return course.reviews;
     }
 
 
 
     async findOne(req: any, id: string): Promise<Course | PromiseLike<Course>> {
-        let course = await this.CourseModel.findById(id).exec();
 
-        let reservations = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(id), paymentStatus: PaymentStatus.Paid });
+        let courses = await this.CourseModel.aggregate([
 
-        // course.inCart = req.user._id != null ? await this.userService.UserModel.exists({
-        //     $and: [
-        //         { _id: new ObjectId(req.user._id) },
-        //         { cart: new ObjectId(id) },
-        //     ]
-        // }) : false;
+            {
+                $match: {
+                    _id: new ObjectId(id)
+                }
+            },
+
+            {
+                $lookup:
+                {
+                    from: 'coursereviews',
+                    localField: 'reviews',
+                    foreignField: '_id',
+                    as: 'reviews'
+                }
+            },
+
+            {
+                $lookup:
+                {
+                    from: 'excercices',
+                    localField: 'excercices',
+                    foreignField: '_id',
+                    as: 'excercices'
+                }
+            },
+            {
+                $lookup:
+                {
+                    from: 'fs.files',
+                    localField: 'attachements',
+                    foreignField: '_id',
+                    as: 'attachements'
+                }
+            },
+
+            {
+                $lookup:
+                {
+                    from: 'grades',
+                    localField: 'grade',
+                    foreignField: '_id',
+                    as: 'grade'
+                }
+            },
+
+            { $unwind: '$grade' },
+            {
+                $lookup:
+                {
+                    from: 'stages',
+                    localField: 'grade.stage',
+                    foreignField: '_id',
+                    as: 'stage'
+                }
+            },
 
 
-        // course.purchased = req.user._id != null ? await this.checkoutService.CheckoutModel.exists({ $and: [{ course: new ObjectId(id) }, { user: new ObjectId(req.user._id) }, { paymentStatus: PaymentStatus.Paid }] }) : false;
-        let teacherCourses = await this.CourseModel.find({ teacher: course.teacher });
-        // course.teacher['cRating'] = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-        let related = await this.CourseModel.find({
-            $or: [
-                { subject: course.subject ? course.subject['_id'] : null },
-                { teacher: course.teacher['_id'] ?? '' },
-                { grade: course.grade['_id'] ?? '' },
-          ],
-            _id: { $ne: course['_id'] }
-        }).exec();
+            { $unwind: '$stage' },
+            { $unset: ['grade.stage'] },
 
-        for await (const rel of related) {
-            rel.teacher.wallet = []
-            rel.days = [];
+            {
+                $lookup:
+                {
+                    from: 'subjects',
+                    localField: 'subject',
+                    foreignField: '_id',
+                    as: 'subject'
+                }
+            },
+
+            { $unwind: '$subject' },
+            {
+                $lookup:
+                {
+                    from: 'users',
+                    localField: 'teacher',
+                    foreignField: '_id',
+                    as: 'teacher'
+                }
+            },
+
+            { $unwind: '$teacher' },
+
+            {
+                $lookup: {
+                    from: "courses",
+                    let: { relatedId: "$_id" },
+                    pipeline: [
+
+
+                        {
+
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $not: { $eq: ["$$relatedId", "$_id"] } },
+                                        { status: Status.approved },
+                                        {
+                                            $or: [
+                                                { subject: '$subject' },
+                                                { teacher: '$teacher' },
+                                                { grade: '$grade' },
+
+                                            ],
+                                        }
+                                    ]
+
+                                },
+                            },
+                        },
+                        {
+                            $unset: [
+                                'attachements', 'days', 'hour', 'excercices', 'reviews', 'startDate', 'grade', 'subject', 'teacher',
+                            ]
+                        }
+
+
+                    ],
+                    as: "related",
+                },
+
+            },
+            {
+                $unset: ['teacher.students', 'teacher.bankAccounts', 'teacher.wallet', 'teacher.studentReviews', 'teacher.studentId', 'teacher.cart', 'teacher.userType', 'teacher.tempCode', 'teacher.defaultLang', 'teacher.teacherApproved', 'teacher.isActive', 'teacher.password', 'teacher.city', 'teacher.additionalPhone', 'teacher.coverletter', 'teacher.resume', 'teacher.email', 'teacher.phone']
+            },
+
+        ]);
+        let course = courses.length > 0 ? courses[0] : null;
+        if (!course) {
+            throw new BadRequestException('Course Not Found')
         }
 
-
-
-        course['related'] = [];
-        let students = []
-
-
-
-        for await (const res of reservations) {
-            students.push({
-                name: res.user?.name,
-                _id: res.user['_id'],
-                stage: res.user?.stage,
-                grade: res.user?.grade,
-            })
-        }
-        for await (const rev of course.reviews) {
-            rev.user = await this.userService.findOne(rev.user['_id'])
-        }
-      
-        course.teacher.wallet = [];
-        course.teacher.bankAccounts = [];
-        course.reviews.forEach((rev) => {
-            if (rev.user != null) {
-                rev.user.studentReviews = []; 
-            }
-        })
-
+        course.enrolled = await this.checkoutService.CheckoutModel.count({ course: new ObjectId(id), paymentStatus: PaymentStatus.Paid });
+        let reviews = await this.getReviwsForTeacher(course.teacher)
+        course.teacher.noOfCourses = await this.CourseModel.count({ teacher: course.teacher });
+        course.teacher.reviewsCount = reviews.length;
+        course.teacher.rate = reviews.length > 0 ? reviews.reduce((acc, feedBack) => acc + feedBack.stars, 0) / course.teacher.noOfCourses : 5;
         return course;
     }
 
-    async findById(id: string): Promise<Course | PromiseLike<Course>> {
-        let course = await this.CourseModel.findById(id).exec();
-        delete course.teacher.wallet;
 
-        // course.related = await this.CourseModel.find({
-        //     $or: [
-        //         { subject: course.subject ? course.subject['_id'] : null },
-        //         { teacher: course.teacher['_id'] ?? null },
-        //         { grade: course.grade['_id'] ?? null },
-        //      ],
-        //     _id: { $ne: course['_id'] }
-        // });
-        // course.related = course.related.slice(0, 6);
-        return course;
-    }
 
     async getTeacherCourses(req: any): Promise<Course[] | PromiseLike<Course[]>> {
         if (req.user.userType !== UserType.teacher.toString()) {
@@ -222,8 +307,8 @@ export class CourseService {
             throw new BadRequestException('you dont purchased this course')
         let course = checkout.course;
         delete course.teacher.wallet;
-    
-        return  null;
+
+        return null;
         // if (lesson.type === LessonType.excercice) {
         //     for await (const link of body) {
         //         let excersise = new Excercice();
@@ -239,11 +324,61 @@ export class CourseService {
 
     async getExcercices(req: any, courseId: string, lessonId: string): Promise<Excercice[] | PromiseLike<Excercice[]>> {
         let course = await this.CourseModel.findById(courseId);
-    
-        return  []
+
+        return []
     }
 
 
+
+    async getReviwsForTeacher(teacher): Promise<CourseReview[] | PromiseLike<CourseReview[]>> {
+        return await this.CourseModel.aggregate([
+            {
+                $match: {
+                    $and: [
+                        { teacher: new ObjectId(teacher._id) },
+                        { status: Status.approved }
+                    ]
+                }
+            },
+            {
+                $lookup:
+                {
+                    from: 'coursereviews',
+                    localField: 'reviews',
+                    foreignField: '_id',
+                    as: 'reviews'
+                }
+            },
+
+            { $unwind: "$reviews" },
+
+            {
+                $replaceRoot: {
+                    newRoot: "$reviews"
+                }
+            },
+
+
+            {
+                $lookup:
+                {
+                    from: 'users',
+                    localField: 'user',
+                    foreignField: '_id',
+                    as: 'user'
+                }
+            },
+
+            {
+                $unset: [
+
+                    'user.students', 'user.bankAccounts', 'user.wallet', 'user.studentReviews', 'user.studentId', 'user.cart', 'user.userType', 'user.tempCode', 'user.defaultLang', 'user.teacherApproved', 'user.isActive', 'user.password', 'user.city', 'user.additionalPhone', 'user.coverletter', 'user.resume', 'user.email', 'user.phone'
+                ]
+            },
+
+
+        ])
+    }
     /**
      * calculateProgress
      */

@@ -9,14 +9,20 @@ export class CheckoutDTO {
     promoCode?: string;
 
     @ApiProperty()
-    purchasedFor : string
+    purchasedFor: string
 
     @ApiProperty({ type: () => Course, isArray: true, required: true })
     courses: Course[];
 
-    @ApiProperty({  enum: [PaymentMethod.VISA,PaymentMethod.MADA,PaymentMethod.MASTER], required: true })
+    @ApiProperty({ enum: [PaymentMethod.VISA, PaymentMethod.MADA, PaymentMethod.MASTER, PaymentMethod.APPLE, PaymentMethod.ANDROID], required: true })
     paymentMethod?: PaymentMethod;
 
+
+    @ApiProperty({ required: false })
+    paymentReffrence: string
+    
+    @ApiProperty({ required: false })
+    paidValue: number
 
 
 

@@ -15,6 +15,7 @@ export class CourseReview extends OBaseEntity {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
     user?: User;
 
+
     @ApiProperty({ description: 'comment', required: true })
     @Prop({ default: '' })
     comment?: string;

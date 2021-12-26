@@ -11,13 +11,13 @@ export class TeacherProfile {
     @ApiProperty()
     noOfStudents: number;
     @ApiProperty()
+    noOfReviews: number;
+    @ApiProperty()
     rate: number;
     @ApiProperty({ type: Course, isArray: true })
     courses: Course[]
     @ApiProperty()
     userId: number;
-    @ApiProperty()
-    teacherId: number;
     @ApiProperty()
     avatar: string;
 }

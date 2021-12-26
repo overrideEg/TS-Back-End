@@ -14,6 +14,8 @@ import { OverrideUtils } from '../../shared/override-utils';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { CourseService } from '../course/course.service';
 import { CheckoutService } from '../checkout/checkout.service';
+import { Status } from '../../enums/status.enum';
+const mongoose = require('mongoose');
 @Injectable()
 export class HomeService {
 
@@ -31,31 +33,211 @@ export class HomeService {
         home.banners = await this.bannerService.findAll();
 
         home.partners = await this.partnerService.findAll();
-        let featuresCourses = await this.courseService.CourseModel.find().sort({ 'cRating': 'desc' }).limit(20).exec();
+        let featuresCourses = await this.checkoutService.CheckoutModel.aggregate([
 
-        // for await (const course of featuresCourses) {
-        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
-        //     course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user._id)}] })
+            {
+                $lookup:
+                {
+                    from: 'courses',
+                    localField: 'course',
+                    foreignField: '_id',
+                    as: 'course'
+                }
+            },
 
-        // }
-        // home.featuresCourses = featuresCourses;
-        // let addedRecently = await this.courseService.CourseModel.find().sort({ 'createdAt': 'desc' }).limit(20).exec();
-        // for await (const course of addedRecently) {
-        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
-        //     course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user._id)}] })
+            { $unwind: '$course' },
+            { $sortByCount: "$course" },
 
-        // }
-        // home.addedRecently = addedRecently;
+            {
+                $replaceRoot: {
+                    newRoot: "$_id"
+                }
+            },
+            { $limit: 10 },
+            {
+                $lookup:
+                {
+                    from: 'grades',
+                    localField: 'grade',
+                    foreignField: '_id',
+                    as: 'grade'
+                }
+            },
+
+            { $unwind: '$grade' },
+            {
+                $lookup:
+                {
+                    from: 'stages',
+                    localField: 'grade.stage',
+                    foreignField: '_id',
+                    as: 'stage'
+                }
+            },
+
+            { $unwind: '$stage' },
+
+
+            {
+                $lookup:
+                {
+                    from: 'subjects',
+                    localField: 'subject',
+                    foreignField: '_id',
+                    as: 'subject'
+                }
+            },
+
+            { $unwind: '$subject' },
+            {
+                $lookup:
+                {
+                    from: 'users',
+                    localField: 'teacher',
+                    foreignField: '_id',
+                    as: 'teacher'
+                }
+            },
+
+            { $unwind: '$teacher' },
+          
+        
+        
+            {
+                $unset: ['attachements', 'days', 'reviews', 'grade.stage', 'teacher.students', 'teacher.bankAccounts', 'teacher.wallet', 'teacher.studentReviews', 'teacher.studentId', 'teacher.cart', 'teacher.userType', 'teacher.tempCode', 'teacher.defaultLang', 'teacher.teacherApproved', 'teacher.isActive', 'teacher.password', 'teacher.city', 'teacher.additionalPhone', 'teacher.coverletter', 'teacher.resume', 'teacher.email', 'teacher.phone']
+            },
+
+
+
+        ])
+
+
+
+        home.featuresCourses = featuresCourses;
+        let addedRecently = await this.courseService.CourseModel.aggregate([
+
+            {
+                $lookup:
+                {
+                    from: 'grades',
+                    localField: 'grade',
+                    foreignField: '_id',
+                    as: 'grade'
+                }
+            },
+
+            { $unwind: '$grade' },
+            {
+                $lookup:
+                {
+                    from: 'stages',
+                    localField: 'grade.stage',
+                    foreignField: '_id',
+                    as: 'stage'
+                }
+            },
+
+            { $unwind: '$stage' },
+
+
+            {
+                $lookup:
+                {
+                    from: 'subjects',
+                    localField: 'subject',
+                    foreignField: '_id',
+                    as: 'subject'
+                }
+            },
+
+            { $unwind: '$subject' },
+            {
+                $lookup:
+                {
+                    from: 'users',
+                    localField: 'teacher',
+                    foreignField: '_id',
+                    as: 'teacher'
+                }
+            },
+
+            { $unwind: '$teacher' },
+            {
+                $unset: ['attachements', 'days', 'reviews', 'grade.stage', 'teacher.students', 'teacher.bankAccounts', 'teacher.wallet', 'teacher.studentReviews', 'teacher.studentId', 'teacher.cart', 'teacher.userType', 'teacher.tempCode', 'teacher.defaultLang', 'teacher.teacherApproved', 'teacher.isActive', 'teacher.password', 'teacher.city', 'teacher.additionalPhone', 'teacher.coverletter', 'teacher.resume', 'teacher.email', 'teacher.phone']
+            },
+            { $sort: { 'createdAt': -1 } },
+            { $limit: 10 },
+
+        ])
+
+
+
+        home.addedRecently = addedRecently;
         let now = moment();
         let afterWeek = moment();
         afterWeek.add(1, 'week');
 
-        let startSoon = await this.courseService.CourseModel.find({ startDate: { $gte: now.unix() * 1000, $lte: afterWeek.unix() * 1000 } }).limit(20).exec();
-        // for await (const course of startSoon) {
-        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
-        //     course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user._id)}] })
+        let startSoon = await this.courseService.CourseModel.aggregate([
 
-        // }
+            {
+                $lookup:
+                {
+                    from: 'grades',
+                    localField: 'grade',
+                    foreignField: '_id',
+                    as: 'grade'
+                }
+            },
+
+            { $unwind: '$grade' },
+            {
+                $lookup:
+                {
+                    from: 'stages',
+                    localField: 'grade.stage',
+                    foreignField: '_id',
+                    as: 'stage'
+                }
+            },
+
+            { $unwind: '$stage' },
+
+
+            {
+                $lookup:
+                {
+                    from: 'subjects',
+                    localField: 'subject',
+                    foreignField: '_id',
+                    as: 'subject'
+                }
+            },
+
+            { $unwind: '$subject' },
+            {
+                $lookup:
+                {
+                    from: 'users',
+                    localField: 'teacher',
+                    foreignField: '_id',
+                    as: 'teacher'
+                }
+            },
+
+            { $unwind: '$teacher' },
+            {
+                $unset: ['attachements', 'days', 'reviews', 'grade.stage', 'teacher.students', 'teacher.bankAccounts', 'teacher.wallet', 'teacher.studentReviews', 'teacher.studentId', 'teacher.cart', 'teacher.userType', 'teacher.tempCode', 'teacher.defaultLang', 'teacher.teacherApproved', 'teacher.isActive', 'teacher.password', 'teacher.city', 'teacher.additionalPhone', 'teacher.coverletter', 'teacher.resume', 'teacher.email', 'teacher.phone']
+            },
+            {
+                $match: {
+                    startDate: { $gte: now.unix() * 1000, $lte: afterWeek.unix() * 1000 }
+                }
+            },
+            { $sort: { 'createdAt': -1 } },
+            { $limit: 10 },
+
+
+        ])
 
         home.startSoon = startSoon;
         home.subjects = await this.subjectService.findAll();
@@ -65,7 +247,6 @@ export class HomeService {
             let profile = new TeacherProfile();
             profile.name = course?.teacher?.name;
             profile.avatar = course.teacher.avatar ?? "";
-            let teacherCourses = await this.courseService.CourseModel.find({ teacher: course.teacher });
             profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments().populate({
                 "path": "course",
                 'model': Course.name
@@ -73,12 +254,14 @@ export class HomeService {
                 path: 'course.teacher._id',
                 "match": new ObjectId(course.teacher['_id'])
             });
-            // profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-            profile.noOfCourses = teacherCourses.length
+            profile.noOfCourses = await this.courseService.CourseModel.count({ teacher: course.teacher, status: Status.approved  })
+            let latestFeedback =  await this.courseService.getReviwsForTeacher(course.teacher) ;
+            profile.noOfReviews = latestFeedback.length
+            profile.rate = latestFeedback.length > 0 ? latestFeedback.reduce((acc, feedBack) => acc + feedBack.stars, 0) / profile.noOfCourses : 5;
+
             profile.bio = course.teacher?.bio ?? course?.teacher?.name;
             profile.userId = course.teacher['_id']
-            profile.teacherId = course.teacher['_id']
-            if (!home.topInstructors.find((instructor) => instructor.userId === course.teacher['_id']))
+            if (!home.topInstructors.find((instructor) => instructor.userId.toString() === course.teacher._id.toString()))
                 home.topInstructors.push(profile);
         }
 
@@ -90,10 +273,79 @@ export class HomeService {
         let home = new TeacherHome()
         let user = await this.userService.findOne(req.user._id);
 
-        let teacherCourses = await this.courseService.CourseModel.find({ teacher: user }).exec();
-        home.noOfCourses = teacherCourses.length
-        // home.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-        let feedbacks = [];
+
+        let teacherCourses = await this.courseService.CourseModel.aggregate([
+            {
+                $match: {
+                    $and: [
+                        { startDate: { $gte: moment().startOf('day').unix() * 1000, $lte: moment().endOf('day').unix() * 1000 } },
+                        { teacher: new ObjectId(req.user._id) }
+                    ]
+                }
+            },
+            {
+                $lookup:
+                {
+                    from: 'grades',
+                    localField: 'grade',
+                    foreignField: '_id',
+                    as: 'grade'
+                }
+            },
+
+            { $unwind: '$grade' },
+            {
+                $lookup:
+                {
+                    from: 'stages',
+                    localField: 'grade.stage',
+                    foreignField: '_id',
+                    as: 'stage'
+                }
+            },
+
+            { $unwind: '$stage' },
+
+            {
+                $lookup:
+                {
+                    from: 'coursereviews',
+                    localField: 'reviews',
+                    foreignField: '_id',
+                    as: 'reviews'
+                }
+            },
+
+            {
+                $lookup:
+                {
+                    from: 'users',
+                    localField: 'reviews.user',
+                    foreignField: '_id',
+                    as: 'reviews.user'
+                }
+            },
+
+
+            {
+                $unset: ['attachements', 'days', 'grade.stage', 'teacher', 'subject',
+
+                    'reviews.user'
+                ]
+            },
+
+            { $sort: { 'startDate': 1 } },
+
+
+        ]);
+     
+
+        home.noOfCourses = await this.courseService.CourseModel.count({ teacher: new ObjectId(req.user._id), status: Status.approved  })
+        home.latestFeedback = await this.courseService.getReviwsForTeacher(req.user)
+
+
+        // home.latestFeedback = await this.courseService.reviewModel.find({ 'teacher': new ObjectId(req.user._id) }).limit(5).sort({ 'createdAt': 1 });
+        home.rate = home.latestFeedback.length > 0 ? home.latestFeedback.reduce((acc, feedBack) => acc + feedBack.stars, 0) / home.noOfCourses : 5;
 
 
         let registers = await this.checkoutService.CheckoutModel.countDocuments().populate({
@@ -103,24 +355,12 @@ export class HomeService {
             path: 'lines.course.teacher',
             "match": new ObjectId(user['_id'].toString())
         });
-        // registers = registers.filter(data=>data.lines.find(line=>line.course.teacher['_id'].toString() === user.teacher['_id'].toString()));
         home.noOfStudents = registers;
 
-        for await (const course of teacherCourses) {
-            course.reviews.forEach(rev => {
-                feedbacks.push(rev)
-            });
-        }
-
-        home.latestFeedback = feedbacks.sort((a, b) => (a.time > b.time) ? -1 : ((b.time > a.time) ? 1 : 0));
-        home.latestFeedback = home.latestFeedback.slice(0, 5)
 
 
-        for await (const feedback of home.latestFeedback) {
-            feedback.user = await this.userService.findOne(String(feedback.user))
-        }
         let todayCourses = teacherCourses;
-    
+
         home.todayCourses = todayCourses;
         return home
     }

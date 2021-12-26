@@ -94,7 +94,7 @@ export class UserService {
     }
 
     async validate(payload: any) {
-        return await this.UserModel.findOne({ _id: payload.id });
+        return await this.UserModel.findById(payload._id );
     }
     ifUserExists(email: string, phone: string) {
         return this.UserModel.exists({ $or: [{ email: email }, { phone: phone }] })

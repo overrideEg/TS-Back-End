@@ -15,7 +15,7 @@ import { WsAdapter } from '@nestjs/platform-ws'
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), { logger: true });
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
   app.setGlobalPrefix('v1')
   // app.useWebSocketAdapter(new WsAdapter(app));
   app.useWebSocketAdapter(new IoAdapter(app));

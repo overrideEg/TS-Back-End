@@ -1,19 +1,11 @@
-import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
-import { WsException } from '@nestjs/websockets';
-import { parse } from 'cookie';
+import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
-import { Socket } from 'socket.io';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AttendanceLog, ChatMessage, LearningClass, LearningClassDocument } from '../../models/learning-class.model';
-import { sendLiveMessageDTO, StartLiveDTO } from '../../dtos/start-live.dto';
-import { User } from '../../models/user.model';
+import { LearningClass, LearningClassDocument } from '../../models/learning-class.model';
 import { CourseService } from '../course/course.service';
-import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
-import { Agora } from '../auth/security/constants';
 import { CheckoutService } from '../checkout/checkout.service';
 import { NoticeService } from '../notice/notice.service';
-import { Lang } from '../../shared/enums/lang.enum';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()

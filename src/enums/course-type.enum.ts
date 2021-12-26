@@ -1,4 +1,5 @@
 export enum CourseType {
-    seesion = 'seesion',
-    toutorial=  'toutorial' 
+    home = 'home',
+    session = 'session',
+    tutorial = 'tutorial'
 }

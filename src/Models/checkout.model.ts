@@ -32,7 +32,7 @@ export class Checkout extends OBaseEntity {
     price?: number;
 
     @ApiProperty({ description: 'PaymentMethod', required: true })
-    @Prop({ enum: [PaymentMethod.VISA, PaymentMethod.MADA, PaymentMethod.MASTER] })
+    @Prop({ enum: [PaymentMethod.VISA, PaymentMethod.MADA, PaymentMethod.MASTER, PaymentMethod.APPLE, PaymentMethod.ANDROID] })
     paymentMethod?: PaymentMethod;
 
     @ApiProperty({ enum: [PaymentStatus.Paid, PaymentStatus.Wait], required: true })

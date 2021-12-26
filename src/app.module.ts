@@ -27,6 +27,7 @@ import { HomeModule } from './modules/home/home.module';
 import { ContactUsModule } from './modules/contact-us/contact-us.module';
 import { NoticeModule } from './modules/notice/notice.module';
 import { SettingModule } from './modules/setting/setting.module';
+import { PricingModule } from './modules/pricing/pricing.module';
 const overrideMoules = [
   FileModule,
   AuthModule,
@@ -47,7 +48,8 @@ const overrideMoules = [
   HomeModule,
   LearningClassModule,
   ContactUsModule,
-  NoticeModule
+  NoticeModule,
+  PricingModule,
 ]
 @Module({
   imports: [
@@ -59,12 +61,14 @@ const overrideMoules = [
       dbName:'ts-academy',
       ssl: false,
       auth: {
-        user: process.env.db_user,
+        username: process.env.db_user,
         password: process.env.db_pwd
       },
 
       connectionFactory: (connection) => {
+      
         connection.on('connected', () => {
+    
           console.log('DB is connected');
         });
         connection.on('disconnected', () => {

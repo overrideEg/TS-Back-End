@@ -54,10 +54,10 @@ export class User extends OBaseEntity {
 
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate: true }])
     cart?: Course[];
+
     @ApiProperty({ type: () => City })
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: City.name, autopopulate: true })
     city?: City;
-
 
     //student
     @ApiProperty()
