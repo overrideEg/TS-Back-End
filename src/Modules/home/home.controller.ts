@@ -7,23 +7,17 @@ import { HomeService } from './home.service';
 @ApiTags('Home')
 @Controller('Home')
 export class HomeController {
-  constructor(private readonly homeService: HomeService) { }
-
+  constructor(private readonly homeService: HomeService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('student')
-  async studentHome(
-    @Req() req,
-  ): Promise<StudentHome> {
+  async studentHome(@Req() req): Promise<StudentHome> {
     return this.homeService.getStudentHome(req);
   }
 
-
   @UseGuards(JwtAuthGuard)
   @Get('teacher')
-  async teacherHome(
-    @Req() req,
-  ): Promise<TeacherHome> {
+  async teacherHome(@Req() req): Promise<TeacherHome> {
     return this.homeService.getTeacherHome(req);
   }
 }

@@ -6,14 +6,14 @@ import { ApiProperty } from '@nestjs/swagger';
 export type BankAccountDocument = BankAccount & Document;
 @Schema()
 export class BankAccount extends OBaseEntity {
-    @ApiProperty()
-    @Prop()
-    accountNumber: string;
-    @ApiProperty()
-    @Prop()
-    bankName: string;
-    @ApiProperty()
-    @Prop()
-    accountHolderName: string;
+  @ApiProperty()
+  @Prop()
+  accountNumber: string;
+  @ApiProperty()
+  @Prop()
+  bankName: string;
+  @ApiProperty()
+  @Prop()
+  accountHolderName: string;
 }
 export const BankAccountSchema = SchemaFactory.createForClass(BankAccount);

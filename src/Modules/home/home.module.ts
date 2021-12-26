@@ -12,16 +12,15 @@ import { CourseModule } from '../course/course.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 
 @Module({
-  imports:[
+  imports: [
     BannerModule,
     PartnerModule,
     UserModule,
     SubjectModule,
     CourseModule,
-    CheckoutModule
-   
+    CheckoutModule,
   ],
   controllers: [HomeController],
-  providers: [HomeService]
+  providers: [HomeService],
 })
 export class HomeModule {}

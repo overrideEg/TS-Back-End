@@ -6,12 +6,8 @@ import { User, UserSchema } from '../../models/user.model';
 import { UserModule } from '../user/user.module';
 
 @Module({
-    imports: [
-      UserModule
-    ],
-    controllers: [
-        CartController],
-    providers: [
-        CartService],
+  imports: [UserModule],
+  controllers: [CartController],
+  providers: [CartService],
 })
-export class CartModule { }
+export class CartModule {}

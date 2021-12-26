@@ -5,9 +5,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../../models/user.model';
 import { CourseModule } from '../course/course.module';
 import { CheckoutModule } from '../checkout/checkout.module';
-import { BankAccount, BankAccountSchema } from '../../models/bank-account.model';
+import {
+  BankAccount,
+  BankAccountSchema,
+} from '../../models/bank-account.model';
 import { Wallet, WalletSchema } from '../../models/wallet-model';
-import { StudentReview, StudentReviewSchema } from '../../models/student-review.model';
+import {
+  StudentReview,
+  StudentReviewSchema,
+} from '../../models/student-review.model';
 import { NoticeModule } from '../notice/notice.module';
 
 @Module({
@@ -32,7 +38,7 @@ import { NoticeModule } from '../notice/notice.module';
       {
         name: Wallet.name,
         useFactory: async () => {
-          const schema = WalletSchema; 
+          const schema = WalletSchema;
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
@@ -46,14 +52,13 @@ import { NoticeModule } from '../notice/notice.module';
         },
       },
     ]),
- 
+
     forwardRef(() => CheckoutModule),
     forwardRef(() => CourseModule),
-    forwardRef(()=>NoticeModule)
-
+    forwardRef(() => NoticeModule),
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports: [UserService]
+  exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}

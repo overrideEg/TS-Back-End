@@ -5,8 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { City, CitySchema } from '../../models/city.model';
 
 @Module({
-  imports:[
-  
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: City.name,

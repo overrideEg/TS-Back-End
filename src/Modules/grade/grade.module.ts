@@ -5,8 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Grade, GradeSchema } from '../../models/grade.model';
 
 @Module({
-  imports:[
-   
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: Grade.name,
@@ -19,6 +18,6 @@ import { Grade, GradeSchema } from '../../models/grade.model';
     ]),
   ],
   controllers: [GradeController],
-  providers: [GradeService]
+  providers: [GradeService],
 })
 export class GradeModule {}

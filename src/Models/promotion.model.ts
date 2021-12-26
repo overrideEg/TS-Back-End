@@ -3,31 +3,39 @@ import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { OBaseEntity } from '../shared/base-entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsString, Max, Min, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsNumber,
+  IsString,
+  Max,
+  Min,
+  MinLength,
+} from 'class-validator';
 export type PromotionDocument = Promotion & Document;
 @Schema()
 export class Promotion extends OBaseEntity {
-    @ApiProperty()
-    @Prop()
-    @IsString()
-    @MinLength(6)
-    code: string;
-    @ApiProperty()
-    @Prop()
-    @IsNumber()
-    fromDate: number;
-    @ApiProperty()
-    @Prop()
-    @IsNumber()
-    toDate: number;
-    @ApiProperty()
-    @Prop()
-    @IsNumber()
-    @Min(1) @Max(100)
-    discountPercent: number;
-    @ApiProperty()
-    @Prop()
-    @IsBoolean()
-    useOnce: boolean;
+  @ApiProperty()
+  @Prop()
+  @IsString()
+  @MinLength(6)
+  code: string;
+  @ApiProperty()
+  @Prop()
+  @IsNumber()
+  fromDate: number;
+  @ApiProperty()
+  @Prop()
+  @IsNumber()
+  toDate: number;
+  @ApiProperty()
+  @Prop()
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  discountPercent: number;
+  @ApiProperty()
+  @Prop()
+  @IsBoolean()
+  useOnce: boolean;
 }
 export const PromotionSchema = SchemaFactory.createForClass(Promotion);

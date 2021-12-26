@@ -11,42 +11,58 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class NoticeService {
-
-
   constructor(
     @InjectModel(Notice.name) private repo: Model<NoticeDocument>,
     @Inject(forwardRef(() => UserService)) private userService: UserService,
-
-  ) { }
-
+  ) {}
 
   async findAll(req): Promise<Notice[]> {
-    return this.repo.find({ user: new ObjectId(req.user._id) }).sort({ valueDate: 'desc' }).exec();
+    return this.repo
+      .find({ user: new ObjectId(req.user._id) })
+      .sort({ valueDate: 'desc' })
+      .exec();
   }
-
 
   async sendNotification(req: Notice): Promise<Notice | PromiseLike<Notice>> {
     if (req.user)
       return this.sendSpecificNotification({
         userId: req.user['_id'],
         notification: { title: req.title, body: req.body },
-        data: req.entityType && req.entityId ? { entityType: req.entityType, entityId: req.entityId } : null
-      })
+        data:
+          req.entityType && req.entityId
+            ? { entityType: req.entityType, entityId: req.entityId }
+            : null,
+      });
     else {
       let users = await this.userService.findAll(UserType.student);
       for await (const user of users) {
         await this.sendSpecificNotification({
           userId: user['_id'],
           notification: { title: req.title, body: req.body },
-          data: req.entityType && req.entityId ? { entityType: req.entityType, entityId: req.entityId } : null
-        })
+          data:
+            req.entityType && req.entityId
+              ? { entityType: req.entityType, entityId: req.entityId }
+              : null,
+        });
       }
     }
   }
   protected readonly logger = new Logger(NoticeService.name);
 
-  async sendSpecificNotification({ userId, notification, data, imageURL }: { userId: string, notification: { title: string, body: string }, data?: { entityType: string, entityId: string }, imageURL?: string }) {
-    let user = await (await this.userService.UserModel.findById(userId).exec()).toObject();
+  async sendSpecificNotification({
+    userId,
+    notification,
+    data,
+    imageURL,
+  }: {
+    userId: string;
+    notification: { title: string; body: string };
+    data?: { entityType: string; entityId: string };
+    imageURL?: string;
+  }) {
+    let user = await (
+      await this.userService.UserModel.findById(userId).exec()
+    ).toObject();
     let notice = new Notice();
     // if (user.fcmTokens.length > 0) {
     //   const message: admin.messaging.MessagingPayload = {
@@ -67,7 +83,6 @@ export class NoticeService {
 
     //   }
 
-
     //   admin.messaging().sendToDevice(user.fcmTokens.filter(tok => tok != ""), message).then(res => {
     //     if (res.successCount > 0) {
     //       this.logger.log(`success notification sent to user ${user.email} success ${res.successCount}`)
@@ -83,13 +98,11 @@ export class NoticeService {
     notice.user = new ObjectId(userId);
     notice.title = notification.title;
     notice.body = notification.body;
-    notice.valueDate = Date.now()
+    notice.valueDate = Date.now();
     if (data) {
       notice.entityType = data.entityType;
       notice.entityId = data.entityId;
-
     }
     return this.repo.create(notice);
   }
-
 }

@@ -1,17 +1,21 @@
-import { ConnectedSocket, MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { LearningClassService } from './learning-class.service';
 import { Server, Socket } from 'socket.io';
 import { sendLiveMessageDTO, StartLiveDTO } from '../../dtos/start-live.dto';
 
 @WebSocketGateway(93)
-export class LearningClassGateway  {
-  constructor(
-    private readonly service: LearningClassService) { }
-
+export class LearningClassGateway {
+  constructor(private readonly service: LearningClassService) {}
 
   // @WebSocketServer()
   // server: Server;
- 
 
   // // @UseGuards(WsGuard)
   // @SubscribeMessage('startLive')
@@ -19,10 +23,9 @@ export class LearningClassGateway  {
   //   @MessageBody() body: StartLiveDTO,
   //   @ConnectedSocket() socket: Socket
   // ){
-   
-    
+
   //   let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
-    
+
   //   let startedClass = await this.service.startLive(user, body)
   //   socket.join(startedClass.lesson.OId);
   //   this.server.to(startedClass.lesson.OId).emit('chat', startedClass.chat.map(message => {
@@ -44,17 +47,14 @@ export class LearningClassGateway  {
   //     startTime: startedClass.startTime,
   //     attenders: startedClass.attenders
   //   });
-  
-  // }
 
+  // }
 
   // @SubscribeMessage('endLive')
   // async endLive(
   //   @MessageBody() body: StartLiveDTO,
   //   @ConnectedSocket() socket: Socket
   // ) {
-    
-   
 
   //   let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
   //   let startedClass = await this.service.endLive(user, body)
@@ -70,16 +70,14 @@ export class LearningClassGateway  {
   //     attenders: startedClass.attenders
   //   });
 
-   
   // }
-
 
   // @SubscribeMessage('join')
   // async joinLive(
   //   @MessageBody() body: StartLiveDTO,
   //   @ConnectedSocket() socket: Socket
   // ){
-   
+
   //   let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
   //   let startedClass = await this.service.joinLive(user, body)
   //   socket.join(startedClass.lesson.OId);
@@ -89,7 +87,7 @@ export class LearningClassGateway  {
   //     message: `${user.name} joined`,
   //     time:Date.now()
   //   })
-  
+
   //     this.server.to(startedClass.lesson.OId).emit('chat', startedClass.chat.map(message => {
   //       return {
   //         user: {
@@ -110,24 +108,18 @@ export class LearningClassGateway  {
   //     attenders: startedClass.attenders
   //   });
 
-  
-
-
-
   // }
   // @SubscribeMessage('sendMessage')
   // async sendMessage(
   //   @MessageBody() body: sendLiveMessageDTO,
   //   @ConnectedSocket() socket: Socket
-  // ){    
-    
-    
+  // ){
+
   //   let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
   //   console.log(body,socket,user);
   //   let msg = await this.service.sendMessage(user, body)
   //   socket.join(body.lessonId);
-    
-    
+
   //     this.server.to(body.lessonId).emit('chat', msg.map(message => {
   //       return {
   //         user: {
@@ -139,9 +131,6 @@ export class LearningClassGateway  {
   //         time: message.time
   //       }
   //     }))
-  
-   
-
 
   // }
 
@@ -150,12 +139,11 @@ export class LearningClassGateway  {
   //   @MessageBody() body: StartLiveDTO,
   //   @ConnectedSocket() socket: Socket
   // ){
-    
-   
+
   //   let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
   //   let startedClass = await this.service.joinLive(user, body)
   //   socket.join(startedClass.lesson.OId);
-    
+
   //     this.server.to(body.lessonId).emit('chat', startedClass.chat.map(message => {
   //       return {
   //         user: {
@@ -175,9 +163,6 @@ export class LearningClassGateway  {
   //       startTime: startedClass.startTime,
   //       attenders: startedClass.attenders
   //     });
-  
-   
-
 
   // }
 
@@ -186,8 +171,6 @@ export class LearningClassGateway  {
   //   @MessageBody() body: StartLiveDTO,
   //   @ConnectedSocket() socket: Socket
   // ) {
-    
-   
 
   //   let user = await  this.service.authenticationService.getUserFromAuthenticationToken(body.token);
   //   let startedClass = await this.service.leave(user, body)
@@ -203,7 +186,6 @@ export class LearningClassGateway  {
   //     attenders: startedClass.attenders
   //   });
 
-   
   //   this.server.to(body.lessonId).emit('chat', startedClass.chat.map(message => {
   //     return {
   //       user: {
@@ -216,8 +198,4 @@ export class LearningClassGateway  {
   //     }
   //   }))
   // }
-
-
-
-
 }

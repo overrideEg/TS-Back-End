@@ -11,30 +11,44 @@ import { Status } from '../enums/status.enum';
 export type WalletDocument = Wallet & Document;
 @Schema()
 export class Wallet extends OBaseEntity {
-   
-    @ApiProperty()
-    @Prop()
-    date: number;
-    @ApiProperty()
-    @Prop()
-    value: number;
-    @ApiProperty({ enum: [TransactionType.in, TransactionType.out] })
-    @Prop({ enum: [TransactionType.in, TransactionType.out] })
-    type: TransactionType;
-    @ApiProperty({ enum: [Status.pending, Status.approved],default: Status.pending})
-    @Prop({ enum: [Status.pending, Status.approved] , default: Status.pending})
-    status: Status
-   
-    @ApiProperty({ type: () => Checkout })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Checkout.name, autopopulate:true })
-    checkout?: Checkout;
+  @ApiProperty()
+  @Prop()
+  date: number;
+  @ApiProperty()
+  @Prop()
+  value: number;
+  @ApiProperty({ enum: [TransactionType.in, TransactionType.out] })
+  @Prop({ enum: [TransactionType.in, TransactionType.out] })
+  type: TransactionType;
+  @ApiProperty({
+    enum: [Status.pending, Status.approved],
+    default: Status.pending,
+  })
+  @Prop({ enum: [Status.pending, Status.approved], default: Status.pending })
+  status: Status;
 
-    @ApiProperty({ type: () => Course })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Course', autopopulate:true })
-    course?: Course;
+  @ApiProperty({ type: () => Checkout })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Checkout.name,
+    autopopulate: true,
+  })
+  checkout?: Checkout;
 
-    @ApiProperty({ type: () => BankAccount })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: BankAccount.name , autopopulate:true})
-    account?: BankAccount;
+  @ApiProperty({ type: () => Course })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+    autopopulate: true,
+  })
+  course?: Course;
+
+  @ApiProperty({ type: () => BankAccount })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: BankAccount.name,
+    autopopulate: true,
+  })
+  account?: BankAccount;
 }
 export const WalletSchema = SchemaFactory.createForClass(Wallet);

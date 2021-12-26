@@ -21,4 +21,4 @@ import { Setting, SettingSchema } from '../../models/setting.model';
   providers: [SettingService],
   exports: [SettingService],
 })
-export class SettingModule { }
+export class SettingModule {}

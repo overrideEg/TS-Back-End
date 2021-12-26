@@ -15,10 +15,10 @@ import { Partner, PartnerSchema } from '../../models/partner.model';
           return schema;
         },
       },
-    ])
+    ]),
   ],
   controllers: [PartnerController],
   providers: [PartnerService],
-  exports:[PartnerService]
+  exports: [PartnerService],
 })
-export class PartnerModule { }
+export class PartnerModule {}

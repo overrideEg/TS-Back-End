@@ -10,18 +10,22 @@ import { Type } from 'class-transformer';
 export type GradeDocument = Grade & Document;
 @Schema()
 export class Grade extends OBaseEntity {
-    @ApiProperty({ type: () => Localized })
-    @Prop({ type: () => Localized })
-    @ValidateNested()
-    @Type(()=>Localized)
-    name: Localized;
-    @ApiProperty()
-    @Prop()
-    @IsNumber()
-    gradeNumber: number;
-    @ApiProperty({ type: () => Stage })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Stage.name,autopopulate: true })
-    @IsNotEmpty()
-    stage?: Stage;
+  @ApiProperty({ type: () => Localized })
+  @Prop({ type: () => Localized })
+  @ValidateNested()
+  @Type(() => Localized)
+  name: Localized;
+  @ApiProperty()
+  @Prop()
+  @IsNumber()
+  gradeNumber: number;
+  @ApiProperty({ type: () => Stage })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Stage.name,
+    autopopulate: true,
+  })
+  @IsNotEmpty()
+  stage?: Stage;
 }
 export const GradeSchema = SchemaFactory.createForClass(Grade);

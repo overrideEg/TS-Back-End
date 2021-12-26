@@ -1,4 +1,3 @@
-
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { jwtConstants } from './constants';
@@ -6,28 +5,26 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from '../../user/user.service';
 import { UserType } from '../../../models/user.model';
 
-
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwtConstants.secret
+      secretOrKey: jwtConstants.secret,
     });
   }
 
   async validate(payload: any) {
-    if (payload.macAddress != null)
-      return payload;
+    if (payload.macAddress != null) return payload;
     const user = await this.userService.validate(payload);
 
     if (user) {
       if (user.userType === UserType.teacher && !user.teacherApproved)
-        throw new UnauthorizedException('please wait until activate your account')
+        throw new UnauthorizedException(
+          'please wait until activate your account',
+        );
       return payload;
-    }
-    else
-      throw new UnauthorizedException('User Not Exists');
+    } else throw new UnauthorizedException('User Not Exists');
   }
 }

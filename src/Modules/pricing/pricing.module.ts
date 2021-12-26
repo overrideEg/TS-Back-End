@@ -21,4 +21,4 @@ import { Pricing, PricingSchema } from '../../models/pricing.model';
   providers: [PricingService],
   exports: [PricingService],
 })
-export class PricingModule { }
+export class PricingModule {}

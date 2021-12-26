@@ -1,11 +1,10 @@
-import { Prop } from "@nestjs/mongoose";
-import { ApiProperty } from "@nestjs/swagger";
-import { SchemaTypes } from "mongoose";
+import { Prop } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { SchemaTypes } from 'mongoose';
 
 export class OBaseEntity {
-
-  @ApiProperty({type: String})
-  _id?: any
+  @ApiProperty({ type: String })
+  _id?: any;
 
   @ApiProperty({ description: 'createdAt', required: true })
   @Prop({})
@@ -14,6 +13,4 @@ export class OBaseEntity {
   @ApiProperty({ description: 'updatedAt', required: true })
   @Prop({})
   updatedAt?: string;
-
-
 }

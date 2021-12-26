@@ -1,11 +1,16 @@
 import { CartModule } from './modules/cart/cart.module';
-import { CacheModule, Module, RequestMethod, ValidationPipe } from '@nestjs/common';
+import {
+  CacheModule,
+  Module,
+  RequestMethod,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { FileModule } from './modules/file/file.module';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './shared/logger.middleware';
@@ -50,37 +55,38 @@ const overrideMoules = [
   ContactUsModule,
   NoticeModule,
   PricingModule,
-]
+];
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    MongooseModule.forRoot(`mongodb://${process.env.db_host}/?readPreference=primary&appname=MongoDB%20Compass&ssl=false`, {
-      dbName:'ts-academy',
-      ssl: false,
-      auth: {
-        username: process.env.db_user,
-        password: process.env.db_pwd
-      },
+    MongooseModule.forRoot(
+      `mongodb://${process.env.db_host}/?readPreference=primary&appname=MongoDB%20Compass&ssl=false`,
+      {
+        dbName: 'ts-academy',
+        ssl: false,
+        auth: {
+          username: process.env.db_user,
+          password: process.env.db_pwd,
+        },
 
-      connectionFactory: (connection) => {
-      
-        connection.on('connected', () => {
-    
-          console.log('DB is connected');
-        });
-        connection.on('disconnected', () => {
-          console.log('DB disconnected');
-        });
-        connection.on('error', (error) => {
-          console.log('DB connection failed! for error: ', error);
-        });
-        connection.plugin(require('mongoose-autopopulate'));
-        return connection;
-      }
-    }),
+        connectionFactory: (connection) => {
+          connection.on('connected', () => {
+            console.log('DB is connected');
+          });
+          connection.on('disconnected', () => {
+            console.log('DB disconnected');
+          });
+          connection.on('error', (error) => {
+            console.log('DB connection failed! for error: ', error);
+          });
+          connection.plugin(require('mongoose-autopopulate'));
+          return connection;
+        },
+      },
+    ),
 
     CacheModule.register(),
     ScheduleModule.forRoot(),
@@ -89,18 +95,17 @@ const overrideMoules = [
       limit: 999999,
     }),
 
-    ...overrideMoules
+    ...overrideMoules,
   ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard
+      useClass: ThrottlerGuard,
     },
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
-    }
-
+    },
   ],
 })
 export class AppModule {
@@ -109,6 +114,5 @@ export class AppModule {
       path: '',
       method: RequestMethod.ALL,
     });
-
   }
 }

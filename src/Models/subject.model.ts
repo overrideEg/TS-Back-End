@@ -9,15 +9,15 @@ import { IsString, ValidateNested } from 'class-validator';
 export type SubjectDocument = Subject & Document;
 @Schema()
 export class Subject extends OBaseEntity {
-    @ApiProperty({ type: () => Localized })
-    @Prop({ type: () => Localized })
-    @ValidateNested()
-    @Type(()=>Localized)
-    name: Localized;
+  @ApiProperty({ type: () => Localized })
+  @Prop({ type: () => Localized })
+  @ValidateNested()
+  @Type(() => Localized)
+  name: Localized;
 
-    @ApiProperty({description: 'image', required: true })
-    @IsString()
-    @Prop()
-    image?: string;
+  @ApiProperty({ description: 'image', required: true })
+  @IsString()
+  @Prop()
+  image?: string;
 }
 export const SubjectSchema = SchemaFactory.createForClass(Subject);

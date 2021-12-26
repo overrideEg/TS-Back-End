@@ -6,8 +6,7 @@ import { Promotion, PromotionSchema } from '../../models/promotion.model';
 import { CheckoutModule } from '../checkout/checkout.module';
 
 @Module({
-  imports:[
-    
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: Promotion.name,
@@ -18,9 +17,7 @@ import { CheckoutModule } from '../checkout/checkout.module';
         },
       },
     ]),
-    forwardRef(()=>CheckoutModule),
-
-
+    forwardRef(() => CheckoutModule),
   ],
   controllers: [PromotionController],
   providers: [PromotionService],

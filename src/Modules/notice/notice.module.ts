@@ -6,24 +6,22 @@ import { Notice, NoticeSchema } from '../../models/notice.model';
 import { UserModule } from '../user/user.module';
 
 @Module({
-  imports:[
-    
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: Notice.name,
-        useFactory:  async () => {
+        useFactory: async () => {
           const schema = NoticeSchema;
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
       },
-      
     ]),
-    
-    forwardRef(()=>UserModule)
-    ],
+
+    forwardRef(() => UserModule),
+  ],
   controllers: [NoticeController],
   providers: [NoticeService],
-  exports: [NoticeService]
+  exports: [NoticeService],
 })
 export class NoticeModule {}

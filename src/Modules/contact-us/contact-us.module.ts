@@ -5,8 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ContactUs, ContactUsSchema } from '../../models/contact-us.model';
 
 @Module({
-  imports:[
-    
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: ContactUs.name,
@@ -19,6 +18,6 @@ import { ContactUs, ContactUsSchema } from '../../models/contact-us.model';
     ]),
   ],
   controllers: [ContactUsController],
-  providers: [ContactUsService]
+  providers: [ContactUsService],
 })
 export class ContactUsModule {}

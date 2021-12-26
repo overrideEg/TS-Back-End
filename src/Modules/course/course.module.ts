@@ -6,7 +6,10 @@ import { Course, CourseSchema } from '../../models/course/course.model';
 import { UserModule } from '../user/user.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 import * as mongoose from 'mongoose';
-import { CourseReview, CourseReviewSchema } from '../../models/course/sub-models/course-review.model';
+import {
+  CourseReview,
+  CourseReviewSchema,
+} from '../../models/course/sub-models/course-review.model';
 @Module({
   imports: [
     MongooseModule.forFeatureAsync([
@@ -17,7 +20,7 @@ import { CourseReview, CourseReviewSchema } from '../../models/course/sub-models
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
-      },      
+      },
       {
         name: CourseReview.name,
         useFactory: () => {
@@ -25,15 +28,15 @@ import { CourseReview, CourseReviewSchema } from '../../models/course/sub-models
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
-      },      
+      },
     ]),
-    
-    forwardRef(()=>UserModule),
 
-    forwardRef(()=>CheckoutModule)
+    forwardRef(() => UserModule),
+
+    forwardRef(() => CheckoutModule),
   ],
   controllers: [CourseController],
   providers: [CourseService],
   exports: [CourseService],
 })
-export class CourseModule { }
+export class CourseModule {}

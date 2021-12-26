@@ -5,10 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose/dist';
 import { OFileSchema } from './entities/file.entity';
 
 @Module({
-  imports:
-
-    [
-      
+  imports: [
     //   MongooseModule.forFeature([
     //   { name: 'fs.files', schema: OFileSchema }
     // ]
@@ -23,11 +20,8 @@ import { OFileSchema } from './entities/file.entity';
         },
       },
     ]),
-
-
-
-    ],
+  ],
   controllers: [FileController],
-  providers: [FileService]
+  providers: [FileService],
 })
-export class FileModule { }
+export class FileModule {}

@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Banner, BannerSchema } from '../../models/banner.model';
 
 @Module({
-  imports:[
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: Banner.name,

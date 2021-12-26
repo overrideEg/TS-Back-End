@@ -6,14 +6,8 @@ import { CourseModule } from '../course/course.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 
 @Module({
-  imports:[
-    CourseModule,
-    CheckoutModule,
-    
-   
-    UserModule
-  ],
+  imports: [CourseModule, CheckoutModule, UserModule],
   controllers: [SearchController],
-  providers: [SearchService]
+  providers: [SearchService],
 })
 export class SearchModule {}

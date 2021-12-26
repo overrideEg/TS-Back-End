@@ -1,4 +1,4 @@
-import {   Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { jwtConstants } from './security/constants';
@@ -6,21 +6,21 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
 import { JwtStrategy } from './security/jwt.strategy';
-import {HttpModule} from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt', session: true }),
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions:{
-        expiresIn:'1y'
-      }
+      signOptions: {
+        expiresIn: '1y',
+      },
     }),
     UserModule,
-    HttpModule
+    HttpModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService,JwtStrategy],
-  exports: [AuthService, JwtModule]
+  providers: [AuthService, JwtStrategy],
+  exports: [AuthService, JwtModule],
 })
-export class AuthModule { }
+export class AuthModule {}

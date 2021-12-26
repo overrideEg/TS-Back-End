@@ -15,101 +15,165 @@ import { OFile } from '../../Modules/file/entities/file.entity';
 import { Status } from '../../enums/status.enum';
 import { Excercice } from './sub-models/excercice.model';
 
-export const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-
+export const random = (min, max) =>
+  Math.floor(Math.random() * (max - min)) + min;
 
 export type CourseDocument = Course & Document;
 @Schema({
-    timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
-    skipVersioning: true
+  timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
+  skipVersioning: true,
 })
 export class Course {
-    @ApiProperty({ type: String })
-    _id?: any
+  @ApiProperty({ type: String })
+  _id?: any;
 
-    @ApiProperty({ description: 'createdAt', required: true })
-    @Prop({})
-    createdAt?: number;
+  @ApiProperty({ description: 'createdAt', required: true })
+  @Prop({})
+  createdAt?: number;
 
-    @ApiProperty({ description: 'updatedAt', required: true })
-    @Prop({})
-    updatedAt?: string;
+  @ApiProperty({ description: 'updatedAt', required: true })
+  @Prop({})
+  updatedAt?: string;
 
-    @ApiProperty({ enum: [Status.pending, Status.approved], default: Status.pending })
-    @Prop({ enum: [Status.pending, Status.approved], default: Status.pending })
-    status: Status
+  @ApiProperty({
+    enum: [Status.pending, Status.approved],
+    default: Status.pending,
+  })
+  @Prop({ enum: [Status.pending, Status.approved], default: Status.pending })
+  status: Status;
 
-    @ApiProperty({ description: 'CourseType', enum: [CourseType.session, CourseType.tutorial, CourseType.home], default: CourseType.session })
-    @Prop({ enum: [CourseType.session, CourseType.tutorial, CourseType.home], default: CourseType.session })
-    type?: CourseType;
+  @ApiProperty({
+    description: 'CourseType',
+    enum: [CourseType.session, CourseType.tutorial, CourseType.home],
+    default: CourseType.session,
+  })
+  @Prop({
+    enum: [CourseType.session, CourseType.tutorial, CourseType.home],
+    default: CourseType.session,
+  })
+  type?: CourseType;
 
-    @ApiProperty({ type: () => Localized })
-    @Prop({ type: () => Localized })
-    cover?: Localized
+  @ApiProperty({ type: () => Localized })
+  @Prop({ type: () => Localized })
+  cover?: Localized;
 
-    @ApiProperty({ type: () => Localized })
-    @Prop({ type: () => Localized })
-    name?: Localized;
+  @ApiProperty({ type: () => Localized })
+  @Prop({ type: () => Localized })
+  name?: Localized;
 
-    @ApiProperty({ type: () => Localized })
-    @Prop({ type: () => Localized })
-    info?: Localized;
+  @ApiProperty({ type: () => Localized })
+  @Prop({ type: () => Localized })
+  info?: Localized;
 
-    @ApiProperty()
-    @Prop()
-    startDate?: number;
+  @ApiProperty()
+  @Prop()
+  startDate?: number;
 
-    @ApiProperty({ type: () => Localized })
-    @Prop({ type: () => Localized })
-    description?: Localized;
+  @ApiProperty({ type: () => Localized })
+  @Prop({ type: () => Localized })
+  description?: Localized;
 
-    @ApiProperty({ type: () => Grade })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Grade.name, autopopulate: true })
-    @IsNotEmpty()
-    grade?: Grade;
+  @ApiProperty({ type: () => Grade })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Grade.name,
+    autopopulate: true,
+  })
+  @IsNotEmpty()
+  grade?: Grade;
 
-    @ApiProperty({ type: () => Subject })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Subject.name, autopopulate: true })
-    @IsNotEmpty()
-    subject?: Subject;
+  @ApiProperty({ type: () => Subject })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Subject.name,
+    autopopulate: true,
+  })
+  @IsNotEmpty()
+  subject?: Subject;
 
-    @ApiProperty()
-    @Prop()
-    price?: number;
+  @ApiProperty()
+  @Prop()
+  price?: number;
 
-    // @ApiProperty({ type: () => CourseContent, isArray: true })
-    // @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: CourseContent.name, autopopulate: true }])
-    // content: CourseContent[];  
+  // @ApiProperty({ type: () => CourseContent, isArray: true })
+  // @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: CourseContent.name, autopopulate: true }])
+  // content: CourseContent[];
 
-    @ApiProperty({ type: () => CourseReview, description: 'CourseReviews', isArray: true })
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: CourseReview.name, autopopulate: true }])
-    reviews?: CourseReview[];
+  @ApiProperty({
+    type: () => CourseReview,
+    description: 'CourseReviews',
+    isArray: true,
+  })
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: CourseReview.name,
+      autopopulate: true,
+    },
+  ])
+  reviews?: CourseReview[];
 
-    @ApiProperty({ type: () => User })
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true })
-    teacher?: User;
+  @ApiProperty({ type: () => User })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    autopopulate: true,
+  })
+  teacher?: User;
 
-    @ApiProperty({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday], isArray: true })
-    @Prop({ enum: [Day.Friday, Day.Saturday, Day.Sunday, Day.Monday, Day.Tuesday, Day.Wednesday, Day.Thursday], type: [String] })
-    @IsEnum(Day, { each: true })
-    @IsOptional()
-    days?: Day[]
+  @ApiProperty({
+    enum: [
+      Day.Friday,
+      Day.Saturday,
+      Day.Sunday,
+      Day.Monday,
+      Day.Tuesday,
+      Day.Wednesday,
+      Day.Thursday,
+    ],
+    isArray: true,
+  })
+  @Prop({
+    enum: [
+      Day.Friday,
+      Day.Saturday,
+      Day.Sunday,
+      Day.Monday,
+      Day.Tuesday,
+      Day.Wednesday,
+      Day.Thursday,
+    ],
+    type: [String],
+  })
+  @IsEnum(Day, { each: true })
+  @IsOptional()
+  days?: Day[];
 
-    @ApiProperty()
-    @Prop()
-    @IsNumber()
-    @IsOptional()
-    hour?: number;
+  @ApiProperty()
+  @Prop()
+  @IsNumber()
+  @IsOptional()
+  hour?: number;
 
-    @ApiProperty({ type: () => OFile, description: 'OFiles', isArray: true })
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'fs.files', autopopulate: true }])
-    attachements?: OFile[];
+  @ApiProperty({ type: () => OFile, description: 'OFiles', isArray: true })
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'fs.files',
+      autopopulate: true,
+    },
+  ])
+  attachements?: OFile[];
 
-    @ApiProperty({ type: () => Excercice, description: 'Excercices', isArray: true })
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Excercice.name }])
-    excercices?: Excercice[];
+  @ApiProperty({
+    type: () => Excercice,
+    description: 'Excercices',
+    isArray: true,
+  })
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Excercice.name }])
+  excercices?: Excercice[];
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);
 CourseSchema.index({
-    '$**': 'text',
+  '$**': 'text',
 });

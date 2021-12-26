@@ -5,63 +5,65 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()
 export class CartService {
+  constructor(private userService: UserService) {}
 
+  async addToCart(
+    req: any,
+    courseId: string,
+  ): Promise<Course[] | PromiseLike<Course[]>> {
+    await this.userService.UserModel.findByIdAndUpdate(req.user._id, {
+      $addToSet: { cart: new ObjectId(courseId) },
+    }).exec();
+    return this.myCart(req);
+  }
 
+  async deleteFromCart(
+    req: any,
+    courseId: string,
+  ): Promise<Course[] | PromiseLike<Course[]>> {
+    await this.userService.UserModel.findByIdAndUpdate(req.user._id, {
+      $pull: { cart: new ObjectId(courseId) },
+    });
+    return this.myCart(req);
+  }
 
-    constructor(
-        private userService: UserService
-    ) { }
+  async myCart(req: any): Promise<Course[] | PromiseLike<Course[]>> {
+    return await this.userService.UserModel.aggregate([
+      {
+        $match: {
+          $and: [{ _id: new ObjectId(req.user._id) }],
+        },
+      },
+      {
+        $lookup: {
+          from: 'courses',
+          localField: 'cart',
+          foreignField: '_id',
+          as: 'cart',
+        },
+      },
 
-    async addToCart(req: any, courseId: string): Promise<Course[] | PromiseLike<Course[]>> {
-        await this.userService.UserModel.findByIdAndUpdate(req.user._id, { $addToSet: { cart: new ObjectId(courseId) } }).exec();
-        return this.myCart(req);
-    }
+      { $unwind: '$cart' },
 
+      {
+        $replaceRoot: {
+          newRoot: '$cart',
+        },
+      },
 
-    async deleteFromCart(req: any, courseId: string): Promise<Course[] | PromiseLike<Course[]>> {
-        await this.userService.UserModel.findByIdAndUpdate(req.user._id, { $pull: { cart: new ObjectId(courseId) } });
-        return this.myCart(req);
-    }
-
-
-    async myCart(req: any): Promise<Course[] | PromiseLike<Course[]>> {
-        return await this.userService.UserModel.aggregate([
-            {
-                $match: {
-                    $and: [
-                        { _id: new ObjectId(req.user._id) },
-                    ]
-                }
-            },
-            {
-                $lookup:
-                {
-                    from: 'courses',
-                    localField: 'cart',
-                    foreignField: '_id',
-                    as: 'cart'
-                }
-            },
-
-            { $unwind: "$cart" },
-
-            {
-                $replaceRoot: {
-                    newRoot: "$cart"
-                }
-            },
-
-
-
-            {
-                $unset: [
-                    'attachements', 'days', 'hour', 'excercices', 'reviews', 'startDate', 'grade', 'subject', 'teacher',
-                ]
-            }
-        ]
-
-
-        );
-        
-    }
+      {
+        $unset: [
+          'attachements',
+          'days',
+          'hour',
+          'excercices',
+          'reviews',
+          'startDate',
+          'grade',
+          'subject',
+          'teacher',
+        ],
+      },
+    ]);
+  }
 }

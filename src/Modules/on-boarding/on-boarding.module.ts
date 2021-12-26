@@ -5,8 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { OnBoarding, OnBoardingSchema } from '../../models/on-boarding.model';
 
 @Module({
-  imports:[
-    
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: OnBoarding.name,
@@ -19,6 +18,6 @@ import { OnBoarding, OnBoardingSchema } from '../../models/on-boarding.model';
     ]),
   ],
   controllers: [OnBoardingController],
-  providers: [OnBoardingService]
+  providers: [OnBoardingService],
 })
 export class OnBoardingModule {}

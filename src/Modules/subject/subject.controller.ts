@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Subject } from '../../models/subject.model';
 import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
@@ -7,51 +16,45 @@ import { SubjectService } from './subject.service';
 @ApiTags('Subject')
 @Controller('Subject')
 export class SubjectController {
+  /* CRUD End Points for Subject Created By Override */
 
-    /* CRUD End Points for Subject Created By Override */
+  constructor(private service: SubjectService) {}
+  /* POST Subject End Point */
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async saveSubject(@Body() req: Subject): Promise<Subject> {
+    return this.service.save(req);
+  }
 
+  /* GET All Subjects End Point */
+  @UseGuards(JwtAuthGuard)
+  @Get('/')
+  getAllSubjects(): Promise<Subject[]> {
+    return this.service.findAll();
+  }
 
-    constructor(private service: SubjectService) { }
-    /* POST Subject End Point */
-    @UseGuards(JwtAuthGuard)
-    @Post()
-    async saveSubject(@Body() req: Subject): Promise<Subject> {
-        return this.service.save(req)
-    }
+  /* GET One Subject End Point */
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  findOne(@Param('id') id: string): Promise<Subject> {
+    return this.service.findOne(id);
+  }
 
+  /* PUT  Subject End Point */
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  updateSubject(@Param('id') id: string, @Body() req: Subject): Promise<any> {
+    return this.service.update(id, req);
+  }
 
-    /* GET All Subjects End Point */
-    @UseGuards(JwtAuthGuard)
-    @Get('/')
-    getAllSubjects(): Promise<Subject[]> {
-        return this.service.findAll();
-    }
+  /* Delete  Subject End Point */
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  deleteSubject(@Param('id') id: string): Promise<any> {
+    return this.service.remove(id);
+  }
 
-
-    /* GET One Subject End Point */
-    @UseGuards(JwtAuthGuard)
-    @Get(':id')
-    findOne(@Param('id') id: string): Promise<Subject> {
-        return this.service.findOne(id);
-    }
-
-
-    /* PUT  Subject End Point */
-    @UseGuards(JwtAuthGuard)
-    @Put(':id')
-    updateSubject(@Param('id') id: string, @Body() req: Subject): Promise<any> {
-        return this.service.update(id, req);
-    }
-
-
-    /* Delete  Subject End Point */
-    @UseGuards(JwtAuthGuard)
-    @Delete(':id')
-    deleteSubject(@Param('id') id: string): Promise<any> {
-        return this.service.remove(id)
-    }
-
-    /* End of Subject Controller Class 
+  /* End of Subject Controller Class 
      
      */
 }

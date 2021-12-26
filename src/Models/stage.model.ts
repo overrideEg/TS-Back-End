@@ -9,14 +9,14 @@ import { Type } from 'class-transformer';
 export type StageDocument = Stage & Document;
 @Schema()
 export class Stage extends OBaseEntity {
-    @ApiProperty({type:()=>Localized})
-    @Prop({type:()=>Localized})
-    @ValidateNested()
-    @Type(()=>Localized)
-    name:Localized;   
-     @ApiProperty()
-    @Prop()
-    @IsNumber()
-    stageNumber: number;
+  @ApiProperty({ type: () => Localized })
+  @Prop({ type: () => Localized })
+  @ValidateNested()
+  @Type(() => Localized)
+  name: Localized;
+  @ApiProperty()
+  @Prop()
+  @IsNumber()
+  stageNumber: number;
 }
 export const StageSchema = SchemaFactory.createForClass(Stage);

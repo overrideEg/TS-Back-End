@@ -1,5 +1,9 @@
-
-import { Injectable, ExecutionContext, UnauthorizedException, CanActivate, } from '@nestjs/common';
+import {
+  Injectable,
+  ExecutionContext,
+  UnauthorizedException,
+  CanActivate,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { WsException } from '@nestjs/websockets';
@@ -10,9 +14,7 @@ import { jwtConstants } from './constants';
 
 @Injectable()
 export class WsGuard implements CanActivate {
-
-  constructor(private authService:AuthService) {
-  }
+  constructor(private authService: AuthService) {}
 
   canActivate(
     context: any,
@@ -20,14 +22,15 @@ export class WsGuard implements CanActivate {
     let bearerToken = context.args[0].request.headers.authorization as string;
     try {
       return new Promise((resolve, reject) => {
-        return this.authService.getUserFromAuthenticationToken(bearerToken).then(user => {
-          if (user) {
-            resolve(user);
-          } else {
-            reject(false);
-          }
-        });
-
+        return this.authService
+          .getUserFromAuthenticationToken(bearerToken)
+          .then((user) => {
+            if (user) {
+              resolve(user);
+            } else {
+              reject(false);
+            }
+          });
       });
     } catch (ex) {
       console.log(ex);
@@ -35,4 +38,3 @@ export class WsGuard implements CanActivate {
     }
   }
 }
-

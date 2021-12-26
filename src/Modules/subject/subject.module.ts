@@ -5,8 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Subject, SubjectSchema } from '../../models/subject.model';
 
 @Module({
-  imports:[
-    
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: Subject.name,

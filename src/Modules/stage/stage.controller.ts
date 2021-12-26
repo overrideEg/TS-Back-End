@@ -1,25 +1,30 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Stage } from '../../models/stage.model';
 import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { StageService } from './stage.service';
 
-
 @ApiTags('Stage')
 @Controller('Stage')
 export class StageController {
-
   /* CRUD End Points for Stage Created By Override */
 
-
-  constructor(private service: StageService) { }
+  constructor(private service: StageService) {}
   /* POST Stage End Point */
   @UseGuards(JwtAuthGuard)
   @Post()
   async saveStage(@Body() req: Stage): Promise<Stage> {
-    return this.service.save(req)
+    return this.service.save(req);
   }
-
 
   /* GET All Stages End Point */
   // @UseGuards(JwtAuthGuard)
@@ -28,14 +33,12 @@ export class StageController {
     return this.service.findAll();
   }
 
-
   /* GET One Stage End Point */
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Stage> {
     return this.service.findOne(id);
   }
-
 
   /* PUT  Stage End Point */
   @UseGuards(JwtAuthGuard)
@@ -44,12 +47,11 @@ export class StageController {
     return this.service.update(id, req);
   }
 
-
   /* Delete  Stage End Point */
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   deleteStage(@Param('id') id: string): Promise<any> {
-    return this.service.remove(id)
+    return this.service.remove(id);
   }
 
   /* End of Stage Controller Class 

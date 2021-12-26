@@ -9,19 +9,18 @@ import { Type } from 'class-transformer';
 export type BannerDocument = Banner & Document;
 @Schema()
 export class Banner extends OBaseEntity {
-    @ApiProperty({ type: () => Localized })
-    @Prop({ type: () => Localized })
-    @ValidateNested()
-    @Type(()=>Localized)
-    title: Localized;
-    @ApiProperty()
-    @Prop()
-    @IsNumber()
-    priority: number;
-    @ApiProperty()
-    @Prop()
-    @IsString()
-    image: string;
-    
+  @ApiProperty({ type: () => Localized })
+  @Prop({ type: () => Localized })
+  @ValidateNested()
+  @Type(() => Localized)
+  title: Localized;
+  @ApiProperty()
+  @Prop()
+  @IsNumber()
+  priority: number;
+  @ApiProperty()
+  @Prop()
+  @IsString()
+  image: string;
 }
 export const BannerSchema = SchemaFactory.createForClass(Banner);

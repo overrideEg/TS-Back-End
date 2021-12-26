@@ -1,5 +1,8 @@
-
-import { Injectable, ExecutionContext, UnauthorizedException, } from '@nestjs/common';
+import {
+  Injectable,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ThrottlerGuard } from '@nestjs/throttler';
 
@@ -12,7 +15,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err, user) {
-    
     // You can throw an exception based on either "info" or "err" arguments
     if (err || !user) {
       throw err || new UnauthorizedException();

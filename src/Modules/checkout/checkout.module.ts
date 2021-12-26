@@ -8,7 +8,7 @@ import { CourseModule } from '../course/course.module';
 import { UserModule } from '../user/user.module';
 import { PromotionModule } from '../promotion/promotion.module';
 import { NoticeModule } from '../notice/notice.module';
-import {HttpModule} from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 import { PricingModule } from '../pricing/pricing.module';
 
 @Module({
@@ -22,19 +22,17 @@ import { PricingModule } from '../pricing/pricing.module';
           return schema;
         },
       },
-      
     ]),
-    forwardRef(()=>CourseModule),
-    forwardRef(()=>UserModule),
-    forwardRef(()=>PromotionModule),
-    
+    forwardRef(() => CourseModule),
+    forwardRef(() => UserModule),
+    forwardRef(() => PromotionModule),
+
     NoticeModule,
     HttpModule,
-    PricingModule
-    
+    PricingModule,
   ],
   controllers: [CheckoutController],
   providers: [CheckoutService],
   exports: [CheckoutService],
 })
-export class CheckoutModule { }
+export class CheckoutModule {}

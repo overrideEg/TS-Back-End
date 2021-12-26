@@ -1,4 +1,4 @@
 export enum Sort {
-    HTL = 'HTL',
-    LTH = 'LTH'
+  HTL = 'HTL',
+  LTH = 'LTH',
 }

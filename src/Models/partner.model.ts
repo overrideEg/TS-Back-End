@@ -6,13 +6,12 @@ import { ApiProperty } from '@nestjs/swagger';
 export type PartnerDocument = Partner & Document;
 @Schema()
 export class Partner extends OBaseEntity {
-    @ApiProperty({ description: 'name', required: true })
-    @Prop()
-    name?: string;
+  @ApiProperty({ description: 'name', required: true })
+  @Prop()
+  name?: string;
 
-
-    @ApiProperty({description: 'logo', required: true })
-    @Prop()
-    logo?: string;
+  @ApiProperty({ description: 'logo', required: true })
+  @Prop()
+  logo?: string;
 }
 export const PartnerSchema = SchemaFactory.createForClass(Partner);

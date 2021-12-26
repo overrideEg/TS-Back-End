@@ -5,8 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Stage, StageSchema } from '../../models/stage.model';
 
 @Module({
-  imports:[
-   
+  imports: [
     MongooseModule.forFeatureAsync([
       {
         name: Stage.name,
@@ -19,6 +18,6 @@ import { Stage, StageSchema } from '../../models/stage.model';
     ]),
   ],
   controllers: [StageController],
-  providers: [StageService]
+  providers: [StageService],
 })
 export class StageModule {}
