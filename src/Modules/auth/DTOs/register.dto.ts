@@ -1,7 +1,5 @@
-import { Prop } from "@nestjs/mongoose";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsEmail, IsEnum, IsString, MaxLength, MinLength, minLength } from "class-validator";
-import { City } from "../../../models/city.model";
 import { Lang } from "../../../shared/enums/lang.enum";
 
 export class RegisterAdmin {
