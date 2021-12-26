@@ -6,8 +6,6 @@ export class Login {
     @ApiProperty({required:true})
     @IsString()
     username: string;
-    @ApiProperty({required:true})
-    fcmToken: string;
     
     @ApiProperty({required:true})
     @IsString()

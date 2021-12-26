@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { OnBoarding } from '../../Models/on-boarding.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { OnBoarding } from '../../models/on-boarding.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { OnBoardingService } from './on-boarding.service';
 
 @ApiTags('OnBoarding')

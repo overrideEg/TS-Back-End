@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Promotion } from '../../Models/promotion.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Promotion } from '../../models/promotion.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { PromotionService } from './promotion.service';
 
 @ApiTags('Promotion')

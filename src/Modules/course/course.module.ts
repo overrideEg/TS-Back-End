@@ -2,7 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CourseController } from './course.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Course, CourseSchema } from '../../Models/course.model';
+import { Course, CourseSchema } from '../../models/course/course.model';
 import { UserModule } from '../user/user.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 import * as mongoose from 'mongoose';

@@ -2,12 +2,12 @@ import { forwardRef, Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '../../Models/user.model';
+import { User, UserSchema } from '../../models/user.model';
 import { CourseModule } from '../course/course.module';
 import { CheckoutModule } from '../checkout/checkout.module';
-import { BankAccount, BankAccountSchema } from '../../Models/bank-account.model';
-import { Wallet, WalletSchema } from '../../Models/wallet-model';
-import { StudentReview, StudentReviewSchema } from '../../Models/student-review.model';
+import { BankAccount, BankAccountSchema } from '../../models/bank-account.model';
+import { Wallet, WalletSchema } from '../../models/wallet-model';
+import { StudentReview, StudentReviewSchema } from '../../models/student-review.model';
 import { NoticeModule } from '../notice/notice.module';
 
 @Module({

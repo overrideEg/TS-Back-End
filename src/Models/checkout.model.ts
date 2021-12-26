@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { OBaseEntity } from '../shared/base-entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { Course } from './course.model';
+import { Course } from './course/course.model';
 import { PaymentMethod, PaymentStatus } from '../enums/payment-method.enum';
 import { User } from './user.model';
 

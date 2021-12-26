@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Banner } from '../../Models/banner.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Banner } from '../../models/banner.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { BannerService } from './banner.service';
 
 @ApiTags('Banner')

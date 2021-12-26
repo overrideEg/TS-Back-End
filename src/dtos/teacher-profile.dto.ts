@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Course } from "../Models/course.model";
+import { Course } from "../models/course/course.model";
 
 export class TeacherProfile {
     @ApiProperty()

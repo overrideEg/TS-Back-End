@@ -3,15 +3,15 @@ import { UserService } from '../user/user.service';
 import { Login } from './DTOs/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterAdmin, RegisterParent, RegisterStudent, RegisterTeacher } from './DTOs/register.dto';
-import { User, UserType } from '../../Models/user.model';
+import { User, UserType } from '../../models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
-import { City } from '../../Models/city.model';
-import { Grade } from '../../Models/grade.model';
-import { Stage } from '../../Models/stage.model';
+import { City } from '../../models/city.model';
+import { Grade } from '../../models/grade.model';
+import { Stage } from '../../models/stage.model';
 import { refreshToken } from './DTOs/refreshToken.dto';
 import { Lang } from '../../shared/enums/lang.enum';
 import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
-import { jwtConstants, sms } from './Security/constants';
+import { jwtConstants, sms } from './security/constants';
 
 
 @Injectable()
@@ -38,19 +38,19 @@ export class AuthService {
         }
     }
     sign(user: User) {
-        return this.jwtService.sign({ id: user['_id'], email: user['email'], phone: user['phone'], userType: user['userType'], defaultLang: user['defaultLang'] })
+        return this.jwtService.sign({ _id: user['_id'], email: user['email'], phone: user['phone'], userType: user['userType'], defaultLang: user['defaultLang'] })
     }
 
 
 
     requestToken(macAddress: string) {
         return {
-            token: this.jwtService.sign({ id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress, defaultLang: Lang.ar }, { expiresIn: '1h' })
+            token: this.jwtService.sign({ _id: null, email: null, phone: null, userType: UserType.student, macAddress: macAddress, defaultLang: Lang.ar }, { expiresIn: '1h' })
         }
     }
 
     async changePassword(req: any, body: ChangePassword) {
-        let user = await this.userService.findOne(req.user.id);
+        let user = await this.userService.findOne(req.user._id);
         if (!user)
             throw new UnauthorizedException('check your credintials');
         if (OverrideUtils.dycreptPassword(user.password) !== body.oldPassword)
@@ -68,7 +68,7 @@ export class AuthService {
 
     }
     async newPassword(req, body: ResetPassword) {
-        let user = await this.userService.findOne(req.user.id);
+        let user = await this.userService.findOne(req.user._id);
         if (!user)
             throw new UnauthorizedException('check your credintials');
 
@@ -115,7 +115,7 @@ export class AuthService {
         }
     }
     async resendCode(req: any) {
-        let user = await this.userService.findOne(req.user.id);
+        let user = await this.userService.findOne(req.user._id);
         if (!user)
             throw new UnauthorizedException('check your credintials');
         user.tempCode = '54321';
@@ -135,7 +135,7 @@ export class AuthService {
        await this.httpService.get(baseURL).toPromise();
     }
     async activate(req: any, code: string) {
-        let user = await this.userService.findOne(req.user.id);
+        let user = await this.userService.findOne(req.user._id);
         if (!user)
             throw new UnauthorizedException('check your credintials');
         if (user.isActive === false && user.tempCode !== code)
@@ -171,11 +171,7 @@ export class AuthService {
             }
         }
 
-        if (body.fcmToken) {
-            user.fcmTokens.push(body.fcmToken)
-            await this.userService.UserModel.updateOne({ _id: user['_id'] }, user);
-
-        }
+      
 
 
 
@@ -196,7 +192,6 @@ export class AuthService {
         let user = new User();
         user.userType = UserType.admin;
         user.name = body.name;
-        user.fcmTokens = body.fcmToken != null ? [body.fcmToken] : []
         user.password = OverrideUtils.encryptPassword(body.password);
         user.email = body.email;
         user.defaultLang = body.defaultLang;
@@ -224,7 +219,6 @@ export class AuthService {
         let user = new User();
         user.userType = UserType.teacher;
         user.name = body.name;
-        user.fcmTokens = body.fcmToken != null ? [body.fcmToken] : []
         user.password = OverrideUtils.encryptPassword(body.password);
         user.email = body.email;
         user.defaultLang = body.defaultLang;
@@ -262,7 +256,6 @@ export class AuthService {
         let user = new User();
         user.userType = UserType.parent;
         user.name = body.name;
-        user.fcmTokens = body.fcmToken != null ? [body.fcmToken] : []
         user.password = OverrideUtils.encryptPassword(body.password);
         user.email = body.email;
         user.defaultLang = body.defaultLang;
@@ -291,7 +284,6 @@ export class AuthService {
         let user = new User();
         user.userType = UserType.student;
         user.name = body.name;
-        user.fcmTokens = body.fcmToken != null ? [body.fcmToken] : []
         user.password = OverrideUtils.encryptPassword(body.password);
         user.email = body.email;
         user.defaultLang = body.defaultLang;

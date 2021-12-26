@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Render, Req, UseGuards, Request,Redirect } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
-import { Checkout } from '../../Models/checkout.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Checkout } from '../../models/checkout.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { CheckoutService } from './checkout.service';
 
 @ApiTags('Checkout')

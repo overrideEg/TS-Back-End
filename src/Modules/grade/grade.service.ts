@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Grade, GradeDocument } from '../../Models/grade.model';
+import { Grade, GradeDocument } from '../../models/grade.model';
 const ObjectId = require('mongoose').Types.ObjectId;
 
 @Injectable()

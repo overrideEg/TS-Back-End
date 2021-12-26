@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, Req } from '@nestjs/common';
 import { NoticeService } from './notice.service';
 import { ApiTags } from '@nestjs/swagger';
-import { Notice } from '../../Models/notice.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Notice } from '../../models/notice.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 
 @ApiTags('Notice')
 @Controller('Notice')

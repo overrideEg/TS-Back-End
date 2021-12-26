@@ -1,32 +1,32 @@
-import { CartModule } from './Modules/cart/cart.module';
+import { CartModule } from './modules/cart/cart.module';
 import { CacheModule, Module, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 
-import { FileModule } from './Modules/file/file.module';
+import { FileModule } from './modules/file/file.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './shared/logger.middleware';
-import { AuthModule } from './Modules/auth/auth.module';
-import { UserModule } from './Modules/user/user.module';
-import { CityModule } from './Modules/city/city.module';
-import { StageModule } from './Modules/stage/stage.module';
-import { GradeModule } from './Modules/grade/grade.module';
-import { OnBoardingModule } from './Modules/on-boarding/on-boarding.module';
-import { BannerModule } from './Modules/banner/banner.module';
-import { SubjectModule } from './Modules/subject/subject.module';
-import { PromotionModule } from './Modules/promotion/promotion.module';
-import { OurContactsModule } from './Modules/our-contacts/our-contacts.module';
-import { CourseModule } from './Modules/course/course.module';
-import { SearchModule } from './Modules/search/search.module';
-import { CheckoutModule } from './Modules/checkout/checkout.module';
-import { LearningClassModule } from './Modules/learning-class/learning-class.module';
-import { PartnerModule } from './Modules/partner/partner.module';
-import { HomeModule } from './Modules/home/home.module';
-import { ContactUsModule } from './Modules/contact-us/contact-us.module';
-import { NoticeModule } from './Modules/notice/notice.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { CityModule } from './modules/city/city.module';
+import { StageModule } from './modules/stage/stage.module';
+import { GradeModule } from './modules/grade/grade.module';
+import { OnBoardingModule } from './modules/on-boarding/on-boarding.module';
+import { BannerModule } from './modules/banner/banner.module';
+import { SubjectModule } from './modules/subject/subject.module';
+import { PromotionModule } from './modules/promotion/promotion.module';
+import { CourseModule } from './modules/course/course.module';
+import { SearchModule } from './modules/search/search.module';
+import { CheckoutModule } from './modules/checkout/checkout.module';
+import { LearningClassModule } from './modules/learning-class/learning-class.module';
+import { PartnerModule } from './modules/partner/partner.module';
+import { HomeModule } from './modules/home/home.module';
+import { ContactUsModule } from './modules/contact-us/contact-us.module';
+import { NoticeModule } from './modules/notice/notice.module';
+import { SettingModule } from './modules/setting/setting.module';
 const overrideMoules = [
   FileModule,
   AuthModule,
@@ -38,7 +38,7 @@ const overrideMoules = [
   BannerModule,
   SubjectModule,
   PromotionModule,
-  OurContactsModule,
+  SettingModule,
   CourseModule,
   CartModule,
   SearchModule,
@@ -51,17 +51,33 @@ const overrideMoules = [
 ]
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
 
-    MongooseModule.forRoot('mongodb://localhost/ts-academy', {
+    MongooseModule.forRoot(`mongodb://${process.env.db_host}/?readPreference=primary&appname=MongoDB%20Compass&ssl=false`, {
+      dbName:'ts-academy',
+      ssl: false,
+      auth: {
+        user: process.env.db_user,
+        password: process.env.db_pwd
+      },
+
       connectionFactory: (connection) => {
+        connection.on('connected', () => {
+          console.log('DB is connected');
+        });
+        connection.on('disconnected', () => {
+          console.log('DB disconnected');
+        });
+        connection.on('error', (error) => {
+          console.log('DB connection failed! for error: ', error);
+        });
         connection.plugin(require('mongoose-autopopulate'));
         return connection;
       }
     }),
-    ConfigModule.forRoot({
-      envFilePath: '.env',
-      isGlobal: true,
-    }),
+
     CacheModule.register(),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot({

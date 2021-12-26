@@ -3,12 +3,11 @@ import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { OBaseEntity } from '../shared/base-entity';
 import { Lang } from '../shared/enums/lang.enum';
-import { Course } from './course.model';
+import { Course } from './course/course.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { City } from './city.model';
 import { Grade } from './grade.model';
 import { Stage } from './stage.model';
-import { TransactionStatus, TransactionType } from '../enums/wallet.enum';
 import { StudentReview } from './student-review.model';
 import { BankAccount } from './bank-account.model';
 import { Wallet } from './wallet-model';
@@ -42,8 +41,6 @@ export class User extends OBaseEntity {
     phone?: string;
     @Prop()
     password?: string;
-    @Prop([String])
-    fcmTokens?: Array<string>;
 
     @Prop()
     avatar?: string

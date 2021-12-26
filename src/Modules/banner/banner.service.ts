@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Banner, BannerDocument } from '../../Models/banner.model';
+import { Banner, BannerDocument } from '../../models/banner.model';
 @Injectable()
 export class BannerService {
     constructor(

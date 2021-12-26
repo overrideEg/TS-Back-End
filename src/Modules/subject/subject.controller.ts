@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Subject } from '../../Models/subject.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Subject } from '../../models/subject.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { SubjectService } from './subject.service';
 
 @ApiTags('Subject')

@@ -6,8 +6,8 @@ import { PartnerModule } from '../partner/partner.module';
 import { UserModule } from '../user/user.module';
 import { SubjectModule } from '../subject/subject.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Course, CourseSchema } from '../../Models/course.model';
-import { Checkout, CheckoutSchema } from '../../Models/checkout.model';
+import { Course, CourseSchema } from '../../models/course/course.model';
+import { Checkout, CheckoutSchema } from '../../models/checkout.model';
 import { CourseModule } from '../course/course.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 

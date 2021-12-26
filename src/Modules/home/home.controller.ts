@@ -1,7 +1,7 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { StudentHome, TeacherHome } from '../../dtos/home.dto';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { HomeService } from './home.service';
 
 @ApiTags('Home')

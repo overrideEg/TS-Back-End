@@ -1,16 +1,17 @@
+import { Status } from './../../enums/status.enum';
 import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
-import { TransactionType, TransactionStatus } from '../../enums/wallet.enum';
-import { BankAccount, BankAccountDocument } from '../../Models/bank-account.model';
-import { CheckoutDocument } from '../../Models/checkout.model';
-import { Course } from '../../Models/course.model';
-import { StudentReview, StudentReviewDocument, StudentReviewSchema } from '../../Models/student-review.model';
-import { User, UserDocument, UserType } from '../../Models/user.model';
-import { Wallet, WalletDocument } from '../../Models/wallet-model';
+import { TransactionType } from '../../enums/wallet.enum';
+import { BankAccount, BankAccountDocument } from '../../models/bank-account.model';
+import { CheckoutDocument } from '../../models/checkout.model';
+import { Course } from '../../models/course/course.model';
+import { StudentReview, StudentReviewDocument, StudentReviewSchema } from '../../models/student-review.model';
+import { User, UserDocument, UserType } from '../../models/user.model';
+import { Wallet, WalletDocument } from '../../models/wallet-model';
 
 import { Lang } from '../../shared/enums/lang.enum';
 import { OverrideUtils } from '../../shared/override-utils';
@@ -52,10 +53,10 @@ export class UserService {
     }
 
     async myProfile(req): Promise<User> {
-        return await this.findOne(req.user.id)
+        return await this.findOne(req.user._id)
     }
     async updateProfile(req: any, profile: UpdateProfile): Promise<User> {
-        let user = await this.findOne(req.user.id);
+        let user = await this.findOne(req.user._id);
         if (profile.name) {
             user.name = profile.name;
         }
@@ -89,7 +90,7 @@ export class UserService {
             }
         }
 
-        return await this.update(req.user.id, user);
+        return await this.update(req.user._id, user);
     }
 
     async validate(payload: any) {
@@ -146,20 +147,13 @@ export class UserService {
         let user = await this.findOne(id);
         let courses = await this.courseService.CourseModel.find({ teacher: new ObjectId(id) }).sort({ createdAt: 'desc' }).exec();
         for await (const course of courses) {
-            course.related = [];
-            course.related = course.related.slice(0, 6);
+            // course.related = [];
+            // course.related = course.related.slice(0, 6);
             let progress = 0;
             let videos = 0;
-            course.enrolled = Number((Math.random() * 100).toFixed(0))
-            course.content.forEach(cont => {
-                let contentProgress = 0;
-                cont.lessons.forEach(less => {
-                    less.type.toString() === 'video' ? videos += 1 : videos += 0;
-                    less.type.toString() === 'video' && less.isDone ? contentProgress += 1 : contentProgress += 0;
-                });
-                progress += contentProgress;
-            });
-            course.progress = progress / videos * 100;
+            // course.enrolled = Number((Math.random() * 100).toFixed(0))
+          
+            // course.progress = progress / videos * 100;
             for await (let review of course.reviews) {
 
                 review.user = await this.UserModel.findById(review.user).exec()
@@ -173,7 +167,7 @@ export class UserService {
         profile.name = user.name;
         profile.userId = user['_id'];
         profile.avatar = user['avatar'] ?? '';
-        profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
+        // profile.rate = courses.reduce((acc, course) => acc + course.cRating, 0) / courses.length;
 
         profile.noOfStudents = await this.checkoutService.CheckoutModel.countDocuments({ paymentStatus: PaymentStatus.Paid }).populate({
             "path": "course",
@@ -186,7 +180,7 @@ export class UserService {
     }
 
     async addBankAccount(req: any, body: BankAccount) {
-        let teacher = await this.findOne(req.user.id);
+        let teacher = await this.findOne(req.user._id);
         let BankAccount = await this.BankAccountModel.create(body);
         teacher.bankAccounts.push(BankAccount);
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);
@@ -194,25 +188,24 @@ export class UserService {
     }
 
     async getBankAccounts(req: any) {
-        let teacher = await this.findOne(req.user.id);
+        let teacher = await this.findOne(req.user._id);
         if (!teacher)
             throw new BadRequestException('no user found');
         return teacher.bankAccounts
     }
 
     async withDrawCash(req: any, accountId: string, amount: number) {
-        let teacher = await this.findOne(req.user.id);
+        let teacher = await this.findOne(req.user._id);
         if (!teacher)
             throw new BadRequestException('no user found');
         let account = teacher.bankAccounts.find((acc) => acc['_id'] === accountId);
-        let balance = teacher.wallet.reduce((acc, wall) => acc + (wall.type === TransactionType.in ? wall.value : (wall.status === TransactionStatus.approved ? wall.value : 0)), 0);
+        let balance = teacher.wallet.reduce((acc, wall) => acc + (wall.type === TransactionType.in ? wall.value : (wall.status === Status.approved ? wall.value : 0)), 0);
         if (balance > amount)
             throw new BadRequestException(`your balance is ${balance} and you requested ${amount}`);
         let wallet = new Wallet();
         wallet.account = account;
         wallet.value = amount;
         wallet.date = Date.now();
-        wallet.status = TransactionStatus.pending;
         wallet.value = amount;
         wallet.type = TransactionType.out;
         wallet = await this.WalletModel.create(wallet);
@@ -221,7 +214,7 @@ export class UserService {
 
         this.noticeService.sendSpecificNotification(
             {
-                userId: req.user.id,
+                userId: req.user._id,
                 notification: {
                     title: teacher.defaultLang === Lang.en ? 'request saved successfullty' : 'تم تسجيل طلبك',
                     body: teacher.defaultLang === Lang.en ? `your request to withdraw cach with amount (${amount}) has been recorded and its status ${wallet.status.toString()}` :
@@ -259,7 +252,7 @@ export class UserService {
         let wallet = teacher?.wallet?.find(wall => wall['_id'] === walletId);
         if (!teacher || !wallet)
             throw new BadRequestException('Check sent IDs');
-        wallet.status = TransactionStatus.approved;
+        wallet.status = Status.approved;
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);
 
 
@@ -288,14 +281,14 @@ export class UserService {
         let wallet = new Wallet()
         wallet.date = Date.now()
         wallet.type = TransactionType.in;
-        wallet.status = TransactionStatus.approved;
+        wallet.status = Status.approved;
         wallet.value = checkoutSaved.price
         wallet.checkout = checkoutSaved;
         wallet = await this.WalletModel.create(wallet);
         checkoutSaved.course.teacher.wallet.push(wallet);
         await this.UserModel.updateOne({ _id: checkoutSaved.course.teacher['_id'] }, checkoutSaved.course.teacher)
     }
-    async getWallets(type: TransactionType, status: TransactionStatus) {
+    async getWallets(type: TransactionType, status: Status) {
         let teachers = await this.UserModel.find({ userType: UserType.teacher }).exec();
         let wallets = [];
         teachers.forEach(teacher => {
@@ -323,7 +316,7 @@ export class UserService {
     }
 
     async deleteBankAccount(req: any, accountId: string) {
-        let teacher = await this.findOne(req.user.id);
+        let teacher = await this.findOne(req.user._id);
         teacher.bankAccounts.splice(teacher.bankAccounts.findIndex((acc) => acc['_id'] === accountId), 1);
         await this.BankAccountModel.deleteOne({ _id: accountId });
         await this.UserModel.updateOne({ _id: teacher['_id'] }, teacher);

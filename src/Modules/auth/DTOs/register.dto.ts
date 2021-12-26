@@ -1,7 +1,7 @@
 import { Prop } from "@nestjs/mongoose";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsEmail, IsEnum, IsString, MaxLength, MinLength, minLength } from "class-validator";
-import { City } from "../../../Models/city.model";
+import { City } from "../../../models/city.model";
 import { Lang } from "../../../shared/enums/lang.enum";
 
 export class RegisterAdmin {
@@ -20,9 +20,7 @@ export class RegisterAdmin {
     @MinLength(8)
     @MaxLength(16)
     password: string;
-    @ApiProperty()
-    @IsString()
-    fcmToken: string;
+
     @ApiProperty({ default: Lang.en, enum: [Lang.en, Lang.ar] })
     @IsEnum(Lang)
     defaultLang?: Lang;

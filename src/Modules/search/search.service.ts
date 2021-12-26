@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { GlobalFilter, GlobalSearch } from '../../dtos/search.dto';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { Sort } from '../../enums/sort.enum';
-import { Course } from '../../Models/course.model';
-import { UserType } from '../../Models/user.model';
+import { Course } from '../../models/course/course.model';
+import { UserType } from '../../models/user.model';
 import { CheckoutService } from '../checkout/checkout.service';
 import { CourseService } from '../course/course.service';
 import { UserService } from '../user/user.service';
@@ -49,56 +49,56 @@ export class SearchService {
             .skip(limit * page)
             .exec();
 
-        for await (const course of courses) {
-            course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id']) })
-            course.related = [];
+        // for await (const course of courses) {
+        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id']) })
+        //     course.related = [];
 
-        }
-        globalSearch.courses = courses;
-        let userTeachers = await this.userService.UserModel.find(
-            {
-                $and: [
-                    {
-                        $or: [
-                            { "name": new RegExp(search, "i") },
-                            { "email": new RegExp(search, "i") }
-                        ],
-                    },
+        // }
+        // globalSearch.courses = courses;
+        // let userTeachers = await this.userService.UserModel.find(
+        //     {
+        //         $and: [
+        //             {
+        //                 $or: [
+        //                     { "name": new RegExp(search, "i") },
+        //                     { "email": new RegExp(search, "i") }
+        //                 ],
+        //             },
 
-                    { userType: UserType.teacher }
-                ]
+        //             { userType: UserType.teacher }
+        //         ]
 
 
-            }
-        ).sort({
-            priority: 'asc'
-        })
-            .limit(limit)
-            .skip(limit * page)
-            .exec();
+        //     }
+        // ).sort({
+        //     priority: 'asc'
+        // })
+        //     .limit(limit)
+        //     .skip(limit * page)
+        //     .exec();
 
         globalSearch.teachers = []
-        for await (const user of userTeachers) {
+        // for await (const user of userTeachers) {
 
-            let profile = new TeacherProfile();
-            profile.name = user.name;
-            profile.avatar = user.avatar ?? "";
-            let teacherCourses = await this.courseService.CourseModel.find({ teacher: user });
-            let registers = await this.checkoutService.CheckoutModel.countDocuments().populate({
-                "path": "lines.course",
-                'model': Course.name
-            }).populate({
-                path: 'lines.course.teacher',
-                "match": new ObjectId(user['_id'].toString())
-            });
-            profile.noOfStudents = registers
-            profile.noOfCourses = teacherCourses.length
-            profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
-            profile.bio = user?.bio ?? user.name;
-            profile.userId = user['_id']
-            profile.teacherId = user['_id']
-            globalSearch.teachers.push(profile);
-        }
+        //     let profile = new TeacherProfile();
+        //     profile.name = user.name;
+        //     profile.avatar = user.avatar ?? "";
+        //     let teacherCourses = await this.courseService.CourseModel.find({ teacher: user });
+        //     let registers = await this.checkoutService.CheckoutModel.countDocuments().populate({
+        //         "path": "lines.course",
+        //         'model': Course.name
+        //     }).populate({
+        //         path: 'lines.course.teacher',
+        //         "match": new ObjectId(user['_id'].toString())
+        //     });
+        //     profile.noOfStudents = registers
+        //     profile.noOfCourses = teacherCourses.length
+        //     profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+        //     profile.bio = user?.bio ?? user.name;
+        //     profile.userId = user['_id']
+        //     profile.teacherId = user['_id']
+        //     globalSearch.teachers.push(profile);
+        // }
         return globalSearch;
     }
 
@@ -116,9 +116,9 @@ export class SearchService {
         }).sort({ 'cRating': 'desc' }).exec();
 
 
-        for await (const course of featuresCourses) {
-            course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
-        }
+        // for await (const course of featuresCourses) {
+        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
+        // }
         globalFilter.topInstructors = []
 
         for await (const course of featuresCourses) {
@@ -135,7 +135,7 @@ export class SearchService {
                 "match": new ObjectId(course.teacher['_id'])
             });
             profile.noOfCourses = teacherCourses.length
-            profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+            // profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
             profile.bio = course.teacher?.bio ?? course.teacher.name;
             profile.userId = course.teacher['_id']
             if (!cityId)
@@ -155,10 +155,10 @@ export class SearchService {
         }).sort({ 'cRating': rate === Sort.HTL ? 'desc' : 'asc' }).limit(limit)
             .skip(limit * page).exec();
 
-        for await (const course of allCourses) {
-            course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
+        // for await (const course of allCourses) {
+        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
 
-        }
+        // }
         if (cityId) {
             allCourses = allCourses.filter(course => course?.teacher?.city['_id'] === cityId);
             featuresCourses = featuresCourses.filter(course => course?.teacher?.city['_id'] === cityId);

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { GradeService } from './grade.service';
 import { GradeController } from './grade.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Grade, GradeSchema } from '../../Models/grade.model';
+import { Grade, GradeSchema } from '../../models/grade.model';
 
 @Module({
   imports:[

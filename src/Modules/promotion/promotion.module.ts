@@ -2,7 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { PromotionService } from './promotion.service';
 import { PromotionController } from './promotion.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Promotion, PromotionSchema } from '../../Models/promotion.model';
+import { Promotion, PromotionSchema } from '../../models/promotion.model';
 import { CheckoutModule } from '../checkout/checkout.module';
 
 @Module({

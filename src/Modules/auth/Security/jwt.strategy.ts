@@ -4,7 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { jwtConstants } from './constants';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from '../../user/user.service';
-import { UserType } from '../../../Models/user.model';
+import { UserType } from '../../../models/user.model';
 
 
 @Injectable()

@@ -1,13 +1,14 @@
+import { Status } from './../../enums/status.enum';
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { profile } from 'console';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { UpdateProfile } from '../../dtos/update-profile.dto';
-import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
-import { BankAccount } from '../../Models/bank-account.model';
-import { StudentReview } from '../../Models/student-review.model';
-import { User, UserType } from '../../Models/user.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import {  TransactionType } from '../../enums/wallet.enum';
+import { BankAccount } from '../../models/bank-account.model';
+import { StudentReview } from '../../models/student-review.model';
+import { User, UserType } from '../../models/user.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -57,9 +58,9 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('wallet')
   @ApiQuery({ name: 'type', enum: [TransactionType.in, TransactionType.out] })
-  @ApiQuery({ name: 'status', enum: [TransactionStatus.approved, TransactionStatus.pending] })
+  @ApiQuery({ name: 'status', enum: [Status.approved, Status.pending] })
   getWallets(@Query('type') type: string, @Query('status') status: string) {
-    return this.service.getWallets(type ? TransactionType[type] : null, status ? TransactionStatus[status] : null);
+    return this.service.getWallets(type ? TransactionType[type] : null, status ? Status[status] : null);
   }
 
 

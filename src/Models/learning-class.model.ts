@@ -2,8 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { OBaseEntity } from '../shared/base-entity';
-import { Course, Lesson } from './course.model';
+import { Course } from './course/course.model';
 import { User } from './user.model';
+import { Lesson } from './course/sub-models/lesson.model';
 export class AttendanceLog {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name , autopopulate: true})
     user?: User;

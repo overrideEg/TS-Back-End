@@ -4,13 +4,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
 import { PaymentMethod, PaymentStatus } from '../../enums/payment-method.enum';
-import { TransactionStatus, TransactionType } from '../../enums/wallet.enum';
-import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
-import { Promotion } from '../../Models/promotion.model';
-import { Wallet } from '../../Models/wallet-model';
+import { Checkout, CheckoutDocument } from '../../models/checkout.model';
+import { Promotion } from '../../models/promotion.model';
+import { Wallet } from '../../models/wallet-model';
 import { Lang } from '../../shared/enums/lang.enum';
 import { OverrideUtils } from '../../shared/override-utils';
-import { Payment } from '../auth/Security/constants';
+import { Payment } from '../auth/security/constants';
 import { CourseService } from '../course/course.service';
 import { NoticeService } from '../notice/notice.service';
 import { PromotionService } from '../promotion/promotion.service';
@@ -56,8 +55,6 @@ export class CheckoutService {
             }
         }
 
-
-
         let checkouts: Checkout[] = []
         for await (const course of body.courses) {
 
@@ -69,11 +66,11 @@ export class CheckoutService {
                     throw new BadRequestException(req.user.defaultLang === Lang.en ? 'please enter correct student id' : 'لا يوجد طالب بالكود الموجود');
 
             } else {
-                checkout.user = new ObjectId(req.user.id)
+                checkout.user = new ObjectId(req.user._id)
             }
 
             checkout.course = await this.courseService.CourseModel.findById(course['_id']);
-            checkout.price = checkout.course.price;
+            // checkout.price = checkout.course.price;
 
             checkout.valueDate = Date.now();
             checkout.priceBeforeDiscount = checkout.price;
@@ -96,9 +93,9 @@ export class CheckoutService {
         }
 
         //TODO Payment
-        let user = await this.userService.findOne(req.user.id);
+        let user = await this.userService.findOne(req.user._id);
         user.cart = [];
-        await this.userService.update(req.user.id, user)
+        await this.userService.update(req.user._id, user)
 
         let paymentResult: any;
         await this.httpService.post('/v1/checkouts', null, {
@@ -188,7 +185,7 @@ export class CheckoutService {
             
             try {
                 let course = checkout['course']
-                course.enrolled = await this.CheckoutModel.count({ paymentStatus: PaymentStatus.Paid, course: course });
+                // course.enrolled = await this.CheckoutModel.count({ paymentStatus: PaymentStatus.Paid, course: course });
                 await this.courseService.CourseModel.updateOne({ _id: checkout.course['_id'] }, course);
                 this.noticeService.sendSpecificNotification(
                     {

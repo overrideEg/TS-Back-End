@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Grade } from '../../Models/grade.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Grade } from '../../models/grade.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { GradeService } from './grade.service';
 
 

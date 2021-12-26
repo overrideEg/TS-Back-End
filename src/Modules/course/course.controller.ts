@@ -1,7 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Course, CourseContent, CourseReview, Excercice } from '../../Models/course.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Course, } from '../../models/course/course.model';
+import { CourseContent } from '../../models/course/sub-models/course-content.model';
+import { CourseReview } from '../../models/course/sub-models/course-review.model';
+import { Excercice } from '../../models/course/sub-models/excercice.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { CourseService } from './course.service';
 
 @ApiTags('Course')
@@ -12,18 +15,15 @@ export class CourseController {
 
 
   constructor(private service: CourseService) { }
+
   /* POST Course End Point */
   @UseGuards(JwtAuthGuard)
   @Post('new')
   async saveCourse(@Req() req, @Body() body: Course): Promise<Course> {
     return this.service.newCourse(req, body)
   }
-  @UseGuards(JwtAuthGuard)
-  @ApiBody({ type: CourseContent, isArray: true })
-  @Post('content/:courseId')
-  async addCourseContent(@Req() req, @Body() body: CourseContent[], @Param('courseId') courseId: string): Promise<CourseContent[]> {
-    return this.service.addCourseContent(req, courseId, body)
-  }
+
+ 
 
   @UseGuards(JwtAuthGuard)
   @ApiBody({ type: CourseReview })
@@ -39,12 +39,10 @@ export class CourseController {
     return this.service.applyExcercice(req, courseId, lessonId, body)
   }
 
-
-
   @UseGuards(JwtAuthGuard)
   @Get('excercice/:courseId/:lessonId')
-  async getExcercices(@Req() req,  @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<Excercice[]> {
-    return this.service.getExcercices(req, courseId, lessonId, )
+  async getExcercices(@Req() req, @Param('courseId') courseId: string, @Param('lessonId') lessonId: string): Promise<Excercice[]> {
+    return this.service.getExcercices(req, courseId, lessonId,)
   }
 
 

@@ -3,9 +3,9 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { Notice, NoticeDocument } from '../../Models/notice.model';
+import { Notice, NoticeDocument } from '../../models/notice.model';
 import * as admin from 'firebase-admin';
-import { UserType } from '../../Models/user.model';
+import { UserType } from '../../models/user.model';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -21,7 +21,7 @@ export class NoticeService {
 
 
   async findAll(req): Promise<Notice[]> {
-    return this.repo.find({ user: new ObjectId(req.user.id) }).sort({ valueDate: 'desc' }).exec();
+    return this.repo.find({ user: new ObjectId(req.user._id) }).sort({ valueDate: 'desc' }).exec();
   }
 
 
@@ -48,38 +48,38 @@ export class NoticeService {
   async sendSpecificNotification({ userId, notification, data, imageURL }: { userId: string, notification: { title: string, body: string }, data?: { entityType: string, entityId: string }, imageURL?: string }) {
     let user = await (await this.userService.UserModel.findById(userId).exec()).toObject();
     let notice = new Notice();
-    if (user.fcmTokens.length > 0) {
-      const message: admin.messaging.MessagingPayload = {
-        notification: {
-          title: notification.title,
-          body: notification.body,
-        }
+    // if (user.fcmTokens.length > 0) {
+    //   const message: admin.messaging.MessagingPayload = {
+    //     notification: {
+    //       title: notification.title,
+    //       body: notification.body,
+    //     }
 
-      };
-      if (data) {
-        message.data = {
-          entityType: data.entityType,
-          entityId: data.entityId.toString(),
-        }
-        if (imageURL) {
-          message.data['imageURL'] = imageURL
-        }
+    //   };
+    //   if (data) {
+    //     message.data = {
+    //       entityType: data.entityType,
+    //       entityId: data.entityId.toString(),
+    //     }
+    //     if (imageURL) {
+    //       message.data['imageURL'] = imageURL
+    //     }
 
-      }
+    //   }
 
 
-      admin.messaging().sendToDevice(user.fcmTokens.filter(tok => tok != ""), message).then(res => {
-        if (res.successCount > 0) {
-          this.logger.log(`success notification sent to user ${user.email} success ${res.successCount}`)
-        }
-        if (res.failureCount > 0) {
-          this.logger.error(`fail notification sent to user ${user.email} fail ${res.failureCount}`)
+    //   admin.messaging().sendToDevice(user.fcmTokens.filter(tok => tok != ""), message).then(res => {
+    //     if (res.successCount > 0) {
+    //       this.logger.log(`success notification sent to user ${user.email} success ${res.successCount}`)
+    //     }
+    //     if (res.failureCount > 0) {
+    //       this.logger.error(`fail notification sent to user ${user.email} fail ${res.failureCount}`)
 
-        }
-      }).catch(err => {
-        this.logger.error(err)
-      });
-    }
+    //     }
+    //   }).catch(err => {
+    //     this.logger.error(err)
+    //   });
+    // }
     notice.user = new ObjectId(userId);
     notice.title = notification.title;
     notice.body = notification.body;

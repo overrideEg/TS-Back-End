@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Param, UploadedFile, Req, Res, UploadedFiles, UseGuards, } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FastifyRequest } from 'fastify'
-import { ClientGuard } from '../auth/Security/client.guard';
+import { ClientGuard } from '../auth/security/client.guard';
 
 type Request = FastifyRequest
 

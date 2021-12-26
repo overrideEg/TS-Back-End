@@ -2,8 +2,8 @@ import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GlobalFilter, GlobalSearch } from '../../dtos/search.dto';
 import { Sort } from '../../enums/sort.enum';
-import { Course } from '../../Models/course.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Course } from '../../models/course/course.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { SearchService } from './search.service';
 
 @ApiTags('Search')

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Stage } from '../../Models/stage.model';
-import { JwtAuthGuard } from '../auth/Security/jwt-auth.guard';
+import { Stage } from '../../models/stage.model';
+import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { StageService } from './stage.service';
 
 

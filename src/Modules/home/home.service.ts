@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StudentHome, TeacherHome } from '../../dtos/home.dto';
-import { Course, CourseDocument } from '../../Models/course.model';
+import { Course, CourseDocument } from '../../models/course/course.model';
 import { BannerService } from '../banner/banner.service';
 import { PartnerService } from '../partner/partner.service';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 import * as moment from 'moment';
 import { SubjectService } from '../subject/subject.service';
-import { Checkout, CheckoutDocument } from '../../Models/checkout.model';
+import { Checkout, CheckoutDocument } from '../../models/checkout.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { CourseService } from '../course/course.service';
@@ -33,29 +33,29 @@ export class HomeService {
         home.partners = await this.partnerService.findAll();
         let featuresCourses = await this.courseService.CourseModel.find().sort({ 'cRating': 'desc' }).limit(20).exec();
 
-        for await (const course of featuresCourses) {
-            course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
-            course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user.id)}] })
+        // for await (const course of featuresCourses) {
+        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
+        //     course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user._id)}] })
 
-        }
-        home.featuresCourses = featuresCourses;
-        let addedRecently = await this.courseService.CourseModel.find().sort({ 'createdAt': 'desc' }).limit(20).exec();
-        for await (const course of addedRecently) {
-            course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
-            course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user.id)}] })
+        // }
+        // home.featuresCourses = featuresCourses;
+        // let addedRecently = await this.courseService.CourseModel.find().sort({ 'createdAt': 'desc' }).limit(20).exec();
+        // for await (const course of addedRecently) {
+        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
+        //     course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user._id)}] })
 
-        }
-        home.addedRecently = addedRecently;
+        // }
+        // home.addedRecently = addedRecently;
         let now = moment();
         let afterWeek = moment();
         afterWeek.add(1, 'week');
 
         let startSoon = await this.courseService.CourseModel.find({ startDate: { $gte: now.unix() * 1000, $lte: afterWeek.unix() * 1000 } }).limit(20).exec();
-        for await (const course of startSoon) {
-            course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user.id), cart: new ObjectId(course['_id'].toString()) })
-            course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user.id)}] })
+        // for await (const course of startSoon) {
+        //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
+        //     course.purchased = await this.checkoutService.CheckoutModel.exists({ $and:[{course: new ObjectId(course['_id'].toString())}, {user: new ObjectId(req.user._id)}] })
 
-        }
+        // }
 
         home.startSoon = startSoon;
         home.subjects = await this.subjectService.findAll();
@@ -73,7 +73,7 @@ export class HomeService {
                 path: 'course.teacher._id',
                 "match": new ObjectId(course.teacher['_id'])
             });
-            profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+            // profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
             profile.noOfCourses = teacherCourses.length
             profile.bio = course.teacher?.bio ?? course?.teacher?.name;
             profile.userId = course.teacher['_id']
@@ -88,11 +88,11 @@ export class HomeService {
 
     async getTeacherHome(req: any): Promise<TeacherHome | PromiseLike<TeacherHome>> {
         let home = new TeacherHome()
-        let user = await this.userService.findOne(req.user.id);
+        let user = await this.userService.findOne(req.user._id);
 
         let teacherCourses = await this.courseService.CourseModel.find({ teacher: user }).exec();
         home.noOfCourses = teacherCourses.length
-        home.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
+        // home.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
         let feedbacks = [];
 
 
@@ -120,11 +120,7 @@ export class HomeService {
             feedback.user = await this.userService.findOne(String(feedback.user))
         }
         let todayCourses = teacherCourses;
-        todayCourses = todayCourses.filter(course => {
-            let today = course.Days.find(day => OverrideUtils.dayOffDay(day) === new Date().getDay());
-            let notFinished = course.content.find(content => content.lessons.find(lesson => lesson.isDone == false || lesson.isDone == null || lesson.isDone == undefined));
-            return today && notFinished
-        })
+    
         home.todayCourses = todayCourses;
         return home
     }

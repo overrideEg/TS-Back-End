@@ -5,8 +5,8 @@ import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
 import { Login } from './DTOs/login.dto';
 import { refreshToken } from './DTOs/refreshToken.dto';
 import { RegisterAdmin, RegisterParent, RegisterStudent, RegisterTeacher } from './DTOs/register.dto';
-import { ClientGuard } from './Security/client.guard';
-import { JwtAuthGuard } from './Security/jwt-auth.guard';
+import { ClientGuard } from './security/client.guard';
+import { JwtAuthGuard } from './security/jwt-auth.guard';
 
 @ApiTags('Auth')
 @Controller('Auth')
