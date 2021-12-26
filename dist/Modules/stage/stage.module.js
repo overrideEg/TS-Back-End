@@ -1,0 +1,36 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StageModule = void 0;
+const common_1 = require("@nestjs/common");
+const stage_service_1 = require("./stage.service");
+const stage_controller_1 = require("./stage.controller");
+const mongoose_1 = require("@nestjs/mongoose");
+const stage_model_1 = require("../../models/stage.model");
+let StageModule = class StageModule {
+};
+StageModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            mongoose_1.MongooseModule.forFeatureAsync([
+                {
+                    name: stage_model_1.Stage.name,
+                    useFactory: () => {
+                        const schema = stage_model_1.StageSchema;
+                        schema.plugin(require('mongoose-autopopulate'));
+                        return schema;
+                    },
+                },
+            ]),
+        ],
+        controllers: [stage_controller_1.StageController],
+        providers: [stage_service_1.StageService],
+    })
+], StageModule);
+exports.StageModule = StageModule;
+//# sourceMappingURL=stage.module.js.map
