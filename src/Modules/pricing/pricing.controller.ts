@@ -4,14 +4,9 @@ import {
   Post,
   Body,
   Get,
-  Param,
-  Put,
-  Delete,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Pricing } from '../../models/pricing.model';
-import { UserType } from '../../models/user.model';
-import { ClientGuard } from '../auth/security/client.guard';
 import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
 import { Roles } from '../auth/security/roles.decorator';
 import { PricingService } from './pricing.service';

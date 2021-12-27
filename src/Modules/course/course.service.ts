@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { LessonType } from '../../enums/lesson-type.enum';
 import { PaymentStatus } from '../../enums/payment-method.enum';
 import { Status } from '../../enums/status.enum';
+import { UserType } from '../../enums/user-type.enum';
 import { Course, CourseDocument } from '../../models/course/course.model';
 import {
   CourseContent,
@@ -27,7 +28,6 @@ import {
   Lesson,
   LessonDocument,
 } from '../../models/course/sub-models/lesson.model';
-import { UserType } from '../../models/user.model';
 import { Lang } from '../../shared/enums/lang.enum';
 import { OverrideUtils } from '../../shared/override-utils';
 import { CheckoutService } from '../checkout/checkout.service';

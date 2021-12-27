@@ -23,7 +23,7 @@ import {
   StudentReviewDocument,
   StudentReviewSchema,
 } from '../../models/student-review.model';
-import { User, UserDocument, UserType } from '../../models/user.model';
+import { User, UserDocument } from '../../models/user.model';
 import { Wallet, WalletDocument } from '../../models/wallet-model';
 
 import { Lang } from '../../shared/enums/lang.enum';
@@ -34,6 +34,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 import * as moment from 'moment';
 import { NoticeService } from '../notice/notice.service';
 import { PaymentStatus } from '../../enums/payment-method.enum';
+import { UserType } from '../../enums/user-type.enum';
 
 @Injectable()
 export class UserService {

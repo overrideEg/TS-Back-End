@@ -11,13 +11,8 @@ import { Stage } from './stage.model';
 import { StudentReview } from './student-review.model';
 import { BankAccount } from './bank-account.model';
 import { Wallet } from './wallet-model';
+import { UserType } from '../enums/user-type.enum';
 
-export enum UserType {
-  admin = 'Admin',
-  student = 'Student',
-  teacher = 'Teacher',
-  parent = 'Parent',
-}
 
 export type UserDocument = User & Document;
 @Schema()

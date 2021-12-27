@@ -12,7 +12,7 @@ import {
   RegisterStudent,
   RegisterTeacher,
 } from './DTOs/register.dto';
-import { User, UserType } from '../../models/user.model';
+import { User } from '../../models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
 import { City } from '../../models/city.model';
 import { Grade } from '../../models/grade.model';
@@ -22,6 +22,7 @@ import { Lang } from '../../shared/enums/lang.enum';
 import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
 import { jwtConstants, sms } from './security/constants';
 import { HttpService } from '@nestjs/axios';
+import { UserType } from '../../enums/user-type.enum';
 
 @Injectable()
 export class AuthService {
