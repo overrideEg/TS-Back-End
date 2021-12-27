@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Stage, StageDocument } from '../../models/stage.model';
+import { Stage, StageDocument } from '../../database-models/stage.model';
 @Injectable()
 export class StageService {
   constructor(

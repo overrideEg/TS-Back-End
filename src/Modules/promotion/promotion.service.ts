@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Promotion, PromotionDocument } from '../../models/promotion.model';
+import { Promotion, PromotionDocument } from '../../database-models/promotion.model';
 import { CheckoutService } from '../checkout/checkout.service';
 @Injectable()
 export class PromotionService {

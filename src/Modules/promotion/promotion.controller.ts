@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Promotion } from '../../models/promotion.model';
+import { Promotion } from '../../database-models/promotion.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { PromotionService } from './promotion.service';
 

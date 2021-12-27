@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   LearningClass,
   LearningClassSchema,
-} from '../../models/learning-class.model';
+} from '../../database-models/learning-class.model';
 import { LearningClassController } from './learning-class.controller';
 import { AuthModule } from '../auth/auth.module';
 import { CourseModule } from '../course/course.module';

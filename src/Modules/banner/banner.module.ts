@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { BannerService } from './banner.service';
 import { BannerController } from './banner.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Banner, BannerSchema } from '../../models/banner.model';
+import { Banner, BannerSchema } from '../../database-models/banner.model';
 
 @Module({
   imports: [

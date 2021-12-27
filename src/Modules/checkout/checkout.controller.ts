@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
-import { Checkout } from '../../models/checkout.model';
+import { Checkout } from '../../database-models/checkout.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { CheckoutService } from './checkout.service';
 

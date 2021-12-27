@@ -12,11 +12,11 @@ import {
   RegisterStudent,
   RegisterTeacher,
 } from './DTOs/register.dto';
-import { User } from '../../models/user.model';
+import { User } from '../../database-models/user.model';
 import { OverrideUtils } from '../../shared/override-utils';
-import { City } from '../../models/city.model';
-import { Grade } from '../../models/grade.model';
-import { Stage } from '../../models/stage.model';
+import { City } from '../../database-models/city.model';
+import { Grade } from '../../database-models/grade.model';
+import { Stage } from '../../database-models/stage.model';
 import { refreshToken } from './DTOs/refreshToken.dto';
 import { Lang } from '../../shared/enums/lang.enum';
 import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';

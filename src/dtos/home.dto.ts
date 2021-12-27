@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Banner } from '../models/banner.model';
-import { Course } from '../models/course/course.model';
-import { CourseReview } from '../models/course/sub-models/course-review.model';
-import { Partner } from '../models/partner.model';
-import { Subject } from '../models/subject.model';
+import { Banner } from '../database-models/banner.model';
+import { Course } from '../database-models/course/course.model';
+import { CourseReview } from '../database-models/course/sub-models/course-review.model';
+import { Partner } from '../database-models/partner.model';
+import { Subject } from '../database-models/subject.model';
 import { TeacherProfile } from './teacher-profile.dto';
 
 export class StudentHome {

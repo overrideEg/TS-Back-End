@@ -2,7 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { NoticeService } from './notice.service';
 import { NoticeController } from './notice.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Notice, NoticeSchema } from '../../models/notice.model';
+import { Notice, NoticeSchema } from '../../database-models/notice.model';
 import { UserModule } from '../user/user.module';
 
 @Module({

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { SettingService } from './setting.service';
-import { Setting } from '../../Models/setting.model';
+import { Setting } from '../../database-models/setting.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { ClientGuard } from '../../security/client.guard';
 

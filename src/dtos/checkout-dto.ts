@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PaymentMethod } from '../enums/payment-method.enum';
-import { Course } from '../models/course/course.model';
+import { Course } from '../database-models/course/course.model';
 
 export class CheckoutDTO {
   @ApiProperty({ description: 'promoCode', required: false })

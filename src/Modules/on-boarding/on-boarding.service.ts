@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { OnBoarding, OnBoardingDocument } from '../../models/on-boarding.model';
+import { OnBoarding, OnBoardingDocument } from '../../database-models/on-boarding.model';
 @Injectable()
 export class OnBoardingService {
   constructor(

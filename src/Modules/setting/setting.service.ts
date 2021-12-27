@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { SettingDocument, Setting } from '../../models/setting.model';
+import { SettingDocument, Setting } from '../../database-models/setting.model';
 
 @Injectable()
 export class SettingService {

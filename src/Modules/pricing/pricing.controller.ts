@@ -6,7 +6,7 @@ import {
   Get,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Pricing } from '../../models/pricing.model';
+import { Pricing } from '../../database-models/pricing.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { Roles } from '../../security/roles.decorator';
 import { PricingService } from './pricing.service';

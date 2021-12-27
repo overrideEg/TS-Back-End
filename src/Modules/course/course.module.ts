@@ -2,14 +2,14 @@ import { forwardRef, Module } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CourseController } from './course.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Course, CourseSchema } from '../../models/course/course.model';
+import { Course, CourseSchema } from '../../database-models/course/course.model';
 import { UserModule } from '../user/user.module';
 import { CheckoutModule } from '../checkout/checkout.module';
 import * as mongoose from 'mongoose';
 import {
   CourseReview,
   CourseReviewSchema,
-} from '../../models/course/sub-models/course-review.model';
+} from '../../database-models/course/sub-models/course-review.model';
 @Module({
   imports: [
     MongooseModule.forFeatureAsync([

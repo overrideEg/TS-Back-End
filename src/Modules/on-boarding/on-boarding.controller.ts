@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { OnBoarding } from '../../models/on-boarding.model';
+import { OnBoarding } from '../../database-models/on-boarding.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { OnBoardingService } from './on-boarding.service';
 

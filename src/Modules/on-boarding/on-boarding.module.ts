@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { OnBoardingService } from './on-boarding.service';
 import { OnBoardingController } from './on-boarding.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { OnBoarding, OnBoardingSchema } from '../../models/on-boarding.model';
+import { OnBoarding, OnBoardingSchema } from '../../database-models/on-boarding.model';
 
 @Module({
   imports: [

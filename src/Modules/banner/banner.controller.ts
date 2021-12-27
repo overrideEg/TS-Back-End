@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Banner } from '../../models/banner.model';
+import { Banner } from '../../database-models/banner.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { BannerService } from './banner.service';
 

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ContactUs, ContactUsDocument } from '../../models/contact-us.model';
+import { ContactUs, ContactUsDocument } from '../../database-models/contact-us.model';
 @Injectable()
 export class ContactUsService {
   constructor(

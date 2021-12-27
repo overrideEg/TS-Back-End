@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { GlobalFilter, GlobalSearch } from '../../dtos/search.dto';
 import { TeacherProfile } from '../../dtos/teacher-profile.dto';
 import { Sort } from '../../enums/sort.enum';
-import { Course } from '../../models/course/course.model';
+import { Course } from '../../database-models/course/course.model';
 import { CheckoutService } from '../checkout/checkout.service';
 import { CourseService } from '../course/course.service';
 import { UserService } from '../user/user.service';

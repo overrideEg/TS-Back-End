@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Stage } from '../../models/stage.model';
+import { Stage } from '../../database-models/stage.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { StageService } from './stage.service';
 

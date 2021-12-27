@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import {
   LearningClass,
   LearningClassDocument,
-} from '../../models/learning-class.model';
+} from '../../database-models/learning-class.model';
 import { CourseService } from '../course/course.service';
 import { CheckoutService } from '../checkout/checkout.service';
 import { NoticeService } from '../notice/notice.service';

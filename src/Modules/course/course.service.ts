@@ -11,23 +11,23 @@ import { LessonType } from '../../enums/lesson-type.enum';
 import { PaymentStatus } from '../../enums/payment-method.enum';
 import { Status } from '../../enums/status.enum';
 import { UserType } from '../../enums/user-type.enum';
-import { Course, CourseDocument } from '../../models/course/course.model';
+import { Course, CourseDocument } from '../../database-models/course/course.model';
 import {
   CourseContent,
   CourseContentDocument,
-} from '../../models/course/sub-models/course-content.model';
+} from '../../database-models/course/sub-models/course-content.model';
 import {
   CourseReview,
   CourseReviewDocument,
-} from '../../models/course/sub-models/course-review.model';
+} from '../../database-models/course/sub-models/course-review.model';
 import {
   Excercice,
   ExcerciceDocument,
-} from '../../models/course/sub-models/excercice.model';
+} from '../../database-models/course/sub-models/excercice.model';
 import {
   Lesson,
   LessonDocument,
-} from '../../models/course/sub-models/lesson.model';
+} from '../../database-models/course/sub-models/lesson.model';
 import { Lang } from '../../shared/enums/lang.enum';
 import { OverrideUtils } from '../../shared/override-utils';
 import { CheckoutService } from '../checkout/checkout.service';

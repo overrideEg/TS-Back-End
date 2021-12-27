@@ -15,16 +15,16 @@ import { TransactionType } from '../../enums/wallet.enum';
 import {
   BankAccount,
   BankAccountDocument,
-} from '../../models/bank-account.model';
-import { CheckoutDocument } from '../../models/checkout.model';
-import { Course } from '../../models/course/course.model';
+} from '../../database-models/bank-account.model';
+import { CheckoutDocument } from '../../database-models/checkout.model';
+import { Course } from '../../database-models/course/course.model';
 import {
   StudentReview,
   StudentReviewDocument,
   StudentReviewSchema,
-} from '../../models/student-review.model';
-import { User, UserDocument } from '../../models/user.model';
-import { Wallet, WalletDocument } from '../../models/wallet-model';
+} from '../../database-models/student-review.model';
+import { User, UserDocument } from '../../database-models/user.model';
+import { Wallet, WalletDocument } from '../../database-models/wallet-model';
 
 import { Lang } from '../../shared/enums/lang.enum';
 import { OverrideUtils } from '../../shared/override-utils';

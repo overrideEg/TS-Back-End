@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ContactUs } from '../../models/contact-us.model';
+import { ContactUs } from '../../database-models/contact-us.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { ContactUsService } from './contact-us.service';
 

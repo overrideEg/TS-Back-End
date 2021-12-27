@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Partner, PartnerDocument } from '../../models/partner.model';
+import { Partner, PartnerDocument } from '../../database-models/partner.model';
 @Injectable()
 export class PartnerService {
   constructor(

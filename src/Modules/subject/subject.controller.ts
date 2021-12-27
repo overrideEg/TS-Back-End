@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Subject } from '../../models/subject.model';
+import { Subject } from '../../database-models/subject.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { SubjectService } from './subject.service';
 

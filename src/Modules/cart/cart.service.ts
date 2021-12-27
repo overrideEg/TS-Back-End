@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Course } from '../../models/course/course.model';
+import { Course } from '../../database-models/course/course.model';
 import { UserService } from '../user/user.service';
 const ObjectId = require('mongoose').Types.ObjectId;
 

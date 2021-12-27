@@ -11,10 +11,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Course } from '../../models/course/course.model';
-import { CourseContent } from '../../models/course/sub-models/course-content.model';
-import { CourseReview } from '../../models/course/sub-models/course-review.model';
-import { Excercice } from '../../models/course/sub-models/excercice.model';
+import { Course } from '../../database-models/course/course.model';
+import { CourseContent } from '../../database-models/course/sub-models/course-content.model';
+import { CourseReview } from '../../database-models/course/sub-models/course-review.model';
+import { Excercice } from '../../database-models/course/sub-models/excercice.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { CourseService } from './course.service';
 
