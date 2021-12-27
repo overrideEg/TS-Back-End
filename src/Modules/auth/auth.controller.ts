@@ -19,8 +19,8 @@ import {
   RegisterStudent,
   RegisterTeacher,
 } from './DTOs/register.dto';
-import { ClientGuard } from './security/client.guard';
 import { JwtAuthGuard } from './security/jwt-auth.guard';
+import { ClientGuard } from './security/client.guard';
 
 @ApiTags('Auth')
 @Controller('Auth')
