@@ -1,4 +1,4 @@
-import { CartModule } from './modules/cart/cart.module';
+import { CartModule } from './api-modules/cart/cart.module';
 import {
   CacheModule,
   Module,
@@ -9,30 +9,30 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 
-import { FileModule } from './modules/file/file.module';
+import { FileModule } from './api-modules/file/file.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './shared/logger.middleware';
-import { AuthModule } from './modules/auth/auth.module';
-import { UserModule } from './modules/user/user.module';
-import { CityModule } from './modules/city/city.module';
-import { StageModule } from './modules/stage/stage.module';
-import { GradeModule } from './modules/grade/grade.module';
-import { OnBoardingModule } from './modules/on-boarding/on-boarding.module';
-import { BannerModule } from './modules/banner/banner.module';
-import { SubjectModule } from './modules/subject/subject.module';
-import { PromotionModule } from './modules/promotion/promotion.module';
-import { CourseModule } from './modules/course/course.module';
-import { SearchModule } from './modules/search/search.module';
-import { CheckoutModule } from './modules/checkout/checkout.module';
-import { LearningClassModule } from './modules/learning-class/learning-class.module';
-import { PartnerModule } from './modules/partner/partner.module';
-import { HomeModule } from './modules/home/home.module';
-import { ContactUsModule } from './modules/contact-us/contact-us.module';
-import { NoticeModule } from './modules/notice/notice.module';
-import { SettingModule } from './modules/setting/setting.module';
-import { PricingModule } from './modules/pricing/pricing.module';
+import { AuthModule } from './api-modules/auth/auth.module';
+import { UserModule } from './api-modules/user/user.module';
+import { CityModule } from './api-modules/city/city.module';
+import { StageModule } from './api-modules/stage/stage.module';
+import { GradeModule } from './api-modules/grade/grade.module';
+import { OnBoardingModule } from './api-modules/on-boarding/on-boarding.module';
+import { BannerModule } from './api-modules/banner/banner.module';
+import { SubjectModule } from './api-modules/subject/subject.module';
+import { PromotionModule } from './api-modules/promotion/promotion.module';
+import { CourseModule } from './api-modules/course/course.module';
+import { SearchModule } from './api-modules/search/search.module';
+import { CheckoutModule } from './api-modules/checkout/checkout.module';
+import { LearningClassModule } from './api-modules/learning-class/learning-class.module';
+import { PartnerModule } from './api-modules/partner/partner.module';
+import { HomeModule } from './api-modules/home/home.module';
+import { ContactUsModule } from './api-modules/contact-us/contact-us.module';
+import { NoticeModule } from './api-modules/notice/notice.module';
+import { SettingModule } from './api-modules/setting/setting.module';
+import { PricingModule } from './api-modules/pricing/pricing.module';
 const overrideMoules = [
   FileModule,
   AuthModule,

@@ -11,7 +11,7 @@ import { User } from '../user.model';
 import { Localized } from '../../shared/localized';
 import { CourseReview } from './sub-models/course-review.model';
 import { CourseType } from '../../enums/course-type.enum';
-import { OFile } from '../../Modules/file/entities/file.entity';
+import { OFile } from '../../api-modules/file/entities/file.entity';
 import { Status } from '../../enums/status.enum';
 import { Excercice } from './sub-models/excercice.model';
 
