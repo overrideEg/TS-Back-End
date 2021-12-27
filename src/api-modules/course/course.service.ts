@@ -439,6 +439,8 @@ export class CourseService {
           as: 'user',
         },
       },
+      { $unwind: '$user' },
+
 
       {
         $unset: [
