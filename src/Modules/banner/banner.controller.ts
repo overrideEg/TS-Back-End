@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Banner } from '../../models/banner.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { BannerService } from './banner.service';
 
 @ApiTags('Banner')

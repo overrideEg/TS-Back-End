@@ -3,7 +3,7 @@ import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GlobalFilter, GlobalSearch } from '../../dtos/search.dto';
 import { Sort } from '../../enums/sort.enum';
 import { Course } from '../../models/course/course.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { SearchService } from './search.service';
 
 @ApiTags('Search')

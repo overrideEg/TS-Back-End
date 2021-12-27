@@ -8,8 +8,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { WsException } from '@nestjs/websockets';
 import { Observable } from 'rxjs';
-import { UserService } from '../../user/user.service';
-import { AuthService } from '../auth.service';
+import { UserService } from '../modules/user/user.service';
+import { AuthService } from '../modules/auth/auth.service';
 import { jwtConstants } from './constants';
 
 @Injectable()

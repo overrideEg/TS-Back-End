@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { City } from '../../models/city.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
-import { Roles } from '../auth/security/roles.decorator';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
+import { Roles } from '../../security/roles.decorator';
 import { CityService } from './city.service';
 
 @ApiTags('City')

@@ -15,7 +15,7 @@ import { Promotion } from '../../models/promotion.model';
 import { Wallet } from '../../models/wallet-model';
 import { Lang } from '../../shared/enums/lang.enum';
 import { OverrideUtils } from '../../shared/override-utils';
-import { Payment } from '../auth/security/constants';
+import { Payment } from '../../security/constants';
 import { CourseService } from '../course/course.service';
 import { NoticeService } from '../notice/notice.service';
 import { PromotionService } from '../promotion/promotion.service';

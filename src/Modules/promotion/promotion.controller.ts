@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Promotion } from '../../models/promotion.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { PromotionService } from './promotion.service';
 
 @ApiTags('Promotion')

@@ -20,7 +20,7 @@ import { Stage } from '../../models/stage.model';
 import { refreshToken } from './DTOs/refreshToken.dto';
 import { Lang } from '../../shared/enums/lang.enum';
 import { ChangePassword, ResetPassword } from './DTOs/change-password.dto';
-import { jwtConstants, sms } from './security/constants';
+import { jwtConstants, sms } from '../../security/constants';
 import { HttpService } from '@nestjs/axios';
 import { UserType } from '../../enums/user-type.enum';
 

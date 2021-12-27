@@ -15,7 +15,7 @@ import { Course } from '../../models/course/course.model';
 import { CourseContent } from '../../models/course/sub-models/course-content.model';
 import { CourseReview } from '../../models/course/sub-models/course-review.model';
 import { Excercice } from '../../models/course/sub-models/excercice.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { CourseService } from './course.service';
 
 @ApiTags('Course')

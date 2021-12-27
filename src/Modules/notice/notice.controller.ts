@@ -13,7 +13,7 @@ import {
 import { NoticeService } from './notice.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Notice } from '../../models/notice.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 
 @ApiTags('Notice')
 @Controller('Notice')

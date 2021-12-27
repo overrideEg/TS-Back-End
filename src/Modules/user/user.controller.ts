@@ -19,7 +19,7 @@ import { TransactionType } from '../../enums/wallet.enum';
 import { BankAccount } from '../../models/bank-account.model';
 import { StudentReview } from '../../models/student-review.model';
 import { User } from '../../models/user.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { UserService } from './user.service';
 import { UserType } from '../../enums/user-type.enum';
 

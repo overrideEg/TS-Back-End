@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Pricing } from '../../models/pricing.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
-import { Roles } from '../auth/security/roles.decorator';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
+import { Roles } from '../../security/roles.decorator';
 import { PricingService } from './pricing.service';
 
 @ApiTags('Pricing')

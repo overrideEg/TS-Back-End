@@ -16,7 +16,7 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckoutDTO } from '../../dtos/checkout-dto';
 import { Checkout } from '../../models/checkout.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { CheckoutService } from './checkout.service';
 
 @ApiTags('Checkout')

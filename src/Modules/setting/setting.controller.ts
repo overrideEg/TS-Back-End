@@ -11,8 +11,8 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { SettingService } from './setting.service';
 import { Setting } from '../../Models/setting.model';
-import { JwtAuthGuard } from '../auth/security/jwt-auth.guard';
-import { ClientGuard } from '../auth/security/client.guard';
+import { JwtAuthGuard } from '../../security/jwt-auth.guard';
+import { ClientGuard } from '../../security/client.guard';
 
 @ApiTags('Setting')
 @Controller('Setting')
