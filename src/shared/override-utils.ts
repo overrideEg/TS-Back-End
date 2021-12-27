@@ -1,6 +1,6 @@
 type GenericObject = { [key: string]: any };
 import * as CryptoJS from 'crypto-js';
-import { jwtConstants } from '../modules/auth/security/constants';
+import { jwtConstants } from 'src/modules/auth/security/constants';
 import { Day } from './enums/day.enum';
 
 export class OverrideUtils {
