@@ -5,7 +5,7 @@ import { OBaseEntity } from '../../../shared/base-entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { LessonType } from '../../../enums/lesson-type.enum';
 import { Excercice } from './excercice.model';
-import { OFile } from '../../../Modules/file/entities/file.entity';
+import { OFile } from '../../../api-modules/file/entities/file.entity';
 export type LessonDocument = Lesson & Document;
 @Schema({
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
