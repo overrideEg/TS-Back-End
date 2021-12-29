@@ -49,10 +49,13 @@ export class FileService {
             file.pipe(uploadStream);
           },
           (err) => {
+            console.log(err);
+            
             reject(new BadRequestException('error while uploading'));
           },
-        );
-      } catch (e) {
+          );
+        } catch (e) {
+        console.log(e);
         reject(new BadRequestException('error while uploading'));
       }
     });
