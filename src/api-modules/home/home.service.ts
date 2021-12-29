@@ -425,7 +425,7 @@ export class HomeService {
       });
     home.noOfStudents = registers;
 
-    let todayCourses = teacherCourses;
+    let todayCourses = teacherCourses.filter((course)=>course.startDate >= moment().startOf('day'));
 
     home.todayCourses = todayCourses;
     return home;
