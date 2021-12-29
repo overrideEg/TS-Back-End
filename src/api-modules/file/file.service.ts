@@ -25,12 +25,14 @@ export class FileService {
   }
 
   async upload({ request, file }: { request; file }) {
+    
     // var fullUrl = 'https://file.remabackend.com';
     const fullUrl = 'http://' + request.hostname + '/v1';
     return new Promise(async (resolve, reject) => {
       try {
         request.multipart(
           (field, file: Stream, filename, encoding, mimetype) => {
+            console.log(filename,mimetype,file);
             const uploadStream = this.bucket.openUploadStream('/' + filename, {
               contentType: mimetype,
             });
