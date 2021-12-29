@@ -389,7 +389,8 @@ export class HomeService {
           'teacher',
           'subject',
 
-          'reviews.user',
+          // 'reviews.user',
+          'reviews',
         ],
       },
 
