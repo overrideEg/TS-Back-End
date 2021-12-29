@@ -298,9 +298,8 @@ export class CourseService {
     if (req.user.userType !== UserType.teacher.toString()) {
       throw new BadRequestException('only teacher can view this request');
     }
-    let teacher = await this.userService.findOne(req.user._id);
-    delete teacher.wallet;
-    let courses = [];
+ 
+    let courses = await this.CourseModel.find({teacher: new ObjectId(req.user._id)});
 
     return courses;
   }
