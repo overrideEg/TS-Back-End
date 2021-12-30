@@ -124,13 +124,23 @@ export class SearchService {
       .sort({ cRating: 'desc' })
       .exec();
 
-    // for await (const course of featuresCourses) {
-    //     course.inCart = await this.userService.UserModel.exists({ _id: new ObjectId(req.user._id), cart: new ObjectId(course['_id'].toString()) })
-    // }
+    
     globalFilter.topInstructors = [];
 
     for await (const course of featuresCourses) {
+
+
       let profile = new TeacherProfile();
+      let latestFeedback = await this.courseService.getReviwsForTeacher(
+        course.teacher,
+      );
+      profile.noOfReviews = latestFeedback.length;
+      profile.rate =
+        latestFeedback.length > 0
+          ? latestFeedback.reduce((acc, feedBack) => acc + feedBack.stars, 0) /
+            profile.noOfCourses
+          : 5;
+
       profile.name = course.teacher.name;
       profile.avatar = course.teacher.avatar ?? '';
       let teacherCourses = await this.courseService.CourseModel.find({
@@ -147,7 +157,6 @@ export class SearchService {
             match: new ObjectId(course.teacher['_id']),
           });
       profile.noOfCourses = teacherCourses.length;
-      // profile.rate = teacherCourses.length > 0 ? teacherCourses.reduce((acc, course) => acc + course.cRating, 0) / teacherCourses?.length : 5;
       profile.bio = course.teacher?.bio ?? course.teacher.name;
       profile.userId = course.teacher['_id'];
       if (!cityId) globalFilter.topInstructors.push(profile);
