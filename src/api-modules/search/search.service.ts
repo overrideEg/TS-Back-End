@@ -137,8 +137,8 @@ export class SearchService {
       profile.noOfReviews = latestFeedback.length;
       profile.rate =
         latestFeedback.length > 0
-          ? latestFeedback.reduce((acc, feedBack) => acc + feedBack.stars, 0) /
-          profile.noOfCourses
+          ? (latestFeedback.reduce((acc, feedBack) => acc + feedBack.stars, 0) /
+            profile.noOfCourses)
           : 5;
 
       profile.name = course.teacher.name;
