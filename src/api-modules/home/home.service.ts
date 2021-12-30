@@ -102,16 +102,7 @@ export class HomeService {
           as: 'reviews',
         },
       },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'reviews.user',
-          foreignField: '_id',
-          as: 'reviews.user',
-        },
-      },
-
-
+    
 
       {
         $unset: [
