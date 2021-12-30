@@ -341,7 +341,7 @@ export class HomeService {
       profile.rate =
         latestFeedback.length > 0
           ? latestFeedback.reduce((acc, feedBack) => acc + feedBack.stars, 0) /
-            profile.noOfCourses
+            profile.noOfReviews
           : 5;
 
       profile.bio = course.teacher?.bio ?? course?.teacher?.name;
