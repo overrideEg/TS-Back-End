@@ -110,7 +110,6 @@ export class HomeService {
           as: 'reviews.user',
         },
       },
-      { $unwind: '$reviews.user' },
 
 
 
@@ -118,6 +117,7 @@ export class HomeService {
         $unset: [
           'attachements',
           'days',
+          'reviews.user',
           'grade.stage',
           'teacher.students',
           'teacher.bankAccounts',
@@ -195,15 +195,7 @@ export class HomeService {
         },
       },
 
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'reviews.user',
-          foreignField: '_id',
-          as: 'reviews.user',
-        },
-      },
-      { $unwind: '$reviews.user' },
+     
 
 
 
@@ -211,6 +203,7 @@ export class HomeService {
         $unset: [
           'attachements',
           'days',
+          'reviews.user',
           'grade.stage',
           'teacher.students',
           'teacher.bankAccounts',
@@ -283,11 +276,22 @@ export class HomeService {
       },
 
       { $unwind: '$teacher' },
+
+      {
+        $lookup: {
+          from: 'coursereviews',
+          localField: 'reviews',
+          foreignField: '_id',
+          as: 'reviews',
+        },
+      },
+
       {
         $unset: [
           'attachements',
+          
           'days',
-          'reviews',
+          'reviews.user',
           'grade.stage',
           'teacher.students',
           'teacher.bankAccounts',
