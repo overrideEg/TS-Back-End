@@ -67,7 +67,6 @@ export class CartService {
           'reviews.user',
           'hour',
           'excercices',
-          'reviews',
           'startDate',
           'grade',
           'subject',
