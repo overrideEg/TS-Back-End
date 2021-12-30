@@ -50,11 +50,21 @@ export class CartService {
           newRoot: '$cart',
         },
       },
+      {
+        $lookup: {
+          from: 'coursereviews',
+          localField: 'reviews',
+          foreignField: '_id',
+          as: 'reviews',
+        },
+      },
+    
 
       {
         $unset: [
           'attachements',
           'days',
+          'reviews.user',
           'hour',
           'excercices',
           'reviews',
