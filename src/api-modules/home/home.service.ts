@@ -185,6 +185,17 @@ export class HomeService {
         },
       },
 
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'reviews.user',
+          foreignField: '_id',
+          as: 'reviews.user',
+        },
+      },
+      { $unwind: '$reviews.teacher' },
+
+
 
       {
         $unset: [
