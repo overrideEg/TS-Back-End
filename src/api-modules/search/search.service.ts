@@ -14,7 +14,7 @@ export class SearchService {
     private courseService: CourseService,
     private checkoutService: CheckoutService,
     private userService: UserService,
-  ) {}
+  ) { }
 
   async globalSearch(
     req: any,
@@ -124,7 +124,7 @@ export class SearchService {
       .sort({ cRating: 'desc' })
       .exec();
 
-    
+
     globalFilter.topInstructors = [];
 
     for await (const course of featuresCourses) {
@@ -138,7 +138,7 @@ export class SearchService {
       profile.rate =
         latestFeedback.length > 0
           ? latestFeedback.reduce((acc, feedBack) => acc + feedBack.stars, 0) /
-            profile.noOfCourses
+          profile.noOfCourses
           : 5;
 
       profile.name = course.teacher.name;
@@ -159,7 +159,9 @@ export class SearchService {
       profile.noOfCourses = teacherCourses.length;
       profile.bio = course.teacher?.bio ?? course.teacher.name;
       profile.userId = course.teacher['_id'];
-      if (!cityId) globalFilter.topInstructors.push(profile);
+      if (!cityId) {
+        if (!globalFilter.topInstructors.find((inst) => inst.userId === profile.userId)) { globalFilter.topInstructors.push(profile); }
+      }
     }
 
     globalFilter.featuresCourses = featuresCourses.slice(0, 10);
