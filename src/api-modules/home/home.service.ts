@@ -95,10 +95,19 @@ export class HomeService {
       { $unwind: '$teacher' },
 
       {
+        $lookup: {
+          from: 'coursereviews',
+          localField: 'reviews',
+          foreignField: '_id',
+          as: 'reviews',
+        },
+      },
+
+
+      {
         $unset: [
           'attachements',
           'days',
-          'reviews',
           'grade.stage',
           'teacher.students',
           'teacher.bankAccounts',
@@ -165,11 +174,22 @@ export class HomeService {
       },
 
       { $unwind: '$teacher' },
+
+
+      {
+        $lookup: {
+          from: 'coursereviews',
+          localField: 'reviews',
+          foreignField: '_id',
+          as: 'reviews',
+        },
+      },
+
+
       {
         $unset: [
           'attachements',
           'days',
-          'reviews',
           'grade.stage',
           'teacher.students',
           'teacher.bankAccounts',
