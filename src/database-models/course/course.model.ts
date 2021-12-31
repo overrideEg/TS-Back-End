@@ -96,9 +96,6 @@ export class Course {
   @Prop()
   price?: number;
 
-  // @ApiProperty({ type: () => CourseContent, isArray: true })
-  // @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: CourseContent.name, autopopulate: true }])
-  // content: CourseContent[];
 
   @ApiProperty({
     type: () => CourseReview,

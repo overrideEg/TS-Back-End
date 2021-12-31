@@ -36,7 +36,7 @@ export type LearningClassDocument = LearningClass & Document;
 export class LearningClass extends OBaseEntity {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: Course.name,
+    ref: 'Course',
     autopopulate: true,
   })
   course?: Course;
