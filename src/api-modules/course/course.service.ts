@@ -501,7 +501,7 @@ export class CourseService {
 
     const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
     console.log('teacherToken',teacherToken);
-    course['teacherToken'] = `${teacherToken}`;
+    course['teacherToken'] = teacherToken;
     
     course['attenders'] = 0;
 
