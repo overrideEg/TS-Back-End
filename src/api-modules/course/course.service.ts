@@ -501,11 +501,13 @@ export class CourseService {
     }
 
 
-    course.liveStartTime = Date.now();
+    course['liveStartTime'] = Date.now();
 
     const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
-    course.teacherToken = teacherToken;
-    course.attenders = 0;
+    console.log(teacherToken);
+    course['teacherToken'] = teacherToken;
+    
+    course['attenders'] = 0;
 
     var checkouts = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(body.courseId) }).exec()
     for await (const checkout of checkouts) {
