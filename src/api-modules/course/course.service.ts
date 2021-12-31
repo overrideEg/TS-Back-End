@@ -504,8 +504,6 @@ export class CourseService {
     course.liveStartTime = Date.now();
 
     const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
-    const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
-    course.studentToken = studentToken;
     course.teacherToken = teacherToken;
     course.attenders = 0;
 
@@ -522,7 +520,7 @@ export class CourseService {
       // })
 
     }
-    await this.CourseModel.findByIdAndUpdate(course._id, { $set: course })
+    await this.CourseModel.findByIdAndUpdate(course._id, { $set: {teacherToken : course.teacherToken,attenders: 0,liveStartTime: course.liveStartTime} })
 
     return course
   }
