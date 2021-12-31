@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Pricing } from '../../database-models/pricing.model';
+import { ClientGuard } from '../../security/client.guard';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { Roles } from '../../security/roles.decorator';
 import { PricingService } from './pricing.service';
@@ -26,7 +27,7 @@ export class PricingController {
   }
 
   /* GET  Pricings End Point */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ClientGuard)
   @Get()
   getHome(): Promise<Pricing> {
     return this.service.getCurrentPricings();
