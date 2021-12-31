@@ -172,21 +172,26 @@ export class Course {
   excercices?: Excercice[];
 
 
-
+  @ApiProperty()
   @Prop()
   liveStartTime?: number;
+  @ApiProperty()
   @Prop()
   liveEndTime?: number;
 
+  @ApiProperty()
   @Prop()
   attenders: number;
 
+  @ApiProperty()
   @Prop()
   teacherToken?: string;
 
+  @ApiProperty()
   @Prop()
   studentToken?: string;
 
+  @ApiProperty({ type: () => AttendanceLog, isArray: true })
   @Prop([AttendanceLog])
   attendanceLogs?: AttendanceLog[];
 
