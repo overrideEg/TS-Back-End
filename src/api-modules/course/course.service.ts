@@ -485,9 +485,6 @@ export class CourseService {
     if (course.teacher['_id'].toString() !== req.user._id)
       throw new BadRequestException('only teacher can start his live');
 
-
-
-
     const expirationTimeInSeconds = 3600
     const currentTimestamp = Math.floor(Date.now() / 1000)
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
@@ -500,12 +497,11 @@ export class CourseService {
       return course;
     }
 
-
     course['liveStartTime'] = Date.now();
 
     const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
-    console.log(teacherToken);
-    course['teacherToken'] = teacherToken;
+    console.log('teacherToken',teacherToken);
+    course['teacherToken'] = `${teacherToken}`;
     
     course['attenders'] = 0;
 
