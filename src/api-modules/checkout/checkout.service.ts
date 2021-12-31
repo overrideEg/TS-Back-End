@@ -40,7 +40,7 @@ export class CheckoutService {
     private noticeService: NoticeService,
     private httpService: HttpService,
     private pricingService: PricingService,
-  ) {}
+  ) { }
 
   private readonly log = new Logger(CheckoutService.name);
 
@@ -128,37 +128,42 @@ export class CheckoutService {
     await this.userService.update(req.user._id, user);
 
     let paymentResult: any;
-    await this.httpService.post('/v1/checkouts', null, {
+    if (body.paymentMethod !== PaymentMethod.APPLE && body.paymentMethod !== PaymentMethod.ANDROID) {
 
+      await this.httpService.post('/v1/checkouts', null, {
         baseURL: Payment.baseURL,
         method: 'POST',
         headers: {
-            'Authorization': Payment.token
+          'Authorization': Payment.token
         },
         params: {
-            'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
-            'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
-            'merchantTransactionId': checkouts.reduce((acc, check) => acc + '-' + check['_id'].toString(), ''),
-            'customer.email': req.user.email,
-            'currency': Payment.Currency,
-            'paymentType': Payment.paymentType,
+          'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
+          'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
+          'merchantTransactionId': checkouts.reduce((acc, check) => acc + '-' + check['_id'].toString(), ''),
+          'customer.email': req.user.email,
+          'currency': Payment.Currency,
+          'paymentType': Payment.paymentType,
         }
-    }).toPromise().then(res => {
+      }).toPromise().then(res => {
         if (res.data['result']['code'] === '000.200.100' || res.data['result']['code'] === '000.000.000')
-            paymentResult = res.data
+          paymentResult = res.data
         else throw new BadRequestException(res.data['result']['description']);
-    }).catch(async err => {
+      }).catch (async err => {
         console.log(err.response.data.result)
-
+  
         await this.CheckoutModel.deleteMany(checkouts);
-
+  
         throw new BadRequestException(err.response.data.result.description)
-    })
+      });
+    }
 
-    for await (const checkout of checkouts) {
-      // checkout.paymentResult = paymentResult;
-      // checkout.paymentId = paymentResult.id;
-      await this.CheckoutModel.findByIdAndUpdate(checkout._id);
+    if (body.paymentMethod !== PaymentMethod.APPLE && body.paymentMethod !== PaymentMethod.ANDROID) {
+      for await (const checkout of checkouts) {
+
+        checkout.paymentResult = paymentResult;
+        checkout.paymentId = paymentResult.id;
+        await this.CheckoutModel.findByIdAndUpdate(checkout._id);
+      }
     }
 
     return checkouts;
@@ -175,14 +180,14 @@ export class CheckoutService {
         return paymentMethod === PaymentMethod.APPLE
           ? pricing.sessionApplePrice ?? 0
           : PaymentMethod.ANDROID
-          ? pricing.sessionAndroidPrice ?? 0
-          : pricing.sessionWebPrice ?? 0;
+            ? pricing.sessionAndroidPrice ?? 0
+            : pricing.sessionWebPrice ?? 0;
       case CourseType.tutorial:
         return paymentMethod === PaymentMethod.APPLE
           ? pricing.tutorialApplePrice ?? 0
           : PaymentMethod.ANDROID
-          ? pricing.tutorialAndroidPrice ?? 0
-          : pricing.tutorialWebPrice ?? 0;
+            ? pricing.tutorialAndroidPrice ?? 0
+            : pricing.tutorialWebPrice ?? 0;
       default:
         return 0;
     }
@@ -191,11 +196,10 @@ export class CheckoutService {
   async authorize(paymentMethod: string, id: string, path: string) {
     let checkouts = await this.CheckoutModel.find({ paymentId: id });
     let paymentResult;
-    path += `?entityId=${
-      paymentMethod !== PaymentMethod.MADA
-        ? Payment.entityIdVisaMaster
-        : Payment.entityIdMada
-    }`;
+    path += `?entityId=${paymentMethod !== PaymentMethod.MADA
+      ? Payment.entityIdVisaMaster
+      : Payment.entityIdMada
+      }`;
 
     if (
       checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0) > 0
@@ -236,8 +240,8 @@ export class CheckoutService {
         checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0) == 0
           ? PaymentStatus.Paid
           : paymentResult.result?.code === '000.100.110'
-          ? PaymentStatus.Paid
-          : PaymentStatus.Fail;
+            ? PaymentStatus.Paid
+            : PaymentStatus.Fail;
       console.log('checkout', checkout.paymentStatus);
 
       await this.CheckoutModel.findByIdAndUpdate(checkout['_id'], checkout);
@@ -284,7 +288,7 @@ export class CheckoutService {
           },
         });
         this.userService.createWalletForCheckout(checkout);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return paymentResult.result;
