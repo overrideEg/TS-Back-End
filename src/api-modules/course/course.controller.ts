@@ -27,41 +27,6 @@ export class CourseController {
   constructor(private service: CourseService) { }
 
 
-  @UseGuards(JwtAuthGuard)
-  @Post('startLive')
-  async startLive(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
-    
-    let startedClass = await this.service.startLive(req, body)
-    console.log(startedClass);
-    
-    return startedClass
-  }
-
-
-
-  @UseGuards(JwtAuthGuard)
-  @Post('join')
-  async join(@Req() req, @Body() body: StartLiveDTO): Promise<any> {    
-    let startedClass = await this.service.joinLive(req, body)
-    return startedClass
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('endLive')
-  async endLive(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
- 
-    let startedClass = await this.service.endLive(req, body)
-    return startedClass
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('leave')
-  async leave(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
-   
-    let startedClass = await this.service.leave(req, body)
-    return startedClass
-  }
-
   /* POST Course End Point */
   @UseGuards(JwtAuthGuard)
   @Post('new')
@@ -150,6 +115,48 @@ export class CourseController {
   @Delete(':id')
   async delete(@Req() req, @Param('id') id: string): Promise<Course> {
     return this.service.delete(req, id);
+  }
+
+
+
+  /**
+   * Live Events
+   * @param req 
+   * @param body 
+   * @returns 
+   */
+
+  @UseGuards(JwtAuthGuard)
+  @Post('startLive')
+  async startLive(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
+    
+    let startedClass = await this.service.startLive(req, body)    
+    return startedClass
+  }
+
+
+
+  @UseGuards(JwtAuthGuard)
+  @Post('join')
+  async join(@Req() req, @Body() body: StartLiveDTO): Promise<any> {    
+    let startedClass = await this.service.joinLive(req, body)
+    return startedClass
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('endLive')
+  async endLive(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
+ 
+    let startedClass = await this.service.endLive(req, body)
+    return startedClass
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('leave')
+  async leave(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
+   
+    let startedClass = await this.service.leave(req, body)
+    return startedClass
   }
 
 
