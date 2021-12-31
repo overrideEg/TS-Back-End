@@ -30,9 +30,10 @@ export class CourseController {
   @UseGuards(JwtAuthGuard)
   @Post('startLive')
   async startLive(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
-    console.log('Start Live',body.courseId);
     
     let startedClass = await this.service.startLive(req, body)
+    console.log(startedClass);
+    
     return startedClass
   }
 
