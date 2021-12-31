@@ -482,19 +482,19 @@ export class CourseService {
   async startLive(req, body: StartLiveDTO) {
     let course = await this.findOne(req, body.courseId);
 
+    
     if (course.teacher['_id'].toString() !== req.user._id)
-      throw new BadRequestException('only teacher can start his live');
-
+    throw new BadRequestException('only teacher can start his live');
+    
     const expirationTimeInSeconds = 3600
     const currentTimestamp = Math.floor(Date.now() / 1000)
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-
+    
     if (course) {
       if (course.liveEndTime) {
         throw new Error(`This Lesson has Ended At ${new Date(course.liveEndTime).toTimeString()}`);
-
+        
       }
-      return course;
     }
 
     course['liveStartTime'] = Date.now();
