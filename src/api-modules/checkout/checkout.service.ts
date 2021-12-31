@@ -127,33 +127,33 @@ export class CheckoutService {
     user.cart = [];
     await this.userService.update(req.user._id, user);
 
-    // let paymentResult: any;
-    // await this.httpService.post('/v1/checkouts', null, {
+    let paymentResult: any;
+    await this.httpService.post('/v1/checkouts', null, {
 
-    //     baseURL: Payment.baseURL,
-    //     method: 'POST',
-    //     headers: {
-    //         'Authorization': Payment.token
-    //     },
-    //     params: {
-    //         'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
-    //         'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
-    //         'merchantTransactionId': checkouts.reduce((acc, check) => acc + '-' + check['_id'].toString(), ''),
-    //         'customer.email': req.user.email,
-    //         'currency': Payment.Currency,
-    //         'paymentType': Payment.paymentType,
-    //     }
-    // }).toPromise().then(res => {
-    //     if (res.data['result']['code'] === '000.200.100' || res.data['result']['code'] === '000.000.000')
-    //         paymentResult = res.data
-    //     else throw new BadRequestException(res.data['result']['description']);
-    // }).catch(async err => {
-    //     console.log(err.response.data.result)
+        baseURL: Payment.baseURL,
+        method: 'POST',
+        headers: {
+            'Authorization': Payment.token
+        },
+        params: {
+            'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
+            'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
+            'merchantTransactionId': checkouts.reduce((acc, check) => acc + '-' + check['_id'].toString(), ''),
+            'customer.email': req.user.email,
+            'currency': Payment.Currency,
+            'paymentType': Payment.paymentType,
+        }
+    }).toPromise().then(res => {
+        if (res.data['result']['code'] === '000.200.100' || res.data['result']['code'] === '000.000.000')
+            paymentResult = res.data
+        else throw new BadRequestException(res.data['result']['description']);
+    }).catch(async err => {
+        console.log(err.response.data.result)
 
-    //     await this.CheckoutModel.deleteMany(checkouts);
+        await this.CheckoutModel.deleteMany(checkouts);
 
-    //     throw new BadRequestException(err.response.data.result.description)
-    // })
+        throw new BadRequestException(err.response.data.result.description)
+    })
 
     for await (const checkout of checkouts) {
       // checkout.paymentResult = paymentResult;

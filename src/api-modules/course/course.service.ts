@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+
   forwardRef,
   Inject,
   Injectable,
@@ -7,31 +8,25 @@ import {
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { LessonType } from '../../enums/lesson-type.enum';
 import { PaymentStatus } from '../../enums/payment-method.enum';
 import { Status } from '../../enums/status.enum';
 import { UserType } from '../../enums/user-type.enum';
 import { Course, CourseDocument } from '../../database-models/course/course.model';
-import {
-  CourseContent,
-  CourseContentDocument,
-} from '../../database-models/course/sub-models/course-content.model';
 import {
   CourseReview,
   CourseReviewDocument,
 } from '../../database-models/course/sub-models/course-review.model';
 import {
   Excercice,
-  ExcerciceDocument,
 } from '../../database-models/course/sub-models/excercice.model';
-import {
-  Lesson,
-  LessonDocument,
-} from '../../database-models/course/sub-models/lesson.model';
 import { Lang } from '../../shared/enums/lang.enum';
 import { OverrideUtils } from '../../shared/override-utils';
 import { CheckoutService } from '../checkout/checkout.service';
 import { UserService } from '../user/user.service';
+import { StartLiveDTO } from '../../dtos/start-live.dto';
+import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
+import { Agora } from '../../security/constants';
+import { AttendanceLog } from '../../database-models/learning-class.model';
 const ObjectId = require('mongoose').Types.ObjectId;
 @Injectable()
 export class CourseService {
@@ -45,7 +40,7 @@ export class CourseService {
     @Inject(forwardRef(() => UserService)) private userService: UserService,
     @Inject(forwardRef(() => CheckoutService))
     private checkoutService: CheckoutService,
-  ) {}
+  ) { }
 
   async newCourse(
     req: any,
@@ -289,7 +284,7 @@ export class CourseService {
     course.teacher.rate =
       reviews.length > 0
         ? reviews.reduce((acc, feedBack) => acc + feedBack.stars, 0) /
-          course.teacher.noOfCourses
+        course.teacher.noOfCourses
         : 5;
     return course;
   }
@@ -298,8 +293,8 @@ export class CourseService {
     if (req.user.userType !== UserType.teacher.toString()) {
       throw new BadRequestException('only teacher can view this request');
     }
- 
-    let courses = await this.CourseModel.find({teacher: new ObjectId(req.user._id)});
+
+    let courses = await this.CourseModel.find({ teacher: new ObjectId(req.user._id) });
 
     return courses;
   }
@@ -481,4 +476,125 @@ export class CourseService {
   //     });
   //     return videos === 0 ? 0 : progress / videos * 100;
   // }
+
+
+
+  async startLive(req, body: StartLiveDTO) {
+    let course = await this.findOne(req, body.courseId);
+
+    if (course.teacher['_id'].toString() !== req.user._id)
+      throw new BadRequestException('only teacher can start his live');
+
+
+
+
+    const expirationTimeInSeconds = 3600
+    const currentTimestamp = Math.floor(Date.now() / 1000)
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+
+    if (course) {
+      if (course.liveEndTime) {
+        throw new Error(`This Lesson has Ended At ${new Date(course.liveEndTime).toTimeString()}`);
+
+      }
+      return course;
+    }
+
+
+    course.liveStartTime = Date.now();
+
+    const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
+    const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+    course.studentToken = studentToken;
+    course.teacherToken = teacherToken;
+    course.attenders = 0;
+
+    var checkouts = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(body.courseId) }).exec()
+    for await (const checkout of checkouts) {
+      // TODO: course
+
+      // this.noticeService.sendSpecificNotification({
+      //     userId: checkout.user['_id'].toString(),
+      //     notification: {
+      //         title: checkout.user.defaultLang == Lang.en ? 'Live Lesson Stated' : 'بدأ البث المباشر للدرس',
+      //         body: checkout.user.defaultLang == Lang.en ? `${course.teacher.name} started live session on lesson ${lesson.name}, join now` : `${course.teacher.name} بدأ بث مباشر لدرس ${lesson.name}`
+      //     }, data: { entityType: 'Course', entityId: course['_id'].toString() }, imageURL: course.cover
+      // })
+
+    }
+    await this.CourseModel.findByIdAndUpdate(course._id, { $set: course })
+
+    return course
+  }
+
+
+
+  async joinLive(req, body: StartLiveDTO) {
+    let checkout = await this.checkoutService.CheckoutModel.findOne({ course: new ObjectId(body.courseId), user: new ObjectId(req.user._id) })
+    if (!checkout)
+      throw new BadRequestException('you dont purchased this course');
+    let course = checkout.course;
+
+    let existsClass = await this.findOne(req, body.courseId)
+
+    if (!existsClass.liveStartTime) {
+      throw new BadRequestException(`this course not started yet`)
+    }
+    if (existsClass.liveEndTime) {
+      throw new BadRequestException(`lesson ended at ${new Date(course.liveEndTime).toTimeString()}`)
+    }
+    existsClass.attenders += 1;
+    let attendanceLog = new AttendanceLog();
+    attendanceLog.time = Date.now();
+    attendanceLog.user = new ObjectId(req.user._id);
+    existsClass.attendanceLogs.push(attendanceLog);
+
+    await this.CourseModel.findByIdAndUpdate({ _id: body.courseId }, existsClass);
+    const expirationTimeInSeconds = 3600
+    const currentTimestamp = Math.floor(Date.now() / 1000)
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+    const studentToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.SUBSCRIBER, privilegeExpiredTs);
+    existsClass.studentToken = studentToken;
+
+    await this.CourseModel.findByIdAndUpdate(course._id, { $set: existsClass })
+
+
+    return existsClass;
+
+  }
+
+
+
+  async leave(req, body: StartLiveDTO) {
+    let checkout = await this.checkoutService.CheckoutModel.findOne({ course: new ObjectId(body.courseId), user: new ObjectId(req.user._id) })
+    if (!checkout)
+      throw new BadRequestException('you dont purchased this course');
+    let course = checkout.course;
+
+    let existsClass = await this.findOne(req, body.courseId)
+
+    if (!existsClass) {
+      throw new BadRequestException(`this course not started yet`)
+
+    }
+    if (existsClass.attenders > 0)
+      existsClass.attenders -= 1;
+
+    await this.CourseModel.findByIdAndUpdate(course._id, { $set: existsClass })
+
+    return course
+  }
+
+  async endLive(req, body: StartLiveDTO) {
+    let course = await this.findOne(req,body.courseId);
+
+    if (course.teacher['_id'].toString() !== req.user._id)
+      throw new BadRequestException('only teacher can end his live');
+    if (course) {
+      course.liveEndTime = Date.now();
+    }
+    await this.CourseModel.findByIdAndUpdate(course._id, { $set: course })
+    return course;
+  }
+
 }

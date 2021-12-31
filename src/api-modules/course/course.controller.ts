@@ -15,6 +15,7 @@ import { Course } from '../../database-models/course/course.model';
 import { CourseContent } from '../../database-models/course/sub-models/course-content.model';
 import { CourseReview } from '../../database-models/course/sub-models/course-review.model';
 import { Excercice } from '../../database-models/course/sub-models/excercice.model';
+import { StartLiveDTO } from '../../dtos/start-live.dto';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { CourseService } from './course.service';
 
@@ -23,7 +24,7 @@ import { CourseService } from './course.service';
 export class CourseController {
   /* CRUD End Points for Course Created By Override */
 
-  constructor(private service: CourseService) {}
+  constructor(private service: CourseService) { }
 
   /* POST Course End Point */
   @UseGuards(JwtAuthGuard)
@@ -114,4 +115,39 @@ export class CourseController {
   async delete(@Req() req, @Param('id') id: string): Promise<Course> {
     return this.service.delete(req, id);
   }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Post('startLive')
+  async startLive(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
+    let startedClass = await this.service.startLive(req, body)
+    return startedClass
+  }
+
+
+
+  @UseGuards(JwtAuthGuard)
+  @Post('join')
+  async join(@Req() req, @Body() body: StartLiveDTO): Promise<any> {    
+    let startedClass = await this.service.joinLive(req, body)
+    return startedClass
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('endLive')
+  async endLive(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
+ 
+    let startedClass = await this.service.endLive(req, body)
+    return startedClass
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('leave')
+  async leave(@Req() req, @Body() body: StartLiveDTO): Promise<any> {
+   
+    let startedClass = await this.service.leave(req, body)
+    return startedClass
+  }
+
 }
+

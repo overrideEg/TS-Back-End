@@ -14,6 +14,7 @@ import { CourseType } from '../../enums/course-type.enum';
 import { OFile } from '../../api-modules/file/entities/file.entity';
 import { Status } from '../../enums/status.enum';
 import { Excercice } from './sub-models/excercice.model';
+import { AttendanceLog } from '../learning-class.model';
 
 export const random = (min, max) =>
   Math.floor(Math.random() * (max - min)) + min;
@@ -172,6 +173,26 @@ export class Course {
   })
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Excercice.name }])
   excercices?: Excercice[];
+
+
+
+  @Prop()
+  liveStartTime?: number;
+  @Prop()
+  liveEndTime?: number;
+
+  @Prop()
+  attenders: number;
+
+  @Prop()
+  teacherToken?: string;
+
+  @Prop()
+  studentToken?: string;
+
+  @Prop([AttendanceLog])
+  attendanceLogs?: AttendanceLog[];
+
 }
 export const CourseSchema = SchemaFactory.createForClass(Course);
 CourseSchema.index({
