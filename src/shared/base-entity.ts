@@ -12,5 +12,5 @@ export class OBaseEntity {
 
   @ApiProperty({ description: 'updatedAt', required: true })
   @Prop({})
-  updatedAt?: string;
+  updatedAt?: number;
 }

@@ -34,7 +34,7 @@ export class Course {
 
   @ApiProperty({ description: 'updatedAt', required: true })
   @Prop({})
-  updatedAt?: string;
+  updatedAt?: number;
 
   @ApiProperty({
     enum: [Status.pending, Status.approved],

@@ -19,7 +19,7 @@ export class Pricing extends OBaseEntity {
 
   @ApiProperty({ description: 'updatedAt', required: true })
   @Prop({})
-  updatedAt?: string;
+  updatedAt?: number;
 
   @ApiProperty({ description: 'sessionAppleId', required: true })
   @Prop()
