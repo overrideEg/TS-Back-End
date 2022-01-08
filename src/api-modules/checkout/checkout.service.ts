@@ -282,8 +282,8 @@ export class CheckoutService {
                 : `لديــك اشتــراك جديــد`,
             body:
               course.teacher.defaultLang === Lang.en
-                ? `you have a new subscription ${course.name} with amount ${checkout.priceAfterDiscount}`
-                : `لديك اشتراك جديد في دورة ${course.name} بمبلغ ${checkout.priceAfterDiscount}`,
+                ? `you have a new subscription ${course.name.en} with amount ${checkout.priceAfterDiscount}`
+                : `لديك اشتراك جديد في دورة ${course.name.ar} بمبلغ ${checkout.priceAfterDiscount}`,
           },
           data: {
             entityType: 'Course',

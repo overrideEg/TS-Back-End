@@ -28,6 +28,7 @@ import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import { Agora } from '../../security/constants';
 import { AttendanceLog } from '../../database-models/learning-class.model';
 const ObjectId = require('mongoose').Types.ObjectId;
+import * as moment from 'moment';
 @Injectable()
 export class CourseService {
   constructor(
@@ -306,28 +307,14 @@ export class CourseService {
     if (req.user.userType !== UserType.teacher.toString()) {
       throw new BadRequestException('only teacher can view this request');
     }
-    let teacher = await this.userService.findOne(req.user._id);
-    let courses = [];
-    if (teacher) {
-      courses = await this.CourseModel.find({ teacher: teacher['_id'] }).exec();
-    }
 
-    let dayOfWeek = new Date(timeStamp).getDay();
-    courses = courses.filter((course) => {
-      let today = course.Days.find(
-        (day) => OverrideUtils.dayOffDay(day) === dayOfWeek,
-      );
-      let notFinished = course.content.find((content) =>
-        content.lessons.find(
-          (lesson) =>
-            lesson.isDone == false ||
-            lesson.isDone == null ||
-            lesson.isDone == undefined,
-        ),
-      );
+    let courses = await this.CourseModel.find({
+      $and: [
+        { teacher: new ObjectId(req.user._id) },
+        { startDate: { $gte: moment.unix(timeStamp).startOf('day').unix() * 1000, $lte: moment.unix(timeStamp).endOf('day').unix() * 1000 } },
+      ]
+    }).exec();
 
-      return today && notFinished;
-    });
 
     return courses;
   }
@@ -482,27 +469,27 @@ export class CourseService {
   async startLive(req, body: StartLiveDTO) {
     let course = await this.findOne(req, body.courseId);
 
-    
+
     if (course.teacher['_id'].toString() !== req.user._id)
-    throw new BadRequestException('only teacher can start his live');
-    
+      throw new BadRequestException('only teacher can start his live');
+
     const expirationTimeInSeconds = 3600
     const currentTimestamp = Math.floor(Date.now() / 1000)
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-    
+
     if (course) {
       if (course.liveEndTime) {
         throw new Error(`This Lesson has Ended At ${new Date(course.liveEndTime).toTimeString()}`);
-        
+
       }
     }
 
     course['liveStartTime'] = Date.now();
 
     const teacherToken = RtcTokenBuilder.buildTokenWithUid(Agora.appId, Agora.appCertificate, body.courseId, 0, RtcRole.PUBLISHER, privilegeExpiredTs);
-    console.log('teacherToken',teacherToken);
+    console.log('teacherToken', teacherToken);
     course['teacherToken'] = teacherToken;
-    
+
     course['attenders'] = 0;
 
     var checkouts = await this.checkoutService.CheckoutModel.find({ course: new ObjectId(body.courseId) }).exec()
@@ -518,7 +505,7 @@ export class CourseService {
       // })
 
     }
-    await this.CourseModel.findByIdAndUpdate(course._id, { $set: {teacherToken : course.teacherToken,attenders: 0,liveStartTime: course.liveStartTime} })
+    await this.CourseModel.findByIdAndUpdate(course._id, { $set: { teacherToken: course.teacherToken, attenders: 0, liveStartTime: course.liveStartTime } })
 
     return course
   }
@@ -582,7 +569,7 @@ export class CourseService {
   }
 
   async endLive(req, body: StartLiveDTO) {
-    let course = await this.findOne(req,body.courseId);
+    let course = await this.findOne(req, body.courseId);
 
     if (course.teacher['_id'].toString() !== req.user._id)
       throw new BadRequestException('only teacher can end his live');
