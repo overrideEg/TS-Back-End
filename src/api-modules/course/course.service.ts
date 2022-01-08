@@ -311,7 +311,7 @@ export class CourseService {
     let courses = await this.CourseModel.find({
       $and: [
         { teacher: new ObjectId(req.user._id) },
-        { startDate: { $gte: moment.unix(timeStamp).startOf('day').unix() * 1000, $lte: moment.unix(timeStamp).endOf('day').unix() * 1000 } },
+        // { startDate: { $gte: moment.unix(timeStamp).startOf('day').unix() * 1000, $lte: moment.unix(timeStamp).endOf('day').unix() * 1000 } },
       ]
     }).exec();
 
