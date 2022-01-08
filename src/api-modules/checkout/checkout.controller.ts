@@ -18,13 +18,14 @@ import { CheckoutDTO } from '../../dtos/checkout-dto';
 import { Checkout } from '../../database-models/checkout.model';
 import { JwtAuthGuard } from '../../security/jwt-auth.guard';
 import { CheckoutService } from './checkout.service';
+import { InAppPurchaseRequest } from '../../dtos/in-app-purchase-request.dto';
 
 @ApiTags('Checkout')
 @Controller('Checkout')
 export class CheckoutController {
   /* CRUD End Points for Checkout Created By Override */
 
-  constructor(private service: CheckoutService) {}
+  constructor(private service: CheckoutService) { }
   /* POST Checkout End Point */
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -50,7 +51,20 @@ export class CheckoutController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('inAppPurchase')
+  verifyInAppPurchase(@Req() req,@Body() body: InAppPurchaseRequest) {
+    return this.service.verifyInAppPurchase(req,body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('purchased/:courseId')
+  purchased(@Req() req,@Param('courseId') courseId: string) {
+    return this.service.purchased(req,courseId);
+  }
+
   @Redirect('https://tsacademy.info/homePage', 301)
+
   @Get('authorize/:paymentMethod/:paymentId')
   authorize(
     @Param('paymentMethod') paymentMethod: string,

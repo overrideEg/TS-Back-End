@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "ts-academy-336923",
+  "private_key_id": "e6156fa56c54d08f265aa462cf70cd24757e0d80",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC5hxg/xK1rdN9u\nMT90CoMepKt2Dl7Bxc8iOyKauomr7VAltrb0sIX/9qtVWZwIg3qHwYJvIBAetaOb\nBVvQNzU2YdXd0AywNkXeSaCTl6oY4YOHtw70nAzfdVxbuYLRs+bSOXYGhMCzq4Ko\nCksRjly1gPNlL8FxiSabrXjBR+wUuqmXIsgENJhoXrCn4nqU9qyN+J1P0Nzv7Ork\nWVgIrGZ3dpVVb6juhOKq7V77Y7UPjO8jS7m1HfFGO3jL+jlD68l6ksNdwnocZJcP\nEm5tohgEaw5WWw65C1VUfLja5gAKUFyXLdjHAjTkBCmMfvvxVoEvKP8jWm83816h\n29n8PBAbAgMBAAECggEAM6NfY3hZkHwiKCh68dBvOFs7Agvz4dkt0uhEtG5RHVJb\nKXQWrjpnwZuliob7f/8gXqLErCtvcSy7Uc2HBYgoPm+yuB9NOMqSXdF+aTYgePZj\nxqVz+y9oAdZHk5wpxjZde4vUxvGyNQ/6uMzMoiFOupIerL5DCFfVMCVzY9Ch7A6i\n3boPi8CSLls4Hx5MdFOdIFyA4q3M5ZgnpeuOdsM/1EKkdy2e99n3oWonLuOly9Tx\n6LYmExH2syTZSq72VYA0CLCAE46rMdANi357dl6zfnTxU3YMaPn1FtotwcC5vsuQ\nvSxA3IttR8JzOUZzXlKnN3uN/51L23/jex74z+JHGQKBgQDmcIuCbWKFmhgG5EOY\nWG/L5IkE2DeQwp/Zpm+8GUkpHFMregCPZqWKBzj3AeRYk+nkdt7njnqp+Fz/aLK0\n/54POymqkyRY9yETb0sn8zLutU8FBRQskTTnn/Xz3XbkOw07nVegH2Ll1+PJ3T4/\nJLH+vBnrOfimlbD3fnOAp/uyrwKBgQDOG0CQYXJKSNFtgpRn9e7r8h/2HZnkmSBA\nm0tEv9uBZrlcKYUMHxCn9MGFFMhYGPcYzABhd2BvsYTfeuGrXCPwmqd3+K6RMFVV\nLUk71AqCVyxRuplkmrB2/AqkNO7XjaztERBPEgbFsN11V+hpFn2rRfvfQKSqJ3Zx\nQcWCetEEVQKBgGnbpZri2PF62jLARXUEm0bU00TQdqYfYgM/+/AyxXMHOgWs4/j8\nNGt16es+iUFPoZB8MuW4hAz0tPP3irCvBFMG4JslQPtFe4JMDABsLieOTqCFtsDK\na71DtF60i9tIbUnHe+tov6vKQzAGXIPxPXtBub5fQSR1e3gWNMUTZgKtAoGALBtm\n6L8B32XP87iTG+Bknfe14UyaZ3JhlZHmPLM2PW4HUvLLtzlaribR1zIIYdoN3y+h\nETqj16NMxSqd6rcQNehS2HjOmuGWEWFcn8IT8arIIEFnnEECbKQpftSZHGYEUMNr\nExDPhDUCX59NbFfU0vdqHG/QDV3emgQySWcRHfUCgYBR3BuA7byIRTU/TpKDx9k9\nYA0hW61mMyAbyZ4XDBhM9l8/HUU9KaA/xnIR7STGPU27K0JL64GioArkH5vBLoYE\n6masMEr0ZrL95Sx1goypr+NggBvyFAZgJoKrjMUlldVNw7/dgfKQ8lx9lJtAAz0V\nJqN34XCBIrKqRGVlPuWgGw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "ts-server@ts-academy-336923.iam.gserviceaccount.com",
+  "client_id": "115152991383448329011",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ts-server%40ts-academy-336923.iam.gserviceaccount.com"
+}

@@ -25,10 +25,20 @@ import { PricingService } from '../pricing/pricing.service';
 import { Course } from '../../database-models/course/course.model';
 import { Pricing } from '../../database-models/pricing.model';
 import { CourseType } from '../../enums/course-type.enum';
+import { AndroidPurchaseResponse } from '../../dtos/android-purchase-response.dto';
+import { InAppPurchaseRequest } from '../../dtos/in-app-purchase-request.dto';
+import { map } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 const ObjectId = require('mongoose').Types.ObjectId;
+
+const { google } = require('googleapis');
+const androidpublisher = google.androidpublisher('v3');
+
 
 @Injectable()
 export class CheckoutService {
+
+
   constructor(
     @InjectModel(Checkout.name) public CheckoutModel: Model<CheckoutDocument>,
     @Inject(forwardRef(() => CourseService))
@@ -53,7 +63,6 @@ export class CheckoutService {
     req,
     body: CheckoutDTO,
   ): Promise<Checkout[] | PromiseLike<any>> {
-    let pricing = await this.pricingService.getCurrentPricings();
     let promotion: Promotion;
     if (body.promoCode && body.promoCode !== null && body.promoCode !== '') {
       promotion = await this.promotionService.PromotionModel.findOne({
@@ -100,7 +109,7 @@ export class CheckoutService {
       course = await this.courseService.CourseModel.findById(course._id);
 
       checkout.course = course;
-      checkout.price = this.calculatePrice(course, pricing, body.paymentMethod);
+      checkout.price = await this.calculatePrice(course, body.paymentMethod);
 
       checkout.valueDate = Date.now();
       checkout.priceBeforeDiscount = checkout.price;
@@ -128,51 +137,50 @@ export class CheckoutService {
     await this.userService.update(req.user._id, user);
 
     let paymentResult: any;
-    if (body.paymentMethod !== PaymentMethod.APPLE && body.paymentMethod !== PaymentMethod.ANDROID) {
 
-      await this.httpService.post('/v1/checkouts', null, {
-        baseURL: Payment.baseURL,
-        method: 'POST',
-        headers: {
-          'Authorization': Payment.token
-        },
-        params: {
-          'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
-          'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
-          'merchantTransactionId': checkouts.reduce((acc, check) => acc + '-' + check['_id'].toString(), ''),
-          'customer.email': req.user.email,
-          'currency': Payment.Currency,
-          'paymentType': Payment.paymentType,
-        }
-      }).toPromise().then(res => {
-        if (res.data['result']['code'] === '000.200.100' || res.data['result']['code'] === '000.000.000')
-          paymentResult = res.data
-        else throw new BadRequestException(res.data['result']['description']);
-      }).catch (async err => {
-        console.log(err.response.data.result)
-  
-        await this.CheckoutModel.deleteMany(checkouts);
-  
-        throw new BadRequestException(err.response.data.result.description)
-      });
-    }
-
-    if (body.paymentMethod !== PaymentMethod.APPLE && body.paymentMethod !== PaymentMethod.ANDROID) {
-      for await (const checkout of checkouts) {
-
-        checkout.paymentResult = paymentResult;
-        checkout.paymentId = paymentResult.id;
-        await this.CheckoutModel.findByIdAndUpdate(checkout._id);
+    await firstValueFrom(this.httpService.post('/v1/checkouts', null, {
+      baseURL: Payment.baseURL,
+      method: 'POST',
+      headers: {
+        'Authorization': Payment.token
+      },
+      params: {
+        'entityId': body.paymentMethod !== PaymentMethod.MADA ? Payment.entityIdVisaMaster : Payment.entityIdMada,
+        'amount': checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0).toFixed(0),
+        'merchantTransactionId': checkouts.reduce((acc, check) => acc + '-' + check['_id'].toString(), ''),
+        'customer.email': req.user.email,
+        'currency': Payment.Currency,
+        'paymentType': Payment.paymentType,
       }
+    })).then(res => {
+      if (res.data['result']['code'] === '000.200.100' || res.data['result']['code'] === '000.000.000')
+        paymentResult = res.data
+      else throw new BadRequestException(res.data['result']['description']);
+    }).catch(async err => {
+      console.log(err.response.data.result)
+
+      await this.CheckoutModel.deleteMany(checkouts);
+
+      throw new BadRequestException(err.response.data.result.description)
+    });
+
+
+    for await (const checkout of checkouts) {
+
+      checkout.paymentResult = paymentResult;
+      checkout.paymentId = paymentResult.id;
+      await this.CheckoutModel.findByIdAndUpdate(checkout._id, { $set: checkout });
     }
 
-    return checkouts;
+    return { _id: paymentResult.id, paymentMethod: body.paymentMethod }
   }
-  calculatePrice(
+  async calculatePrice(
     course: Course,
-    pricing: Pricing,
     paymentMethod: PaymentMethod,
-  ): number {
+  ): Promise<number> {
+    let pricing = await this.pricingService.getCurrentPricings();
+
+
     switch (course.type) {
       case CourseType.home:
         return course.price ?? 0;
@@ -204,26 +212,21 @@ export class CheckoutService {
     if (
       checkouts.reduce((acc, check) => acc + check.priceAfterDiscount, 0) > 0
     ) {
-      await this.httpService
+      await firstValueFrom(this.httpService
         .get(path, {
           baseURL: Payment.baseURL,
           method: 'GET',
           headers: {
             Authorization: Payment.token,
           },
-        })
-        .toPromise()
-        .then((res) => {
+        })).then((res) => {
           paymentResult = res.data;
           console.log(res.data.result);
-        })
-        .catch(async (err) => {
+          return res;
+        }).catch((err) => {
           paymentResult = err.response.data;
+        })
 
-          // await this.CheckoutModel.deleteMany(checkouts);
-
-          // throw new BadRequestException(err.response.data.result.description)
-        });
     }
     for await (const checkout of checkouts) {
       if (
@@ -292,5 +295,89 @@ export class CheckoutService {
     }
 
     return paymentResult.result;
+  }
+
+
+  purchased(req: any, courseId: string) {
+    return this.CheckoutModel.exists({
+      $and: [
+        { course: new ObjectId(courseId) },
+        { user: new ObjectId(req.user._id) },
+        { paymentStatus: PaymentStatus.Paid },
+      ]
+    });
+  }
+
+  async verifyInAppPurchase(req, body: InAppPurchaseRequest) {
+    if (body.appType === PaymentMethod.ANDROID) {
+
+      const auth = new google.auth.GoogleAuth({
+        keyFile: './ts-academy-336923-e6156fa56c54.json',
+        // Scopes can be specified either as an array or as a single, space-delimited string.
+        scopes: ['https://www.googleapis.com/auth/androidpublisher'],
+      });
+
+      // Acquire an auth client, and bind it to all future calls
+      const authClient = await auth.getClient();
+
+      google.options({ auth: authClient });
+
+      const res = await androidpublisher.purchases.products.get({
+
+        // The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+        packageName: 'com.ts_academy',
+        // The purchased subscription ID (for example, 'monthly001').
+        productId: body.productId,
+        // The token provided to the user's device when the subscription was purchased.
+        token: body.orderToken,
+      });
+      const data = res.data as AndroidPurchaseResponse;
+
+      if (res.status === 200 && data.purchaseState === 0 && data.consumptionState === 1) {
+
+        if (await this.CheckoutModel.exists({ paymentId: data.orderId })) {
+          throw new BadRequestException('you are already purchased this course')
+        }
+        let checkout = new Checkout();
+
+        if (body.purchasedFor) {
+          checkout.user = await this.userService.UserModel.findOne({
+            studentId: body.purchasedFor,
+          }).exec();
+          if (!checkout.user)
+            throw new BadRequestException(
+              req.user.defaultLang === Lang.en
+                ? 'please enter correct student id'
+                : 'لا يوجد طالب بالكود الموجود',
+            );
+        } else {
+          checkout.user = new ObjectId(req.user._id);
+        }
+
+        let course = await this.courseService.CourseModel.findById(body.courseId);
+
+        checkout.course = course;
+        checkout.price = await this.calculatePrice(course, body.appType);
+
+        checkout.valueDate = Date.now();
+        checkout.priceBeforeDiscount = checkout.price;
+        checkout.priceAfterDiscount = checkout.price;
+        checkout.paymentResult = data;
+        checkout.paymentMethod = body.appType;
+        checkout.paymentStatus = PaymentStatus.Paid;
+        checkout.discount = 0;
+        checkout.paymentId = data.orderId;
+
+        let checkoutSaved = await this.CheckoutModel.create(checkout);
+
+        return true;
+      } else {
+        return false;
+      }
+    }
+    if (body.appType === PaymentMethod.APPLE) {
+
+    }
+
   }
 }
