@@ -335,9 +335,9 @@ export class CheckoutService {
 
       if (res.status === 200 && data.purchaseState === 0 && data.consumptionState === 1) {
 
-        if (await this.CheckoutModel.exists({ paymentId: data.orderId })) {
-          throw new BadRequestException('you are already purchased this course')
-        }
+        // if (await this.CheckoutModel.exists({ paymentId: data.orderId })) {
+        //   throw new BadRequestException('you are already purchased this course')
+        // }
         let checkout = new Checkout();
 
         if (body.purchasedFor) {
