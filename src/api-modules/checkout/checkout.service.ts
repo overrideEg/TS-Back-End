@@ -370,7 +370,7 @@ export class CheckoutService {
 
         let checkoutSaved = await this.CheckoutModel.create(checkout);
 
-        return true;
+        return checkoutSaved ? true : false;
       } else {
         return false;
       }
