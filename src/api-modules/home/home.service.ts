@@ -25,7 +25,7 @@ export class HomeService {
     private subjectService: SubjectService,
     private courseService: CourseService,
     private checkoutService: CheckoutService,
-  ) {}
+  ) { }
   async getStudentHome(
     req: any,
   ): Promise<StudentHome | PromiseLike<StudentHome>> {
@@ -51,6 +51,7 @@ export class HomeService {
           newRoot: '$_id',
         },
       },
+
       { $limit: 10 },
       {
         $lookup: {
@@ -102,7 +103,9 @@ export class HomeService {
           as: 'reviews',
         },
       },
-    
+      { $sort: { createdAt: -1 } },
+
+      { $match: { startDate: { $gte: Date.now() } } },
 
       {
         $unset: [
@@ -186,7 +189,7 @@ export class HomeService {
         },
       },
 
-     
+
 
 
 
@@ -217,6 +220,8 @@ export class HomeService {
         ],
       },
       { $sort: { createdAt: -1 } },
+      { $match: { startDate: { $gte: Date.now() } } },
+
       { $limit: 10 },
     ]);
 
@@ -280,7 +285,7 @@ export class HomeService {
       {
         $unset: [
           'attachements',
-          
+
           'days',
           'reviews.user',
           'grade.stage',
@@ -341,7 +346,7 @@ export class HomeService {
       profile.rate =
         latestFeedback.length > 0
           ? latestFeedback.reduce((acc, feedBack) => acc + feedBack.stars, 0) /
-            profile.noOfReviews
+          profile.noOfReviews
           : 5;
 
       profile.bio = course.teacher?.bio ?? course?.teacher?.name;
@@ -445,9 +450,9 @@ export class HomeService {
     home.rate =
       home.latestFeedback.length > 0
         ? home.latestFeedback.reduce(
-            (acc, feedBack) => acc + feedBack.stars,
-            0,
-          ) / home.noOfCourses
+          (acc, feedBack) => acc + feedBack.stars,
+          0,
+        ) / home.noOfCourses
         : 5;
 
     let registers = await this.checkoutService.CheckoutModel.countDocuments()
@@ -461,7 +466,7 @@ export class HomeService {
       });
     home.noOfStudents = registers;
 
-    let todayCourses = teacherCourses.filter((course)=>course.startDate >= moment().startOf('day'));
+    let todayCourses = teacherCourses.filter((course) => course.startDate >= moment().startOf('day'));
 
     home.todayCourses = todayCourses;
     return home;

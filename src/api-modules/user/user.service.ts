@@ -53,7 +53,7 @@ export class UserService {
     private checkoutService: CheckoutService,
     @Inject(forwardRef(() => NoticeService))
     private noticeService: NoticeService,
-  ) {}
+  ) { }
 
   async login(username: string, defaultLang?: Lang) {
     let user = await this.UserModel.findOne({
@@ -159,7 +159,10 @@ export class UserService {
   async getTeacherProfile(id: string): Promise<TeacherProfile> {
     let user = await this.findOne(id);
     let courses = await this.courseService.CourseModel.find({
-      teacher: new ObjectId(id),
+      $and: [
+        { teacher: new ObjectId(id) },
+        { startDate: { $gte: Date.now() } }
+      ]
     })
       .sort({ createdAt: 'desc' })
       .exec();
@@ -178,12 +181,12 @@ export class UserService {
         course.reviews.length == 0
           ? 5
           : course.reviews.reduce((acc, review) => acc + review.stars, 0) /
-            course.reviews.length;
+          course.reviews.length;
     }
     let profile = new TeacherProfile();
     profile.bio = user.bio;
     profile.courses = courses;
-    profile.noOfCourses = courses.length;
+    profile.noOfCourses = await this.courseService.CourseModel.count({ teacher: new ObjectId(id) });
     profile.name = user.name;
     profile.userId = user['_id'];
     profile.avatar = user['avatar'] ?? '';
@@ -228,8 +231,8 @@ export class UserService {
         (wall.type === TransactionType.in
           ? wall.value
           : wall.status === Status.approved
-          ? wall.value
-          : 0),
+            ? wall.value
+            : 0),
       0,
     );
     if (balance > amount)
@@ -275,12 +278,10 @@ export class UserService {
               : 'لديك طلب سحب جديد',
           body:
             admin.defaultLang === Lang.en
-              ? `you have request to withdraw (${amount}) from ${
-                  teacher.name
-                } with status ${wallet.status.toString()}`
-              : `لديك طلب سحب مبلغ ${amount} من ${
-                  teacher.name
-                } وحالته ${wallet.status.toString()}`,
+              ? `you have request to withdraw (${amount}) from ${teacher.name
+              } with status ${wallet.status.toString()}`
+              : `لديك طلب سحب مبلغ ${amount} من ${teacher.name
+              } وحالته ${wallet.status.toString()}`,
         },
         data: {
           entityType: 'Wallet',
@@ -428,9 +429,9 @@ export class UserService {
     let lastMonthReviews = reviews.filter(
       (rev) =>
         rev.valueDate >=
-          moment().subtract(1, 'month').startOf('month').unix() * 1000 &&
+        moment().subtract(1, 'month').startOf('month').unix() * 1000 &&
         rev.valueDate <=
-          moment().subtract(1, 'month').endOf('month').unix() * 1000,
+        moment().subtract(1, 'month').endOf('month').unix() * 1000,
     );
 
     if (lastMonthReviews.length > 0)
