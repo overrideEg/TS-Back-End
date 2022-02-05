@@ -295,7 +295,7 @@ export class CourseService {
       throw new BadRequestException('only teacher can view this request');
     }
 
-    let courses = await this.CourseModel.find({ teacher: new ObjectId(req.user._id) });
+    let courses = await this.CourseModel.find({teacher: new ObjectId(req.user._id) }).sort( { createdAt: -1 });
 
     return courses;
   }
