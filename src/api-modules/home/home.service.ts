@@ -105,7 +105,7 @@ export class HomeService {
       },
       { $sort: { createdAt: -1 } },
 
-      { $match: { startDate: { $gte: Date.now() } } },
+      // { $match: { startDate: { $gte: Date.now() } } },
 
       {
         $unset: [
@@ -220,7 +220,7 @@ export class HomeService {
         ],
       },
       { $sort: { createdAt: -1 } },
-      { $match: { startDate: { $gte: Date.now() } } },
+      // { $match: { startDate: { $gte: Date.now() } } },
 
       { $limit: 10 },
     ]);
@@ -309,12 +309,12 @@ export class HomeService {
           'teacher.phone',
         ],
       },
-      {
-        $match: {
-          startDate: { $gte: now.unix() * 1000, $lte: afterWeek.unix() * 1000 },
-        },
-      },
-      { $sort: { createdAt: -1 } },
+      // {
+      //   $match: {
+      //     startDate: { $gte: now.unix() * 1000, $lte: afterWeek.unix() * 1000 },
+      //   },
+      // },
+      { $sort: { startDate: -1 } },
       { $limit: 10 },
     ]);
 
