@@ -39,6 +39,7 @@ const androidpublisher = google.androidpublisher('v3');
 export class CheckoutService {
 
 
+
   constructor(
     @InjectModel(Checkout.name) public CheckoutModel: Model<CheckoutDocument>,
     @Inject(forwardRef(() => CourseService))
@@ -306,6 +307,17 @@ export class CheckoutService {
         { paymentStatus: PaymentStatus.Paid },
       ]
     });
+  }
+
+
+  async subscribers(req: any, courseId: string)  {
+    return await (await this.CheckoutModel.find({
+      $and: [
+        { course: new ObjectId(courseId) },
+        // { user: new ObjectId(req.user._id) },
+        { paymentStatus: PaymentStatus.Paid },
+      ]
+    })).map((res)=>res.course);
   }
 
   async verifyInAppPurchase(req, body: InAppPurchaseRequest) {

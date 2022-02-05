@@ -63,6 +63,12 @@ export class CheckoutController {
     return this.service.purchased(req,courseId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('subscribers/:courseId')
+  subscribers(@Req() req,@Param('courseId') courseId: string) {
+    return this.service.subscribers(req,courseId);
+  }
+
   @Redirect('https://tsacademy.info/homePage', 301)
 
   @Get('authorize/:paymentMethod/:paymentId')

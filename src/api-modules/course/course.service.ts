@@ -296,7 +296,6 @@ export class CourseService {
     }
 
     let courses = await this.CourseModel.find({teacher: new ObjectId(req.user._id) }).sort( { createdAt: -1 });
-
     return courses;
   }
 
