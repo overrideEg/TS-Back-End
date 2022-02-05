@@ -317,7 +317,7 @@ export class CheckoutService {
         // { user: new ObjectId(req.user._id) },
         { paymentStatus: PaymentStatus.Paid },
       ]
-    })).map((res)=>res.course);
+    })).map((res)=>res.user);
   }
 
   async verifyInAppPurchase(req, body: InAppPurchaseRequest) {
