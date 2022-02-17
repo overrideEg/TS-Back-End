@@ -48,7 +48,7 @@ export class AuthService {
   sign(user: User) {
     return this.jwtService.sign({
       _id: user['_id'],
-      email: user['email'],
+      username: user['username'],
       phone: user['phone'],
       userType: user['userType'],
       defaultLang: user['defaultLang'],
@@ -160,6 +160,19 @@ export class AuthService {
     user.isActive = true;
     user.tempCode = '';
     user = await this.userService.update(user['_id'], user);
+    return {
+      ...user['_doc'],
+      token: this.sign(user),
+    };
+  }
+  async signInUsingToken(reqUser){
+    if (reqUser.macAddress){
+      return {
+        ...reqUser,
+        token : this.requestToken(reqUser.macAddress)
+      }
+    }
+    let user = await this.userService.login(reqUser.email, reqUser.defaultLang);
     return {
       ...user['_doc'],
       token: this.sign(user),

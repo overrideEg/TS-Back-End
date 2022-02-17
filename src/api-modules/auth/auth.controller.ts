@@ -36,7 +36,7 @@ export class AuthController {
   @Post('/loginByToken')
   @UseGuards(JwtAuthGuard)
   public signInUsingToken(@Req() req) {
-    return req.user
+    return this.service.signInUsingToken(req.user)
   }
 
   @Put('/activate/:code')
