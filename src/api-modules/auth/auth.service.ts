@@ -172,7 +172,10 @@ export class AuthService {
         token : this.requestToken(reqUser.macAddress)
       }
     }
-    let user = await this.userService.login(reqUser.email, reqUser.defaultLang);
+    let user = await this.userService.login(reqUser.email??reqUser.phone, reqUser.defaultLang);
+    if (!user){
+      throw new UnauthorizedException('invalid token')
+    }
     return {
       ...user['_doc'],
       token: this.sign(user),
