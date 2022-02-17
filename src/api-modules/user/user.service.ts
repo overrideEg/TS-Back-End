@@ -235,7 +235,7 @@ export class UserService {
             : 0),
       0,
     );
-    if (balance > amount)
+    if (balance < amount)
       throw new BadRequestException(
         `your balance is ${balance} and you requested ${amount}`,
       );
