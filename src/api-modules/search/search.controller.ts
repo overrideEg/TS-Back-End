@@ -43,8 +43,8 @@ export class SearchController {
   async filter(
     @Req() req,
     @Query('subjectId') subjectId: string,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 1000,
     @Query('gradeId') gradeId: string,
     @Query('stageId') stageId: string,
     @Query('cityId') cityId: string,

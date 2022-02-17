@@ -33,6 +33,11 @@ export class AuthController {
   public login(@Body() body: Login) {
     return this.service.login(body);
   }
+  @Post('/loginByToken')
+  @UseGuards(JwtAuthGuard)
+  public signInUsingToken(@Req() req) {
+    return req.user
+  }
 
   @Put('/activate/:code')
   @UseGuards(JwtAuthGuard)
