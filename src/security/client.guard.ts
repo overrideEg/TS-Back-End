@@ -23,7 +23,7 @@ export class ClientGuard
     let token;
     const authHeader = req.headers['authorization'] as string;
     if (authHeader) {
-      token = authHeader.substr(7);
+      token = authHeader.substring(7);
     } else
       throw new UnauthorizedException(
         'You Are Can Not Login Auth Token is Required',
