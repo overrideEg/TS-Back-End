@@ -27,7 +27,7 @@ export class PricingController {
   }
 
   /* GET  Pricings End Point */
-  @UseGuards(ClientGuard)
+  // @UseGuards(ClientGuard)
   @Get()
   getHome(): Promise<Pricing> {
     return this.service.getCurrentPricings();

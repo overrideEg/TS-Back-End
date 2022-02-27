@@ -27,7 +27,7 @@ export class SettingController {
   }
 
   /* GET  Settings End Point */
-  // @ApiBearerAuth()
+  @ApiBearerAuth()
   // @UseGuards(ClientGuard)
   @Get()
   getHome(): Promise<Setting> {
