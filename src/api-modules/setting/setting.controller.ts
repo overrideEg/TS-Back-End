@@ -20,7 +20,7 @@ export class SettingController {
   constructor(private service: SettingService) {}
   /* POST Setting End Point */
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post()
   async saveHome(@Body() req: Setting): Promise<Setting> {
     return this.service.save(req);
